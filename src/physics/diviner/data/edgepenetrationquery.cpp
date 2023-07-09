@@ -1,6 +1,8 @@
 
 #include <physics/diviner/data/edgepenetrationquery.hpp>
 #include <physics/diviner/physics_statics.hpp>
+#include <rendering/debugrendering.hpp>
+
 
 namespace legion::physics
 {

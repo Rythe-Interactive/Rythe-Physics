@@ -1,9 +1,6 @@
 #include <physics/diviner/broadphasecollisionalgorithms/broadphaseuniformgrid.hpp>
 #include <physics/diviner/physics_contact.hpp>
 
-#ifdef RYTHE_GRAPHICS
-#include <graphics/debuggraphics.hpp>
-#endif
 
 namespace legion::physics
 {
@@ -210,10 +207,7 @@ namespace legion::physics
         {
             int childCount = m_groupings.at(listIndex).size();
             math::ivec3 pos = index * m_cellSize;
-
-#ifdef RYTHE_GRAPHICS
             debug::drawCube(pos, pos + m_cellSize, childCount > 1 ? math::colors::red : math::colors::blue, 5.0f);
-#endif
         }
     }
 }

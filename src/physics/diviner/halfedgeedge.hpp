@@ -2,6 +2,8 @@
 #include <core/core.hpp>
 #include <physics/diviner/data/edge_label.hpp>
 
+#include <rendering/debugrendering.hpp>
+
 namespace legion::physics
 {
     struct HalfEdgeFace;

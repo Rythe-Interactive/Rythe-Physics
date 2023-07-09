@@ -1,9 +1,6 @@
 #include <physics/diviner/halfedgeface.hpp>
+#include <rendering/debugrendering.hpp>
 #include <physics/diviner/physics_statics.hpp>
-
-#ifdef RYTHE_GRAPHICS
-#include <graphics/debuggraphics.hpp>
-#endif
 
 namespace legion::physics
 {
@@ -158,9 +155,7 @@ namespace legion::physics
         math::vec3 worldStart = transform * math::vec4(centroid, 1);
         math::vec3 worldEnd = transform * math::vec4(centroid + normal * 0.1f, 1);
 
-#ifdef RYTHE_GRAPHICS
         debug::drawLine(worldStart, worldEnd, math::colors::green, 3.0f, time, false);
-#endif
 
         forEachEdge(drawFunc);
     }

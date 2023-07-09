@@ -3,10 +3,6 @@
 #include <physics/diviner/data/collider_face_to_vert.hpp>
 #include <physics/diviner/physics_statics.hpp>
 
-#ifdef RYTHE_GRAPHICS
-#include <graphics/debuggraphics.hpp>
-#endif
-
 namespace legion::physics
 {
     HalfEdgeEdge::HalfEdgeEdge(math::vec3 newEdgePositionPtr) : edgePosition{ newEdgePositionPtr } {}
@@ -66,9 +62,7 @@ namespace legion::physics
         math::vec3 worldStart = transform * math::vec4(edgePosition, 1);
         math::vec3 worldEnd = transform * math::vec4(nextEdge->edgePosition, 1);
 
-#ifdef RYTHE_GRAPHICS
         debug::drawLine(worldStart, worldEnd, debugColor, width, time, true);
-#endif
     }
 
     void HalfEdgeEdge::DEBUG_drawInsetEdge(const math::vec3 spacing, const math::color& debugColor, float time, float width)
@@ -81,9 +75,7 @@ namespace legion::physics
         math::vec3 worldEnd = nextEdge->edgePosition + spacing;
         math::vec3 endDifference = (worldCentroid - worldEnd) * 0.1f;
 
-#ifdef RYTHE_GRAPHICS
         debug::drawLine(worldStart + startDifference, worldEnd + endDifference, debugColor, width, time, true);
-#endif
     }
 
     void HalfEdgeEdge::DEBUG_directionDrawEdge(const math::mat4& transform, const math::color& debugColor, float time, float width)
@@ -96,16 +88,12 @@ namespace legion::physics
         math::vec3 startDifference = (worldCentroid - worldStart) * 0.1f;
         math::vec3 endDifference = (worldCentroid - worldEnd) * 0.1f;
 
-#ifdef RYTHE_GRAPHICS
         debug::drawLine(worldStart + startDifference, worldEnd + endDifference, debugColor, width, time, true);
-#endif
 
         math::vec3 pointStart = worldStart + startDifference;
         math::vec3 diff = worldEnd + endDifference - (worldStart + startDifference);
 
-#ifdef RYTHE_GRAPHICS
         debug::drawLine(pointStart + diff * 0.75f, worldCentroid, math::colors::red, width, time, true);
-#endif
     }
 
     void HalfEdgeEdge::suicidalMergeWithPairing(std::vector<math::vec3>& unmergedVertices, math::vec3& normal, float scalingEpsilon)

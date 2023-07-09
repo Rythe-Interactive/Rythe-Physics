@@ -8,6 +8,7 @@
 #include <physics/diviner/halfedgeface.hpp>
 #include <physics/diviner/data/convex_convergence_identifier.hpp>
 #include <physics/diviner/data/physics_manifold.hpp>
+#include <rendering/debugrendering.hpp>
 
 namespace legion::physics
 {

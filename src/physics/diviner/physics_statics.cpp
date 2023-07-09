@@ -1,5 +1,6 @@
 #include <core/core.hpp>
 #include <physics/diviner/physics_statics.hpp>
+#include <rendering/debugrendering.hpp>
 
 namespace legion::physics
 {

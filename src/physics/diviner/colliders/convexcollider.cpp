@@ -1,13 +1,11 @@
 #include <physics/diviner/colliders/convexcollider.hpp>
 #include <physics/diviner/physics_statics.hpp>
+#include <physics/diviner/data/identifier.hpp>
 #include <physics/diviner/data/convexconvexpenetrationquery.hpp>
 #include <physics/diviner/data/edgepenetrationquery.hpp>
 #include <physics/diviner/data/pointer_encapsulator.hpp>
 #include <physics/diviner/systems/physicssystem.hpp>
-
-#ifdef RYTHE_GRAPHICS
-#include <graphics/debuggraphics.hpp>
-#endif
+#include <rendering/debugrendering.hpp>
 
 namespace legion::physics
 {
@@ -124,16 +122,16 @@ namespace legion::physics
         math::mat4& refTransform = manifold.penetrationInformation->isARef ? manifold.transformA : manifold.transformB;
         math::mat4& incTransform = manifold.penetrationInformation->isARef ? manifold.transformB : manifold.transformA;
 
-        physicsComponent* refPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompA : manifold.physicsCompB;
-        physicsComponent* incPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompB : manifold.physicsCompA;
+        diviner::physics_component* refPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompA : manifold.physicsCompB;
+        diviner::physics_component* incPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompB : manifold.physicsCompA;
 
         PhysicsCollider* refCollider = manifold.penetrationInformation->isARef ? manifold.colliderA : manifold.colliderB;
         PhysicsCollider* incCollider = manifold.penetrationInformation->isARef ? manifold.colliderB : manifold.colliderA;
 
         manifold.penetrationInformation->populateContactList(manifold, refTransform, incTransform, refCollider);
 
-        rigidbody* refRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyA : manifold.rigidbodyB;
-        rigidbody* incRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyB : manifold.rigidbodyA;
+        diviner::rigidbody* refRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyA : manifold.rigidbodyB;
+        diviner::rigidbody* incRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyB : manifold.rigidbodyA;
 
         math::vec3 refWorldCentroid = refTransform * math::vec4(refPhysicsComp->localCenterOfMass,1);
         math::vec3 incWorldCentroid = incTransform * math::vec4(incPhysicsComp->localCenterOfMass,1);
@@ -172,9 +170,7 @@ namespace legion::physics
             math::vec3 faceStart = transform * math::vec4(face->centroid, 1);
             math::vec3 faceEnd = faceStart + math::vec3((transform * math::vec4(face->normal, 0))) * 0.5f;
 
-#ifdef RYTHE_GRAPHICS
             debug::user_projectDrawLine(faceStart, faceEnd, math::colors::green, 2.0f);
-#endif
 
             if (!currentEdge) { return; }
 
@@ -186,9 +182,7 @@ namespace legion::physics
                 math::vec3 worldStart = transform * math::vec4(edgeToExecuteOn->edgePosition, 1);
                 math::vec3 worldEnd = transform * math::vec4(edgeToExecuteOn->nextEdge->edgePosition, 1);
 
-#ifdef RYTHE_GRAPHICS
                 debug::user_projectDrawLine(worldStart, worldEnd, usedColor, width, time,ignoreDepth);
-#endif
 
             } while (initialEdge != currentEdge && currentEdge != nullptr);
         }
