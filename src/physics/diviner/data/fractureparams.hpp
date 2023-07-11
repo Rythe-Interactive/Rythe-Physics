@@ -1,7 +1,7 @@
 #pragma once
 #include <core/core.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     /** @struct FractureParams
     * @brief contains the parameters that will be used for a given fracture event.
@@ -9,10 +9,10 @@ namespace legion::physics
     struct FractureParams
     {
 
-        math::vec3 explosionCentroid;
+        rsl::math::float3 explosionCentroid;
         float strength;
 
-        FractureParams(math::vec3 pWorldExplostionCent, float pStrength = 5.0f)
+        FractureParams(rsl::math::float3 pWorldExplostionCent, float pStrength = 5.0f)
             : explosionCentroid(pWorldExplostionCent),strength(pStrength)
         {
 

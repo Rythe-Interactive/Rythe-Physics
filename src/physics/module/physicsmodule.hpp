@@ -10,7 +10,7 @@
 #include <physics/diviner/components/rigidbody.hpp>
 #include <physics/physx/systems/physx_physics_system.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     class PhysicsModule : public Module
     {

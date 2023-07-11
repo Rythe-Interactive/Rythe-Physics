@@ -2,7 +2,7 @@
 #include <core/core.hpp>
 #include <physics/diviner/data/convergence_identifier.hpp>
 #include <physics/diviner/data/edge_label.hpp>
-namespace legion::physics
+namespace rythe::physics
 {
     class ConvexConvergenceIdentifier : public ConvergenceIdentifier
     {

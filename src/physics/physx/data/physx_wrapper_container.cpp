@@ -4,7 +4,7 @@
 #include <physics/components/capsule_controller.hpp>
 #include <physics/physx/data/physx_wrapper.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     template<class PhysxObject>
     PhysxObject& PhysxWrapperContainer<PhysxObject>::createPhysxWrapper(physics_component& unregisteredPhysXWrapper)
@@ -25,9 +25,9 @@ namespace legion::physics
     }
 
     template<class PhysxObject>
-    void PhysxWrapperContainer<PhysxObject>::PopAndSwapRemoveWrapper(size_type id)
+    void PhysxWrapperContainer<PhysxObject>::PopAndSwapRemoveWrapper(rsl::size_type id)
     {
-        size_type index = m_wrapperIDSet.index_of(id);
+        rsl::size_type index = m_wrapperIDSet.index_of(id);
 
         if (index != m_wrapperIDSet.npos)
         {
@@ -38,7 +38,7 @@ namespace legion::physics
     }
 
     template<class PhysxObject>
-    pointer<PhysxObject> PhysxWrapperContainer<PhysxObject>::findWrapperWithID(size_type id)
+    pointer<PhysxObject> PhysxWrapperContainer<PhysxObject>::findWrapperWithID(rsl::size_type id)
     {
         if (m_wrapperIDSet.contains(id))
         {
@@ -49,7 +49,7 @@ namespace legion::physics
     }
 
     template<class PhysxObject>
-    PhysxObject& PhysxWrapperContainer<PhysxObject>::registerWrapperID(size_type& outID)
+    PhysxObject& PhysxWrapperContainer<PhysxObject>::registerWrapperID(rsl::size_type& outID)
     {
         outID = nextID;
         m_wrapperIDSet.insert(nextID);

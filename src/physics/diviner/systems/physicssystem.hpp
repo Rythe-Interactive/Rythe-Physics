@@ -13,7 +13,7 @@
 #include <memory>
 #include <rendering/debugrendering.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     class PhysicsSystem final : public System<PhysicsSystem>
     {
@@ -30,7 +30,7 @@ namespace legion::physics
         void fixedUpdate(time::time_span<fast_time> deltaTime)
         {
             ecs::component_container<diviner::rigidbody> rigidbodies;
-            std::vector<byte> hasRigidBodies;
+            std::vector<rsl::byte> hasRigidBodies;
 
             {
                 diviner::rigidbody emptyRigidbody;
@@ -120,7 +120,7 @@ namespace legion::physics
          * Broadphase Collision Detection, Narrowphase Collision Detection, and the Collision Resolution)
         */
         void runPhysicsPipeline(
-            std::vector<byte>& hasRigidBodies,
+            std::vector<rsl::byte>& hasRigidBodies,
             ecs::component_container<diviner::rigidbody>& rigidbodies,
             ecs::component_container<diviner::physics_component>& physComps,
             ecs::component_container<position>& positions,
@@ -134,11 +134,11 @@ namespace legion::physics
         * @param isRigidbodyInvolved A bool that indicates whether a diviner::rigidbody is involved in this manifold
         * @param isTriggerInvolved A bool that indicates whether a diviner::physics_component with a diviner::physics_component::isTrigger set to true is involved in this manifold
         */
-        void constructManifoldsWithPrecursors(ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<byte>& hasRigidBodies, physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB,
+        void constructManifoldsWithPrecursors(ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<rsl::byte>& hasRigidBodies, physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB,
             std::vector<physics_manifold>& manifoldsToSolve, bool isRigidbodyInvolved, bool isTriggerInvolved);
        
         void constructManifoldWithCollider(
-            ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<byte>& hasRigidBodies,
+            ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<rsl::byte>& hasRigidBodies,
             PhysicsCollider* colliderA, PhysicsCollider* colliderB
             , physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB, physics_manifold& manifold)
         {
@@ -165,7 +165,7 @@ namespace legion::physics
 
         /** @brief gets all the entities with a diviner::rigidbody component and calls the integrate function on them
         */
-        void integrateRigidbodies(std::vector<byte>& hasRigidBodies, ecs::component_container<diviner::rigidbody>& rigidbodies, float deltaTime)
+        void integrateRigidbodies(std::vector<rsl::byte>& hasRigidBodies, ecs::component_container<diviner::rigidbody>& rigidbodies, float deltaTime)
         {
             queueJobs(manifoldPrecursorQuery.size(), [&]() {
                 if (!hasRigidBodies[async::this_job::get_id()])
@@ -174,11 +174,11 @@ namespace legion::physics
                 diviner::rigidbody& rb = rigidbodies[async::this_job::get_id()];
 
                 ////-------------------- update velocity ------------------//
-                math::vec3 acc = rb.forceAccumulator * rb.inverseMass;
+                rsl::math::float3 acc = rb.forceAccumulator * rb.inverseMass;
                 rb.velocity += (acc + constants::gravity) * deltaTime;
 
                 ////-------------------- update angular velocity ------------------//
-                math::vec3 angularAcc = rb.torqueAccumulator * rb.globalInverseInertiaTensor;
+                rsl::math::float3 angularAcc = rb.torqueAccumulator * rb.globalInverseInertiaTensor;
                 rb.angularVelocity += (angularAcc)*deltaTime;
 
                 rb.resetAccumulators();
@@ -186,7 +186,7 @@ namespace legion::physics
         }
 
         void integrateRigidbodyQueryPositionAndRotation(
-            std::vector<byte>& hasRigidBodies,
+            std::vector<rsl::byte>& hasRigidBodies,
             ecs::component_container<position>& positions,
             ecs::component_container<rotation>& rotations,
             ecs::component_container<diviner::rigidbody>& rigidbodies,
@@ -210,7 +210,7 @@ namespace legion::physics
 
                 if (!math::epsilonEqual(dtAngle, 0.0f, math::epsilon<float>()))
                 {
-                    math::vec3 axis = math::normalize(rb.angularVelocity);
+                    rsl::math::float3 axis = math::normalize(rb.angularVelocity);
 
                     math::quat glmQuat = math::angleAxis(dtAngle, axis);
                     rot = glmQuat * rot;
@@ -224,7 +224,7 @@ namespace legion::physics
                 }).wait();
         }
 
-        void initializeManifolds(std::vector<physics_manifold>& manifoldsToSolve, std::vector<byte>& manifoldValidity)
+        void initializeManifolds(std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity)
         {
             for (int i = 0; i < manifoldsToSolve.size(); i++)
             {
@@ -242,7 +242,7 @@ namespace legion::physics
             }
         }
 
-        void resolveContactConstraint(std::vector<physics_manifold>& manifoldsToSolve, std::vector<byte>& manifoldValidity, float dt, int contactIter)
+        void resolveContactConstraint(std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity, float dt, int contactIter)
         {
             for (int manifoldIter = 0;
                 manifoldIter < manifoldsToSolve.size(); manifoldIter++)
@@ -259,7 +259,7 @@ namespace legion::physics
             }
         }
 
-        void resolveFrictionConstraint(std::vector<physics_manifold>& manifoldsToSolve, std::vector<byte>& manifoldValidity)
+        void resolveFrictionConstraint(std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity)
         {
             for (int manifoldIter = 0;
                 manifoldIter < manifoldsToSolve.size(); manifoldIter++)

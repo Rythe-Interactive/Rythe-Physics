@@ -2,7 +2,7 @@
 #include <physics/diviner/broadphasecollisionalgorithms/broadphasecollisionalgorithm.hpp>
 #include <physics/diviner/physics_statics.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     /**@class BroadphaseUniformGrid
      * @brief Implementation of broad-phase collision detection
@@ -35,7 +35,7 @@ namespace legion::physics
 
         /**@brief Calculates a cell index from a point. i.e. calculates in which cell in the uniform grid a point will be.
          */
-        math::ivec3 calculateCellIndex(const math::vec3 point);
+        math::ivec3 calculateCellIndex(const rsl::math::float3 point);
 
         std::vector<std::vector<physics_manifold_precursor>> manifoldPrecursorGrouping;
     };

@@ -2,9 +2,9 @@
 #include <rendering/debugrendering.hpp>
 #include <physics/diviner/physics_statics.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
-    HalfEdgeFace::HalfEdgeFace(HalfEdgeEdge* newStartEdge, math::vec3 newNormal) : startEdge{ newStartEdge }, normal{ newNormal }
+    HalfEdgeFace::HalfEdgeFace(HalfEdgeEdge* newStartEdge, rsl::math::float3 newNormal) : startEdge{ newStartEdge }, normal{ newNormal }
     {
         initializeFace();
     }
@@ -13,7 +13,7 @@ namespace legion::physics
     {
         static int faceCount = 0;
 
-        math::vec3 faceCenter{ 0.0f };
+        rsl::math::float3 faceCenter{ 0.0f };
         int edgeCount = 0;
 
         auto calculateFaceCentroid = [&faceCenter, &edgeCount](HalfEdgeEdge* edge)
@@ -49,17 +49,17 @@ namespace legion::physics
     float HalfEdgeFace::calculateFaceExtents()
     {
         //get vector of vertices of face
-        std::vector<math::vec3> vertices;
+        std::vector<rsl::math::float3> vertices;
         vertices.reserve(6);
 
         auto collectVertices = [&vertices](HalfEdgeEdge* edge) {vertices.push_back(edge->edgePosition); };
         forEachEdge(collectVertices);
 
         //get tangents of normals
-        math::vec3 forward = math::normalize(centroid - startEdge->edgePosition);
-        math::vec3 right = math::cross(normal, forward);
+        rsl::math::float3 forward = math::normalize(centroid - startEdge->edgePosition);
+        rsl::math::float3 right = math::cross(normal, forward);
 
-        math::vec3 maxForward, minForward, maxRight, minRight;
+        rsl::math::float3 maxForward, minForward, maxRight, minRight;
 
         //get support point for the tangents and inverse tangents of this face 
         PhysicsStatics::GetSupportPoint(vertices, forward, maxForward);
@@ -77,8 +77,8 @@ namespace legion::physics
         return (maxForwardLength + minForwardLength) + (maxRightLength + minRightLength);
     }
 
-    void HalfEdgeFace::forEachEdge(legion::core::delegate< void(HalfEdgeEdge*)> functionToExecute,
-        legion::core::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge )
+    void HalfEdgeFace::forEachEdge(rythe::core::delegate< void(HalfEdgeEdge*)> functionToExecute,
+        rythe::core::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge )
     {
         HalfEdgeEdge* initialEdge = startEdge;
         HalfEdgeEdge* currentEdge = startEdge;
@@ -96,7 +96,7 @@ namespace legion::physics
         } while (initialEdge != currentEdge && getNextEdge(currentEdge) != nullptr);
     }
 
-    void HalfEdgeFace::forEachEdgeReverse(legion::core::delegate<void(HalfEdgeEdge*)> functionToExecute)
+    void HalfEdgeFace::forEachEdgeReverse(rythe::core::delegate<void(HalfEdgeEdge*)> functionToExecute)
     {
         auto getPrevEdges = [](HalfEdgeEdge* current) {return current->prevEdge; };
 
@@ -117,10 +117,10 @@ namespace legion::physics
 
         forEachEdgeReverse(collectEdges);
 
-        for (size_type i = 0; i < edges.size(); i++)
+        for (rsl::size_type i = 0; i < edges.size(); i++)
         {
-            size_type nextIndex = (i + 1) % edges.size();
-            size_type prevIndex = (i == 0ull ? (edges.size() - 1ull) : (i - 1ull));
+            rsl::size_type nextIndex = (i + 1) % edges.size();
+            rsl::size_type prevIndex = (i == 0ull ? (edges.size() - 1ull) : (i - 1ull));
 
             HalfEdgeEdge* newNext = edges.at(prevIndex);
             HalfEdgeEdge* newPrev = edges.at(nextIndex);
@@ -139,8 +139,8 @@ namespace legion::physics
 
         };
 
-        math::vec3 worldStart = transform * math::vec4(centroid, 1);
-        math::vec3 worldEnd = transform * math::vec4(centroid + normal * 0.1f, 1);
+        rsl::math::float3 worldStart = transform * math::vec4(centroid, 1);
+        rsl::math::float3 worldEnd = transform * math::vec4(centroid + normal * 0.1f, 1);
 
         forEachEdge(drawFunc);
     }
@@ -152,8 +152,8 @@ namespace legion::physics
             edge->DEBUG_directionDrawEdge(transform, debugColor, time, 5.0f);
         };
 
-        math::vec3 worldStart = transform * math::vec4(centroid, 1);
-        math::vec3 worldEnd = transform * math::vec4(centroid + normal * 0.1f, 1);
+        rsl::math::float3 worldStart = transform * math::vec4(centroid, 1);
+        rsl::math::float3 worldEnd = transform * math::vec4(centroid + normal * 0.1f, 1);
 
         debug::drawLine(worldStart, worldEnd, math::colors::green, 3.0f, time, false);
 

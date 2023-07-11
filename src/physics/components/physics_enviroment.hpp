@@ -2,9 +2,9 @@
 #include <core/core.hpp>
 #include <physics/data/physics_enviroment_data.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
-    constexpr size_type invalid_physics_enviroment = std::numeric_limits<size_type>::max();
+    constexpr rsl::size_type invalid_physics_enviroment = std::numeric_limits<rsl::size_type>::max();
 
     struct physics_enviroment
     {

@@ -2,13 +2,13 @@
 
 #include <core/core.hpp>
 
-namespace legion::physics::constants
+namespace rythe::physics::constants
 {
-    static math::vec3 gravity = math::vec3(0, -9.81, 0);
+    static rsl::math::float3 gravity = rsl::math::float3(0, -9.81, 0);
 
-    static constexpr size_type contactSolverIterationCount = 9;
+    static constexpr rsl::size_type contactSolverIterationCount = 9;
 
-    static constexpr size_type frictionSolverIterationCount = 4;
+    static constexpr rsl::size_type frictionSolverIterationCount = 4;
 
     static constexpr float faceToFacePenetrationBias = 0.005f;
 

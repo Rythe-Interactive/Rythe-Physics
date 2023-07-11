@@ -1,7 +1,7 @@
 #pragma once
 #include <core/core.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     struct physics_component;
     struct physics_enviroment;
@@ -18,9 +18,9 @@ namespace legion::physics
 
         PhysxObject& createPhysxWrapper(capsule_controller& unregisteredPhysXWrapper);
 
-        void PopAndSwapRemoveWrapper(size_type id);
+        void PopAndSwapRemoveWrapper(rsl::size_type id);
 
-        pointer<PhysxObject> findWrapperWithID(size_type id);
+        pointer<PhysxObject> findWrapperWithID(rsl::size_type id);
 
         inline void ReleasePhysicsWrappers() { m_physxWrappers.clear(); }
 
@@ -28,12 +28,12 @@ namespace legion::physics
 
     private:
 
-        PhysxObject& registerWrapperID(size_type& outID);
+        PhysxObject& registerWrapperID(rsl::size_type& outID);
 
-        sparse_set<size_type> m_wrapperIDSet;
+        sparse_set<rsl::size_type> m_wrapperIDSet;
         std::vector<PhysxObject> m_physxWrappers;
 
-        size_type nextID = 0;
+        rsl::size_type nextID = 0;
     };
 
 }

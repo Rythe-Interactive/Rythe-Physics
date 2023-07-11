@@ -3,19 +3,19 @@
 #include <physics/diviner/halfedgeedge.hpp>
 
 
-namespace legion::physics
+namespace rythe::physics
 {
     struct ColliderFaceToVert;
 
     struct HalfEdgeFace
     {
-        math::vec3 normal;
-        math::vec3 centroid;
+        rsl::math::float3 normal;
+        rsl::math::float3 centroid;
 
         HalfEdgeEdge* startEdge = nullptr;
         ColliderFaceToVert* faceToVert = nullptr; 
         
-        HalfEdgeFace(HalfEdgeEdge* newStartEdge, math::vec3 newNormal);
+        HalfEdgeFace(HalfEdgeEdge* newStartEdge, rsl::math::float3 newNormal);
 
         /**@brief Given that the face has a startEdge,a normal, and a centroid,
          * initializes the face so that it can be used for collision detection in a convex hull
@@ -29,10 +29,10 @@ namespace legion::physics
         /** @brief given a function that takes in a HalfEdgeEdge*, 
         * executes the function on each edge connected to 'startEdge'
         */
-        void forEachEdge(legion::core::delegate< void(HalfEdgeEdge*)> functionToExecute,
-            legion::core::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge = [](HalfEdgeEdge* current) { return current->nextEdge; });
+        void forEachEdge(rythe::core::delegate< void(HalfEdgeEdge*)> functionToExecute,
+            rythe::core::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge = [](HalfEdgeEdge* current) { return current->nextEdge; });
 
-        void forEachEdgeReverse(legion::core::delegate< void(HalfEdgeEdge*)> functionToExecute);
+        void forEachEdgeReverse(rythe::core::delegate< void(HalfEdgeEdge*)> functionToExecute);
 
         /**@brief Inverses the face
          * The edges will be stored in reverse and therefore the normal will point in the other direction

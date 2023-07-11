@@ -1,7 +1,7 @@
 #include <physics/diviner/systems/physicssystem.hpp>
 #include <physics/diviner/broadphasecollisionalgorithms/broadphaseuniformgridnocaching.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     namespace detail
     {
@@ -20,12 +20,12 @@ namespace legion::physics
 
     void PhysicsSystem::setup()
     {
-        m_broadPhase = std::make_unique<BroadphaseUniformGridNoCaching>(math::vec3(3, 3, 3));
+        m_broadPhase = std::make_unique<BroadphaseUniformGridNoCaching>(rsl::math::float3(3, 3, 3));
         createProcess<&PhysicsSystem::fixedUpdate>("Physics", m_timeStep);
     }
 
     void PhysicsSystem::runPhysicsPipeline(
-        std::vector<byte>& hasRigidBodies,
+        std::vector<rsl::byte>& hasRigidBodies,
         ecs::component_container<diviner::rigidbody>& rigidbodies,
         ecs::component_container<diviner::physics_component>& physComps,
         ecs::component_container<position>& positions,
@@ -49,7 +49,7 @@ namespace legion::physics
         {
             std::set<std::pair<id_type, id_type>> idPairings;
 
-            size_type totalChecks = 0;
+            rsl::size_type totalChecks = 0;
             for (auto& manifoldPrecursor : manifoldPrecursorGrouping)
             {
                 if (manifoldPrecursor.size() == 0) continue;
@@ -112,7 +112,7 @@ namespace legion::physics
 
         // all manifolds are initially valid
 
-        std::vector<byte> manifoldValidity(manifoldsToSolve.size(), true);
+        std::vector<rsl::byte> manifoldValidity(manifoldsToSolve.size(), true);
 
         //-------------------------------------------------- Collision Solver ---------------------------------------------------//
         //for both contact and friction resolution, an iterative algorithm is used.
@@ -170,7 +170,7 @@ namespace legion::physics
 
     }
 
-    void PhysicsSystem::constructManifoldsWithPrecursors(ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<byte>& hasRigidBodies,
+    void PhysicsSystem::constructManifoldsWithPrecursors(ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<rsl::byte>& hasRigidBodies,
         physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB,
         std::vector<physics_manifold>& manifoldsToSolve, bool isRigidbodyInvolved, bool isTriggerInvolved)
     {

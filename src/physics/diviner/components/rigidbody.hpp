@@ -3,29 +3,29 @@
 #include <core/core.hpp>
 #include <physics/diviner/physicsconstants.hpp>
 
-namespace legion::physics::diviner
+namespace rythe::physics::diviner
 {
     struct rigidbody
     {
 
         //linear motion component
         float inverseMass = 1.0f;
-        math::vec3 velocity = math::vec3(0.0);
-        math::vec3 acc = math::vec3(0.0);
+        rsl::math::float3 velocity = rsl::math::float3(0.0);
+        rsl::math::float3 acc = rsl::math::float3(0.0);
         float linearDrag;
 
         //angular motion component
         math::mat3 localInverseInertiaTensor = math::mat3(6.0f);
         math::mat3 globalInverseInertiaTensor = localInverseInertiaTensor;
 
-        math::vec3 angularAcc = math::vec3(0.0);
-        math::vec3 angularVelocity = math::vec3(0.0);
+        rsl::math::float3 angularAcc = rsl::math::float3(0.0);
+        rsl::math::float3 angularVelocity = rsl::math::float3(0.0);
         float angularDrag = 0.01f;
 
         //force application component
-        math::vec3 forceAccumulator = math::vec3(0.0);
-        math::vec3 torqueAccumulator = math::vec3(0.0);
-        math::vec3 globalCentreOfMass = math::vec3(0.0);
+        rsl::math::float3 forceAccumulator = rsl::math::float3(0.0);
+        rsl::math::float3 torqueAccumulator = rsl::math::float3(0.0);
+        rsl::math::float3 globalCentreOfMass = rsl::math::float3(0.0);
 
         float restitution = 0.3f;
         float friction = 0.3f;
@@ -58,17 +58,17 @@ namespace legion::physics::diviner
         * length of 'force'.
         * @note This does NOT cause torque
         */
-        void addForce(math::vec3 force)
+        void addForce(rsl::math::float3 force)
         {
             forceAccumulator += force;
         }
 
         /** @brief Adds a force in the direction of 'force' and
         */
-        void addForceAt(math::vec3 worldForcePosition, math::vec3 force)
+        void addForceAt(rsl::math::float3 worldForcePosition, rsl::math::float3 force)
         {
             forceAccumulator += force;
-            math::vec3 axis = worldForcePosition - globalCentreOfMass;
+            rsl::math::float3 axis = worldForcePosition - globalCentreOfMass;
             torqueAccumulator += math::cross(axis, force);
         }
 
@@ -89,8 +89,8 @@ namespace legion::physics::diviner
 
         void resetAccumulators()
         {
-            forceAccumulator = math::vec3(0);
-            torqueAccumulator = math::vec3(0);
+            forceAccumulator = rsl::math::float3(0);
+            torqueAccumulator = rsl::math::float3(0);
         }
 
         void UpdateInertiaTensor(math::quat orientation)

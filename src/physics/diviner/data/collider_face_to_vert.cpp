@@ -1,17 +1,17 @@
 #include <physics/diviner/data/collider_face_to_vert.hpp>
 #include <physics/diviner/physics_statics.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
-    std::pair<math::vec3, float> legion::physics::ColliderFaceToVert::getFurthestOutsideVert() const
+    std::pair<rsl::math::float3, float> rythe::physics::ColliderFaceToVert::getFurthestOutsideVert() const
     {
-        const math::vec3& faceCentroid = face->centroid;
-        const math::vec3& faceNormal = face->normal;
+        const rsl::math::float3& faceCentroid = face->centroid;
+        const rsl::math::float3& faceNormal = face->normal;
 
         float largestDist = std::numeric_limits<float>::lowest();
-        const math::vec3* mostDistantVert = nullptr;
+        const rsl::math::float3* mostDistantVert = nullptr;
 
-        for (const math::vec3& vert : outsideVerts)
+        for (const rsl::math::float3& vert : outsideVerts)
         {
             float distance = PhysicsStatics::PointDistanceToPlane(faceNormal,faceCentroid,vert);
 
@@ -25,7 +25,7 @@ namespace legion::physics
         return std::make_pair(*mostDistantVert,largestDist);
     }
 
-    void ColliderFaceToVert::populateVectorWithVerts(std::vector<math::vec3>& vertVector)
+    void ColliderFaceToVert::populateVectorWithVerts(std::vector<rsl::math::float3>& vertVector)
     {
         for (size_t i = 0; i < outsideVerts.size(); i++)
         {

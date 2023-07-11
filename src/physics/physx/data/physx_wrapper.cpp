@@ -2,7 +2,7 @@
 #include <physx/PxPhysicsAPI.h>
 #include <physics/physx/data/controller_hit_feedback.inl>
 
-namespace legion::physics
+namespace rythe::physics
 {
     PhysxInternalWrapper::~PhysxInternalWrapper()
     {

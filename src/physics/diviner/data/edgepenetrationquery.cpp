@@ -4,10 +4,10 @@
 #include <rendering/debugrendering.hpp>
 
 
-namespace legion::physics
+namespace rythe::physics
 {
     EdgePenetrationQuery::EdgePenetrationQuery(HalfEdgeEdge* pRefEdge, HalfEdgeEdge* pIncEdge,
-        math::vec3& pFaceCentroid, math::vec3& pNormal, float& pPenetration, bool pIsARef) :
+        rsl::math::float3& pFaceCentroid, rsl::math::float3& pNormal, float& pPenetration, bool pIsARef) :
         PenetrationQuery(pFaceCentroid,pNormal,pPenetration,pIsARef),refEdge(pRefEdge),incEdge(pIncEdge)
     {
         debugID = "EdgePenetrationQuery";
@@ -20,14 +20,14 @@ namespace legion::physics
         //------------------- The contact points between 2 edges are the closest points between the 2 edges --------------------//
         //log::debug("EdgePenetrationQuery::populateContactList");
 
-        math::vec3 p1 = refTransform * math::vec4(refEdge->edgePosition, 1);
-        math::vec3 p2 = refTransform * math::vec4(refEdge->nextEdge->edgePosition, 1);
+        rsl::math::float3 p1 = refTransform * math::vec4(refEdge->edgePosition, 1);
+        rsl::math::float3 p2 = refTransform * math::vec4(refEdge->nextEdge->edgePosition, 1);
 
-        math::vec3 p3 = incTransform * math::vec4(incEdge->edgePosition, 1);
-        math::vec3 p4 = incTransform * math::vec4(incEdge->nextEdge->edgePosition, 1);
+        rsl::math::float3 p3 = incTransform * math::vec4(incEdge->edgePosition, 1);
+        rsl::math::float3 p4 = incTransform * math::vec4(incEdge->nextEdge->edgePosition, 1);
 
-        math::vec3 refContactPoint;
-        math::vec3 incContactPoint;
+        rsl::math::float3 refContactPoint;
+        rsl::math::float3 incContactPoint;
 
         PhysicsStatics::FindClosestPointsBetweenLineSegments(p1, p2, p3, p4, refContactPoint, incContactPoint);
 

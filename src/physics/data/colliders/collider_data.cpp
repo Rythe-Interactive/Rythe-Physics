@@ -1,14 +1,14 @@
 #include "collider_data.hpp"
 
-namespace legion::physics
+namespace rythe::physics
 {
-    ColliderData::ColliderData(size_type colliderIndex, pointer<std::vector<collider_modification_data>> modificationsRequests, collider_type colliderType,
-        const math::vec3& offset, const math::quat& rotation) noexcept
+    ColliderData::ColliderData(rsl::size_type colliderIndex, pointer<std::vector<collider_modification_data>> modificationsRequests, collider_type colliderType,
+        const rsl::math::float3& offset, const math::quat& rotation) noexcept
         :
         m_rotationOffset(rotation), m_positionOffset(offset), m_colliderIndex(colliderIndex),
         m_colliderType(colliderType),  m_modificationsRequests(modificationsRequests),m_isRegistered(false) { }
 
-    void ColliderData::setMaterialHash(size_type materialHash) noexcept
+    void ColliderData::setMaterialHash(rsl::size_type materialHash) noexcept
     {
         m_materialHash = materialHash;
 
@@ -20,7 +20,7 @@ namespace legion::physics
         m_modificationsRequests->push_back(modData);
     }
 
-    void ColliderData::setBoxExtents(const math::vec3& newExtents) noexcept
+    void ColliderData::setBoxExtents(const rsl::math::float3& newExtents) noexcept
     {
         collider_modification_data modData;
         modData.colliderIndex = m_colliderIndex;

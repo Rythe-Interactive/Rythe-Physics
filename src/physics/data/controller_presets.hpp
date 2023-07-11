@@ -1,12 +1,12 @@
 #pragma once
 #include <core/core.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     struct gravity_preset
     {
-        math::vec3 gravityValue = math::vec3(0.0f);
-        math::vec3 gravityAcc = math::vec3(0.0f);
+        rsl::math::float3 gravityValue = rsl::math::float3(0.0f);
+        rsl::math::float3 gravityAcc = rsl::math::float3(0.0f);
     };
 
     //preset must be added within the same physics time step that the target capsule is created

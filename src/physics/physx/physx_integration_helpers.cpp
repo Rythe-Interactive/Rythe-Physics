@@ -4,14 +4,14 @@
 
 using namespace physx;
 
-namespace legion::physics
+namespace rythe::physics
 {
     physx::PxPhysics* getSDK()
     {
         return PhysXPhysicsSystem::getSDK();
     }
 
-    static inline void toPhysxTransform(physx::PxTransform& pxTransform, const math::vec3& pos, const math::quat& rot)
+    static inline void toPhysxTransform(physx::PxTransform& pxTransform, const rsl::math::float3& pos, const math::quat& rot)
     {
         pxTransform.p = { pos.x,pos.y,pos.z };
         pxTransform.q = { rot.x,rot.y,rot.z,rot.w };
@@ -19,7 +19,7 @@ namespace legion::physics
 
     void calculateLocalColliderTransform(physx::PxTransform& outLocalTransform, const ColliderData& collider)
     {
-        const math::vec3& localOffset = collider.getOffset();
+        const rsl::math::float3& localOffset = collider.getOffset();
         const math::quat& localRot = collider.getRotationOffset();
 
         toPhysxTransform(outLocalTransform, localOffset, localRot);
@@ -30,7 +30,7 @@ namespace legion::physics
         transform trans = ent.get_component<transform>();
         const math::mat4& globalTransform = trans.to_world_matrix();
 
-        math::vec3 pos; math::quat rot; math::vec3 tempScale;
+        rsl::math::float3 pos; math::quat rot; rsl::math::float3 tempScale;
         math::decompose(globalTransform, tempScale, rot, pos);
        
         calculateLocalColliderTransform(outLocalTransform, collider);

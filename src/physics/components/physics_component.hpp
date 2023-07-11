@@ -1,9 +1,9 @@
 #pragma once
 #include <physics/data/physics_component_data.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
-    constexpr size_t invalid_physics_component = std::numeric_limits<size_type>::max();
+    constexpr size_t invalid_physics_component = std::numeric_limits<rsl::size_type>::max();
 
     struct physics_component
     {

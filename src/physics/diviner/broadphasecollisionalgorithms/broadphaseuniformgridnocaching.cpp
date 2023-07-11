@@ -1,8 +1,8 @@
 #include <physics/diviner/broadphasecollisionalgorithms/broadphaseuniformgridnocaching.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
-    const std::vector<std::vector<physics_manifold_precursor>>& legion::physics::BroadphaseUniformGridNoCaching::collectPairs
+    const std::vector<std::vector<physics_manifold_precursor>>& rythe::physics::BroadphaseUniformGridNoCaching::collectPairs
     (std::vector<physics_manifold_precursor>&& manifoldPrecursors)
     {
       
@@ -12,13 +12,13 @@ namespace legion::physics
         std::unordered_map<math::ivec3, int> cellIndices;
         for (auto& precursor : manifoldPrecursors)
         {
-            std::vector<legion::physics::PhysicsColliderPtr> colliders = precursor.physicsComp->colliders;
+            std::vector<rythe::physics::PhysicsColliderPtr> colliders = precursor.physicsComp->colliders;
             if (colliders.size() == 0) continue;
 
             // Get the biggest AABB collider of this physics component
             // If it has one collider we can simply retrieve it
             // Oherwise we have to combine the bounds of all its colliders
-            std::pair<math::vec3, math::vec3> aabb = colliders.at(0)->GetMinMaxWorldAABB();
+            std::pair<rsl::math::float3, rsl::math::float3> aabb = colliders.at(0)->GetMinMaxWorldAABB();
             for (int i = 1; i < colliders.size(); ++i)
             {
                 aabb = PhysicsStatics::CombineAABB(colliders.at(i)->GetMinMaxWorldAABB(), aabb);
@@ -51,10 +51,10 @@ namespace legion::physics
 
     }
 
-    math::ivec3 BroadphaseUniformGridNoCaching::calculateCellIndex(const math::vec3 point)
+    math::ivec3 BroadphaseUniformGridNoCaching::calculateCellIndex(const rsl::math::float3 point)
     {
         // A point below 0 needs an extra 'push' since -0.5 will be cast to int as 0
-        math::vec3 temp = point;
+        rsl::math::float3 temp = point;
         if (temp.x < 0) --temp.x;
         if (temp.y < 0) --temp.y;
         if (temp.z < 0) --temp.z;

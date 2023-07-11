@@ -1,14 +1,14 @@
 #pragma once
 #include <core/core.hpp>
 #include <physics/diviner/data/edge_label.hpp>
-namespace legion::physics
+namespace rythe::physics
 {
     struct ContactVertex
     {
-        math::vec3 position;
+        rsl::math::float3 position;
         EdgeLabel label;
 
-        ContactVertex(const math::vec3& pPosition, const EdgeLabel& pLabel) : position(pPosition)
+        ContactVertex(const rsl::math::float3& pPosition, const EdgeLabel& pLabel) : position(pPosition)
         {
             label = pLabel;
         }

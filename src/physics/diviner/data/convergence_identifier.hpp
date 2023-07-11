@@ -3,7 +3,7 @@
 #include <physics/diviner/data/edge_label.hpp>
 #include <physics/diviner/physics_contact.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     class ConvexConvergenceIdentifier;
 

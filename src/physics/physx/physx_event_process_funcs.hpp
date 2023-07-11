@@ -10,7 +10,7 @@ namespace physx
     class PxScene;
 }
 
-namespace legion::physics
+namespace rythe::physics
 {
     class capsule_controller;
     class rigidbody;

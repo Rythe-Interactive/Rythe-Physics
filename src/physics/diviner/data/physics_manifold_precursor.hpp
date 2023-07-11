@@ -2,7 +2,7 @@
 #include <core/core.hpp>
 #include <physics/diviner/components/physics_component.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     /** @struct physics_manifold_precursor
     * @brief contains the necessary data to create a physics_manifold.

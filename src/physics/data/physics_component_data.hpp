@@ -4,13 +4,13 @@
 #include <physics/data/component_flags.hpp>
 #include <bitset>
 
-namespace legion::physics
+namespace rythe::physics
 {
     constexpr float boxExtentSizeMultiplier = 0.5f;
 
     class PhysicsComponentData
     {
-        using GenerateConvexDelegate = delegate<void* (const std::vector<math::vec3>& vertices)>;
+        using GenerateConvexDelegate = delegate<void* (const std::vector<rsl::math::float3>& vertices)>;
 
     public:
 
@@ -50,7 +50,7 @@ namespace legion::physics
             return *this;
         }
 
-        L_ALWAYS_INLINE void addBoxCollider(const math::vec3& extents, const math::vec3& offset, const math::quat& rotation)
+        R_ALWAYS_INLINE void addBoxCollider(const rsl::math::float3& extents, const rsl::math::float3& offset, const math::quat& rotation)
         {
             if (extents.x == 0.0f || extents.y == 0.0f || extents.z == 0.0f)
             {
@@ -64,12 +64,12 @@ namespace legion::physics
             updateColliderRecords(physics_component_flag::pc_add_first_box, physics_component_flag::pc_add_next_box);
         }
 
-        L_ALWAYS_INLINE void addBoxCollider(const math::vec3& extents)
+        R_ALWAYS_INLINE void addBoxCollider(const rsl::math::float3& extents)
         {
-            addBoxCollider(extents, math::vec3(0.0f), math::identity<math::quat>());
+            addBoxCollider(extents, rsl::math::float3(0.0f), math::identity<math::quat>());
         }
 
-        void addConvexCollider(const std::vector<math::vec3>& vertices, const math::vec3& offset, const math::quat& rotation)
+        void addConvexCollider(const std::vector<rsl::math::float3>& vertices, const rsl::math::float3& offset, const math::quat& rotation)
         {
             //convex colliders depend on an external vertex array, needs to be handled immediately 
             void* convexColliderPtr = m_generateConvexColliderFunc(vertices);
@@ -86,7 +86,7 @@ namespace legion::physics
             }
         }
         
-        L_ALWAYS_INLINE void addSphereCollider(float radius, const math::vec3& offset = math::vec3(0.0f))
+        R_ALWAYS_INLINE void addSphereCollider(float radius, const rsl::math::float3& offset = rsl::math::float3(0.0f))
         {
            if (radius == 0.0f)
            {
@@ -99,24 +99,24 @@ namespace legion::physics
            updateColliderRecords(physics_component_flag::pc_add_first_sphere, physics_component_flag::pc_add_next_sphere);
         }
 
-        L_ALWAYS_INLINE std::vector<ColliderData>& getColliders() noexcept
+        R_ALWAYS_INLINE std::vector<ColliderData>& getColliders() noexcept
         {
             return m_colliders;
         }
 
-        L_ALWAYS_INLINE const std::bitset<physics_component_flag::pc_max>& getGeneratedModifyEvents() const noexcept
+        R_ALWAYS_INLINE const std::bitset<physics_component_flag::pc_max>& getGeneratedModifyEvents() const noexcept
         {
             return m_modificationFlags;
         };
 
-        L_ALWAYS_INLINE const std::vector<collider_modification_data>& getGeneratedColliderModifyEvents() const noexcept
+        R_ALWAYS_INLINE const std::vector<collider_modification_data>& getGeneratedColliderModifyEvents() const noexcept
         {
             return m_colliderModificationRequests;
         };
 
-        L_ALWAYS_INLINE void resetModificationFlags() { m_modificationFlags.reset(); }
+        R_ALWAYS_INLINE void resetModificationFlags() { m_modificationFlags.reset(); }
 
-        L_ALWAYS_INLINE void resetColliderModificationFlags() { m_colliderModificationRequests.clear(); }
+        R_ALWAYS_INLINE void resetColliderModificationFlags() { m_colliderModificationRequests.clear(); }
         
         static void setConvexGeneratorDelegate(GenerateConvexDelegate generateConvexFunc)
         {
@@ -125,7 +125,7 @@ namespace legion::physics
 
     private:
 
-        L_ALWAYS_INLINE void updateColliderRecords(physics_component_flag firstColliderFlag, physics_component_flag nextColliderFlag) noexcept
+        R_ALWAYS_INLINE void updateColliderRecords(physics_component_flag firstColliderFlag, physics_component_flag nextColliderFlag) noexcept
         {
             m_colliderCount == 0 ?
                 m_modificationFlags.set(firstColliderFlag) :
@@ -138,7 +138,7 @@ namespace legion::physics
         std::vector<collider_modification_data> m_colliderModificationRequests;
         
         inline static GenerateConvexDelegate m_generateConvexColliderFunc =
-            [](const std::vector<math::vec3>& vertices) -> void*
+            [](const std::vector<rsl::math::float3>& vertices) -> void*
         {
             log::warn("convex collider not generated because PhysicsComponentData::m_generateConvexColliderFunc not set ");
             return nullptr;
@@ -146,6 +146,6 @@ namespace legion::physics
 
         std::bitset<physics_component_flag::pc_max> m_modificationFlags;
 
-        size_type m_colliderCount = 0;
+        rsl::size_type m_colliderCount = 0;
     };
 }

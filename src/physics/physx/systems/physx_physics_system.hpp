@@ -3,7 +3,7 @@
 #include <physics/physx/data/physx_wrapper_container.hpp>
 #include <physics/physx/data/physx_wrapper.hpp>
 #include <physics/physx/physx_integration_helpers.hpp>
-#include <core/containers/delegate.hpp>
+#include <rsl/delegate>
 #include <physics/components/rigidbody.hpp>
 #include <physics/components/physics_component.hpp>
 #include <physics/physics_helpers.hpp>
@@ -17,7 +17,7 @@ namespace physx
     struct PxControllerShapeHit;
 };
 
-namespace legion::physics
+namespace rythe::physics
 {
     class CapsuleControllerData;
     struct controller_preset;
@@ -32,7 +32,7 @@ namespace legion::physics
 
         void physicsStep();
 
-        void update(legion::time::span deltaTime);
+        void update(rythe::rsl::span deltaTime);
 
         static physx::PxPhysics* getSDK();
 
@@ -40,7 +40,7 @@ namespace legion::physics
 
         float m_accumulation;
         
-        static void* physxGenerateConvexMesh(const std::vector<math::vec3>& vertices);
+        static void* physxGenerateConvexMesh(const std::vector<rsl::math::float3>& vertices);
 
         void lazyInitPhysXVariables();
 
@@ -75,7 +75,7 @@ namespace legion::physics
         delegate<void(const physx::PxControllerShapeHit&)> initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum);
 
         static constexpr float m_timeStep = 0.02f;
-        static constexpr size_type m_maxPhysicsStep = 3;
+        static constexpr rsl::size_type m_maxPhysicsStep = 3;
 
         physx::PxScene* m_physxScene = nullptr;
         physx::PxControllerManager* m_characterManager = nullptr;
@@ -99,11 +99,11 @@ namespace legion::physics
         std::array<ccEventProcessFunc, capsule_character_flag::cc_max> m_capsuleActionFuncs;
 
         using characterPresetProcessFunc = delegate<void(controller_preset&, PhysxCharacterWrapper&, const PhysxEnviromentInfo&)>;
-        std::unordered_map<size_type,characterPresetProcessFunc> m_hashToPresetProcessFunc;
+        std::unordered_map<rsl::size_type,characterPresetProcessFunc> m_hashToPresetProcessFunc;
 
-        std::vector<size_type> m_wrapperPendingRemovalID;
+        std::vector<rsl::size_type> m_wrapperPendingRemovalID;
 
-        std::unordered_map<size_type, physx::PxMaterial*> m_physicsMaterials;
+        std::unordered_map<rsl::size_type, physx::PxMaterial*> m_physicsMaterials;
 
         //------------------------------------------------ Debugging Related --------------------------------------------------------------//
 

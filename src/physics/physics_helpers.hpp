@@ -2,9 +2,9 @@
 #include <core/core.hpp>
 #include <physics/data/colliders/collider_data.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
-    using physics_material_hash = size_type;
+    using physics_material_hash = rsl::size_type;
 
     constexpr physics_material_hash defaultMaterialHash = 0;
 

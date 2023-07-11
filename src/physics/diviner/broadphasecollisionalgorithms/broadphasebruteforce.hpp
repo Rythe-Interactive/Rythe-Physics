@@ -1,7 +1,7 @@
 #pragma once
 #include <physics/diviner/broadphasecollisionalgorithms/broadphasecollisionalgorithm.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     class BroadphaseBruteforce : public BroadPhaseCollisionAlgorithm
     {

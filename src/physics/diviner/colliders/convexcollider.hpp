@@ -10,7 +10,7 @@
 #include <physics/diviner/data/physics_manifold.hpp>
 #include <rendering/debugrendering.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     class ConvexCollider : public PhysicsCollider
     {
@@ -63,14 +63,14 @@ namespace legion::physics
         /**@brief Does one step of the convex hull generation
          * Just for debug purposes
          */
-        void doStep(legion::core::mesh& mesh)
+        void doStep(rythe::core::mesh& mesh)
         {
            
             ConstructConvexHullWithMesh(mesh);
             ++step;
         }
 
-        void ConstructConvexHullWithVertices( std::vector<math::vec3>& vertices,math::vec3 spacingAmount = math::vec3())
+        void ConstructConvexHullWithVertices( std::vector<rsl::math::float3>& vertices,rsl::math::float3 spacingAmount = rsl::math::float3())
         {
             //many of the functions for convex hull are coupled to mesh,
             //for now we create a mesh so that we can pass it into the function
@@ -83,7 +83,7 @@ namespace legion::physics
         //TODO(cont.) investigate unused variables! (projected)
         //LIKE A LOT OF CLEANUP
 
-        void  ConstructConvexHullWithMesh(mesh& mesh, math::vec3 spacingAmount = math::vec3(), bool shouldDebug = false);
+        void  ConstructConvexHullWithMesh(mesh& mesh, rsl::math::float3 spacingAmount = rsl::math::float3(), bool shouldDebug = false);
        
         /**@brief Constructs a box-shaped convex hull that encompasses the given mesh.
         */
@@ -94,7 +94,7 @@ namespace legion::physics
 
         void CalculateLocalColliderCentroid()
         {
-            localColliderCentroid = math::vec3();
+            localColliderCentroid = rsl::math::float3();
 
             for (auto& vertex : vertices)
             {
@@ -125,15 +125,15 @@ namespace legion::physics
             //||           ||       //||           ||                                              
             //c ----------- d       //g ----------- h
 
-            /*a*/ math::vec3 minVertexPlusBreadth = math::vec3(-halfWidth, -halfHeight, halfBreath);
-            /*b*/ math::vec3 minVertexPlusWidthPlusBreadth = math::vec3(halfWidth, -halfHeight, halfBreath);
-            /*c*/ math::vec3 minVertex = math::vec3(-halfWidth, -halfHeight, -halfBreath);
-            /*d*/ math::vec3 minVertexPlusWidth = math::vec3(halfWidth, -halfHeight, -halfBreath);
+            /*a*/ rsl::math::float3 minVertexPlusBreadth = rsl::math::float3(-halfWidth, -halfHeight, halfBreath);
+            /*b*/ rsl::math::float3 minVertexPlusWidthPlusBreadth = rsl::math::float3(halfWidth, -halfHeight, halfBreath);
+            /*c*/ rsl::math::float3 minVertex = rsl::math::float3(-halfWidth, -halfHeight, -halfBreath);
+            /*d*/ rsl::math::float3 minVertexPlusWidth = rsl::math::float3(halfWidth, -halfHeight, -halfBreath);
 
-            /*e*/ math::vec3 maxVertexMinusWidth = math::vec3(-halfWidth, halfHeight, halfBreath);
-            /*f*/ math::vec3 maxVertex = math::vec3(halfWidth, halfHeight, halfBreath);
-            /*g*/ math::vec3 maxVertexMinusWidthMinusBreadth = math::vec3(-halfWidth, halfHeight, -halfBreath);
-            /*h*/ math::vec3 maxVertexMinusBreadth = math::vec3(halfWidth, halfHeight, -halfBreath);
+            /*e*/ rsl::math::float3 maxVertexMinusWidth = rsl::math::float3(-halfWidth, halfHeight, halfBreath);
+            /*f*/ rsl::math::float3 maxVertex = rsl::math::float3(halfWidth, halfHeight, halfBreath);
+            /*g*/ rsl::math::float3 maxVertexMinusWidthMinusBreadth = rsl::math::float3(-halfWidth, halfHeight, -halfBreath);
+            /*h*/ rsl::math::float3 maxVertexMinusBreadth = rsl::math::float3(halfWidth, halfHeight, -halfBreath);
 
             //the HalfEdgeEdge only needs a ptr to the vertex  
             vertices.push_back(minVertexPlusBreadth);
@@ -150,14 +150,14 @@ namespace legion::physics
                 vertex += cubeParams.offset;
             }
 
-            math::vec3 a = vertices.at(0);
-            math::vec3 b = vertices.at(1);
-            math::vec3 c = vertices.at(2);
-            math::vec3 d = vertices.at(3);
-            math::vec3 e = vertices.at(4);
-            math::vec3 f = vertices.at(5);
-            math::vec3 g = vertices.at(6);
-            math::vec3 h = vertices.at(7);
+            rsl::math::float3 a = vertices.at(0);
+            rsl::math::float3 b = vertices.at(1);
+            rsl::math::float3 c = vertices.at(2);
+            rsl::math::float3 d = vertices.at(3);
+            rsl::math::float3 e = vertices.at(4);
+            rsl::math::float3 f = vertices.at(5);
+            rsl::math::float3 g = vertices.at(6);
+            rsl::math::float3 h = vertices.at(7);
 
             CalculateLocalColliderCentroid();
 
@@ -178,7 +178,7 @@ namespace legion::physics
             hf->setNextAndPrevEdge(gh, fe);
             fe->setNextAndPrevEdge(hf, eg);
 
-            HalfEdgeFace* eghf = new HalfEdgeFace(eg, math::vec3(0, 1, 0));
+            HalfEdgeFace* eghf = new HalfEdgeFace(eg, rsl::math::float3(0, 1, 0));
             halfEdgeFaces.push_back(eghf);
             //eghf->id = " eghf";
 
@@ -194,7 +194,7 @@ namespace legion::physics
             cd->setNextAndPrevEdge(gc, dh);
             dh->setNextAndPrevEdge(cd, hg);
 
-            HalfEdgeFace* hgcd = new HalfEdgeFace(hg, math::vec3(0, 0, -1));
+            HalfEdgeFace* hgcd = new HalfEdgeFace(hg, rsl::math::float3(0, 0, -1));
             halfEdgeFaces.push_back(hgcd);
             //hgcd->id = "hgcd";
 
@@ -210,7 +210,7 @@ namespace legion::physics
             db->setNextAndPrevEdge(hd, bf);
             bf->setNextAndPrevEdge(db, fh);
 
-            HalfEdgeFace* fhdb = new HalfEdgeFace(fh, math::vec3(1, 0, 0));
+            HalfEdgeFace* fhdb = new HalfEdgeFace(fh, rsl::math::float3(1, 0, 0));
             halfEdgeFaces.push_back(fhdb);
             //fhdb->id = "fhdb";
 
@@ -226,7 +226,7 @@ namespace legion::physics
             ba->setNextAndPrevEdge(fb, ae);
             ae->setNextAndPrevEdge(ba, ef);
 
-            HalfEdgeFace* efba = new HalfEdgeFace(ef, math::vec3(0, 0, 1));
+            HalfEdgeFace* efba = new HalfEdgeFace(ef, rsl::math::float3(0, 0, 1));
             halfEdgeFaces.push_back(efba);
             //efba->id = "efba";
 
@@ -242,7 +242,7 @@ namespace legion::physics
             ac->setNextAndPrevEdge(ea, cg);
             cg->setNextAndPrevEdge(ac, ge);
 
-            HalfEdgeFace* geac = new HalfEdgeFace(ge, math::vec3(-1, 0, 0));
+            HalfEdgeFace* geac = new HalfEdgeFace(ge, rsl::math::float3(-1, 0, 0));
             halfEdgeFaces.push_back(geac);
             //geac->id = "geac";
 
@@ -258,7 +258,7 @@ namespace legion::physics
             dc->setNextAndPrevEdge(bd, ca);
             ca->setNextAndPrevEdge(dc, ab);
 
-            HalfEdgeFace* abdc = new HalfEdgeFace(ab, math::vec3(0, -1, 0));
+            HalfEdgeFace* abdc = new HalfEdgeFace(ab, rsl::math::float3(0, -1, 0));
             halfEdgeFaces.push_back(abdc);
             //abdc->id = "abdc";
 
@@ -321,7 +321,7 @@ namespace legion::physics
             return halfEdgeFaces;
         }
 
-        std::vector<math::vec3>& GetVertices() 
+        std::vector<rsl::math::float3>& GetVertices() 
         {
             return vertices;
         }
@@ -351,7 +351,7 @@ namespace legion::physics
     private:
 
 
-        std::vector<math::vec3> vertices;
+        std::vector<rsl::math::float3> vertices;
 
         std::vector<HalfEdgeFace*> halfEdgeFaces;
     };

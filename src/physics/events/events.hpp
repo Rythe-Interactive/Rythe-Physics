@@ -2,7 +2,7 @@
 #include <core/events/event.hpp>
 #include <physics/diviner/data/physics_manifold.hpp>
 
-namespace legion::physics {
+namespace rythe::physics {
 
 
     template <class T>
@@ -22,7 +22,7 @@ namespace legion::physics {
          *         of this collision.
          */
 
-        L_NODISCARD std::pair<ecs::entity,ecs::entity> participants() const
+        R_NODISCARD std::pair<ecs::entity,ecs::entity> participants() const
         {
             return std::make_pair(
                 manifold->entityA,
@@ -32,7 +32,7 @@ namespace legion::physics {
 
         /** @brief gets the centers of the colliders in local space
          */
-        L_NODISCARD std::pair<math::vec3,math::vec3> centers() const noexcept
+        R_NODISCARD std::pair<rsl::math::float3,rsl::math::float3> centers() const noexcept
         {
             return std::make_pair(
                 manifold->colliderA->GetLocalCentroid(),
@@ -42,7 +42,7 @@ namespace legion::physics {
 
         /** @brief gets the colliders themselves
          */
-        L_NODISCARD std::pair<PhysicsCollider*,
+        R_NODISCARD std::pair<PhysicsCollider*,
                              PhysicsCollider*> colliders() const noexcept
         {
             return std::make_pair(manifold->colliderA, manifold->colliderB);
@@ -76,10 +76,10 @@ namespace legion::physics {
         float newDynamicFriction;
         float newStaticFriction;
         float newRestitution;
-        size_type newMaterialHash;
+        rsl::size_type newMaterialHash;
 
         request_create_physics_material(float dynamicFriction, float staticFriction,
-            float restitution, size_type materialHash)
+            float restitution, rsl::size_type materialHash)
             : newDynamicFriction(dynamicFriction), newStaticFriction(staticFriction),
             newRestitution(restitution), newMaterialHash(materialHash)
         {

@@ -4,11 +4,11 @@
 #include <physics/diviner/halfedgeedge.hpp>
 #include <physics/diviner/halfedgeface.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     struct ConvexConvexCollisionInfo
     {
-        math::vec3 edgeNormal;
+        rsl::math::float3 edgeNormal;
 
         float ARefSeperation, BRefSeperation, aToBEdgeSeperation;
 

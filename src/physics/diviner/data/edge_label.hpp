@@ -1,7 +1,7 @@
 #pragma once
 #include <core/core.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     struct EdgeLabel
     {

@@ -1,9 +1,9 @@
 #pragma once
 #include <core/core.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
-    enum physics_component_flag : size_type
+    enum physics_component_flag : rsl::size_type
     {
         pc_add_first_box = 0ull,
         pc_add_first_sphere,
@@ -14,7 +14,7 @@ namespace legion::physics
         pc_max //must always be the last enum
     };
 
-    enum collider_modification_flag : size_type
+    enum collider_modification_flag : rsl::size_type
     {
         cm_set_new_material = 0ull,
         cm_set_new_sphere_radius,
@@ -30,7 +30,7 @@ namespace legion::physics
         not_set //internal use only
     };
 
-    enum rigidbody_flag : size_type
+    enum rigidbody_flag : rsl::size_type
     {
         rb_velocity,
         rb_angular_velocity,
@@ -41,7 +41,7 @@ namespace legion::physics
         rb_max //must always be the last enum
     };
 
-    enum physics_enviroment_flag : size_type
+    enum physics_enviroment_flag : rsl::size_type
     {
         pe_add_plane,
         pe_max
@@ -54,7 +54,7 @@ namespace legion::physics
         not_set
     };
 
-    enum capsule_character_flag : size_type
+    enum capsule_character_flag : rsl::size_type
     {
         cc_set_radius,
         cc_set_height,

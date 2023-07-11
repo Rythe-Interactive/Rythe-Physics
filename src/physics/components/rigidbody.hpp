@@ -1,7 +1,7 @@
 #pragma once
 #include <physics/data/rigibody_data.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     struct rigidbody
     {

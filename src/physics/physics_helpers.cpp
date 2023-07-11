@@ -1,20 +1,20 @@
 #include "physics_helpers.hpp"
 #include <physics/events/events.hpp>
-namespace legion::physics
+namespace rythe::physics
 {
     std::vector<physics_material_hash> PhysicsHelpers::m_physicsMaterialHashes;
 
     void PhysicsHelpers::createPhysicsMaterial(float dynamicFriction, float staticFriction, float restitution, const char* name)
     {
-        size_type hashResult = nameHash(name);
+        rsl::size_type hashResult = nameHash(name);
 
         m_physicsMaterialHashes.push_back(hashResult);
         events::EventBus::raiseEvent<request_create_physics_material>(request_create_physics_material{ dynamicFriction,staticFriction,restitution,hashResult});
     }
 
-    size_type PhysicsHelpers::retrievePhysicsMaterialHash(const char* name)
+    rsl::size_type PhysicsHelpers::retrievePhysicsMaterialHash(const char* name)
     {
-        size_type hashResult = nameHash(name);
+        rsl::size_type hashResult = nameHash(name);
 
         for (physics_material_hash materialHash : m_physicsMaterialHashes)
         {

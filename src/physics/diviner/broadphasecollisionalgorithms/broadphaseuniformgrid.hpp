@@ -2,7 +2,7 @@
 #include <physics/diviner/broadphasecollisionalgorithms/broadphasecollisionalgorithm.hpp>
 #include <physics/diviner/physics_statics.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     /**@class BroadphaseUniformGrid
      * @brief Implementation of broad-phase collision detection
@@ -18,7 +18,7 @@ namespace legion::physics
          * This can be usefull since every empty cell still takes up space in lists. when a new object is added to the list the list may have to be moved in memory, 
          * which takes time. By keeping the lists small and removing empty cells lists require less moving.
          */
-        BroadphaseUniformGrid(math::ivec3 cellSize, size_type emptyCellDestroyThreshold = 0) : m_cellSize(cellSize), m_emptyCellDestroyThreshold(emptyCellDestroyThreshold)
+        BroadphaseUniformGrid(math::ivec3 cellSize, rsl::size_type emptyCellDestroyThreshold = 0) : m_cellSize(cellSize), m_emptyCellDestroyThreshold(emptyCellDestroyThreshold)
         {
         }
 
@@ -56,11 +56,11 @@ namespace legion::physics
 
     private:
         math::ivec3 m_cellSize;
-        size_type m_emptyCellDestroyThreshold = 0;
+        rsl::size_type m_emptyCellDestroyThreshold = 0;
 
         /**@brief Calculates a cell index from a point. i.e. calculates in which cell in the uniform grid a point will be. 
          */
-        math::ivec3 calculateCellIndex(const math::vec3 point);
+        math::ivec3 calculateCellIndex(const rsl::math::float3 point);
 
         // Stores the cell index (ivec3) to the index in the m_groupings list.
         std::unordered_map<math::ivec3, int> cellIndices;
@@ -68,7 +68,7 @@ namespace legion::physics
         // All the entites in the cells. Using this new entities can be detected.
         std::unordered_set<id_type> m_collectedEntities;
         // Stores the old positions of the collected entities. This way we can check if an object moved.
-        std::unordered_map<id_type, math::vec3> m_oldPositions;
+        std::unordered_map<id_type, rsl::math::float3> m_oldPositions;
         // Stores all the cells that an entity occupies. An entity can be on the edge of mulitple cells and therefore be in multiple cells at once.
         std::unordered_map<id_type, std::unordered_set<math::ivec3>> m_entityOccupiedCells;
 

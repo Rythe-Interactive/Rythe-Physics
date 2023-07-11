@@ -9,7 +9,7 @@ namespace physx
     class PxTransform;
 };
 
-namespace legion::physics
+namespace rythe::physics
 {
     class ColliderData;
     class PhysxInternalWrapper;
@@ -19,7 +19,7 @@ namespace legion::physics
         physx::PxScene* scene = nullptr;
         physx::PxMaterial* defaultMaterial = nullptr;
         float timeStep = 0.02f;
-        std::unordered_map<size_type, physx::PxMaterial*>* physicsMaterials;
+        std::unordered_map<rsl::size_type, physx::PxMaterial*>* physicsMaterials;
         float defaultRigidbodyDensity = 1.0f;
     };
 

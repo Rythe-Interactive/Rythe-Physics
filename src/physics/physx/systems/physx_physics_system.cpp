@@ -8,7 +8,7 @@
 
 #include <physics/physx/data/controller_hit_feedback.inl>
 
-namespace legion::physics
+namespace rythe::physics
 {
     using namespace physx;
 
@@ -26,8 +26,8 @@ namespace legion::physics
             const PxVec3& pxStart = line.pos0;
             const PxVec3& pxEnd = line.pos1;
 
-            math::vec3 start{ pxStart.x, pxStart.y, pxStart.z };
-            math::vec3 end{ pxEnd.x, pxEnd.y,pxEnd.z };
+            rsl::math::float3 start{ pxStart.x, pxStart.y, pxStart.z };
+            rsl::math::float3 end{ pxEnd.x, pxEnd.y,pxEnd.z };
 
             debug::drawLine(start, end, math::colors::green, 1.0f, 0.0f);
         }
@@ -51,8 +51,8 @@ namespace legion::physics
 
     //PhysX PVD Debugger Related
     constexpr const char* pvdHost = "127.0.0.1";
-    constexpr size_type defaultPVDListeningPort = 5425;
-    constexpr size_type defaultPVDHostTimeout = 10;
+    constexpr rsl::size_type defaultPVDListeningPort = 5425;
+    constexpr rsl::size_type defaultPVDHostTimeout = 10;
 
     class DebuggerWrapper
     {
@@ -134,7 +134,7 @@ namespace legion::physics
 
     struct PhysxStatics
     {
-        inline static size_type selfInstanceCounter = 0;
+        inline static rsl::size_type selfInstanceCounter = 0;
 
         inline static PxFoundation* foundation = nullptr;
         inline static DebuggerWrapper debugger;
@@ -149,7 +149,7 @@ namespace legion::physics
 
     using PS = PhysxStatics;
 
-    constexpr size_type convexHullVertexLimit = 256;
+    constexpr rsl::size_type convexHullVertexLimit = 256;
 
     physx::PxPhysics* PhysXPhysicsSystem::getSDK()
     {
@@ -172,7 +172,7 @@ namespace legion::physics
         bindToEvent<events::component_destruction<physics_component>, &PhysXPhysicsSystem::markPhysicsWrapperPendingRemove>();
         bindToEvent<request_create_physics_material, &PhysXPhysicsSystem::onRequestCreatePhysicsMaterial>();
 
-        PhysicsComponentData::setConvexGeneratorDelegate([this](const std::vector<math::vec3>& vertices)->void*
+        PhysicsComponentData::setConvexGeneratorDelegate([this](const std::vector<rsl::math::float3>& vertices)->void*
             {
                 return physxGenerateConvexMesh(vertices);
             });
@@ -204,11 +204,11 @@ namespace legion::physics
         }
     }
 
-    void* PhysXPhysicsSystem::physxGenerateConvexMesh(const std::vector<math::vec3>& vertices)
+    void* PhysXPhysicsSystem::physxGenerateConvexMesh(const std::vector<rsl::math::float3>& vertices)
     {
         PxConvexMeshDesc convexDesc;
         convexDesc.points.count = vertices.size();
-        convexDesc.points.stride = sizeof(math::vec3);
+        convexDesc.points.stride = sizeof(rsl::math::float3);
         convexDesc.points.data = vertices.data();
         convexDesc.flags =
             PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eDISABLE_MESH_VALIDATION | PxConvexFlag::eFAST_INERTIA_COMPUTATION;
@@ -233,7 +233,7 @@ namespace legion::physics
 
             PS::dispatcher = PxDefaultCpuDispatcherCreate(0); //deal with multithreading later on
 
-            #ifdef LEGION_DEBUG
+            #ifdef RYTHE_DEBUG
             PS::debugger.initializeDebugger(PS::foundation, DebuggerWrapper::transport_mode::none);
             #endif
 
@@ -263,7 +263,7 @@ namespace legion::physics
         PxMaterial* defaultMaterial = PS::physxSDK->createMaterial(0.5f, 0.5f, 0.6f);
         m_physicsMaterials.insert({ defaultMaterialHash,defaultMaterial });
 
-        #ifdef LEGION_DEBUG
+        #ifdef RYTHE_DEBUG
         m_physxScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
         m_physxScene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
         m_physxScene->setVisualizationParameter(PxVisualizationParameter::eBODY_MASS_AXES, 1.0f);
@@ -319,13 +319,13 @@ namespace legion::physics
         PS::foundation->release();
     }
 
-    void PhysXPhysicsSystem::update(legion::time::span deltaTime)
+    void PhysXPhysicsSystem::update(rythe::rsl::span deltaTime)
     {
         if (m_isContinuousStepActive || m_isSingleStepContinueAcitve)
         {
             m_accumulation += deltaTime;
 
-            size_type tickAmount = 0;
+            rsl::size_type tickAmount = 0;
 
             executePreSimulationActions();
 
@@ -363,7 +363,7 @@ namespace legion::physics
     void PhysXPhysicsSystem::executePreSimulationActions()
     {
         //[1] Identify invalid entities and remove them from pxScene
-        for (size_type idToRemove : m_wrapperPendingRemovalID)
+        for (rsl::size_type idToRemove : m_wrapperPendingRemovalID)
         {
             m_physxWrapperContainer.PopAndSwapRemoveWrapper(idToRemove);
         }
@@ -397,7 +397,7 @@ namespace legion::physics
         for (auto entity : capsuleCharacterFilter)
         {
             auto& capsule = *entity.get_component<capsule_controller>();
-            math::vec3& entPos = *entity.get_component<position>();
+            rsl::math::float3& entPos = *entity.get_component<position>();
 
             if (capsule.id == invalid_capsule_controller)
             {
@@ -490,7 +490,7 @@ namespace legion::physics
             const PxVec3& pxPosition = pxTransform.p;
             const PxQuat& pxRotation = pxTransform.q;
 
-            *entity.get_component<position>() = math::vec3(pxPosition.x, pxPosition.y, pxPosition.z);
+            *entity.get_component<position>() = rsl::math::float3(pxPosition.x, pxPosition.y, pxPosition.z);
             *entity.get_component<rotation>() = math::quat(pxRotation.w, pxRotation.x, pxRotation.y, pxRotation.z);
         }
 
@@ -525,7 +525,7 @@ namespace legion::physics
             ecs::entity entity = { static_cast<ecs::entity_data*>(controller->getUserData()) };
 
             const PxExtendedVec3& pxVec =  controller->getPosition();
-            *entity.get_component<position>() = math::vec3{ pxVec.x,pxVec.y,pxVec.z };
+            *entity.get_component<position>() = rsl::math::float3{ pxVec.x,pxVec.y,pxVec.z };
         }
 
     }
@@ -561,7 +561,7 @@ namespace legion::physics
 
     void PhysXPhysicsSystem::instantiateCharacterController(ecs::entity ent, const CapsuleControllerData& capsuleData, PhysxCharacterWrapper& outCharacterWrapper)
     {
-        const math::vec3& pos = ent.get_component<position>();
+        const rsl::math::float3& pos = ent.get_component<position>();
         
         outCharacterWrapper.controllerFeedback = std::make_unique<ControllerHitFeedback>();
 
@@ -638,7 +638,7 @@ namespace legion::physics
 
         if (!wrapperPtr) { return; }
 
-        for(size_type bitPos = 0; bitPos < eventsGenerated.size(); ++bitPos)
+        for(rsl::size_type bitPos = 0; bitPos < eventsGenerated.size(); ++bitPos)
         {
             if (eventsGenerated.test(bitPos))
             {
@@ -652,14 +652,14 @@ namespace legion::physics
     void PhysXPhysicsSystem::processRigidbodyComponentEvents(ecs::entity ent, rigidbody& rigidbody, physics_component& physicsComponentToProcess,
         const PhysxEnviromentInfo& physicsEnviromentInfo)
     {
-        size_type physicsComponentID = physicsComponentToProcess.physicsComponentID;
+        rsl::size_type physicsComponentID = physicsComponentToProcess.physicsComponentID;
         auto& eventsGenerated = rigidbody.data.getGeneratedModifyEvents();
 
         pointer<PhysxInternalWrapper> wrapperPtr = m_physxWrapperContainer.findWrapperWithID(physicsComponentID);
 
         if (!wrapperPtr) { return; }
 
-        for (size_type bitPos = 0; bitPos < eventsGenerated.size(); ++bitPos)
+        for (rsl::size_type bitPos = 0; bitPos < eventsGenerated.size(); ++bitPos)
         {
             if (eventsGenerated.test(bitPos))
             {
@@ -672,7 +672,7 @@ namespace legion::physics
 
     void PhysXPhysicsSystem::processColliderModificationEvents(physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo)
     {
-        size_type physicsComponentID = physicsComponentToProcess.physicsComponentID;
+        rsl::size_type physicsComponentID = physicsComponentToProcess.physicsComponentID;
         pointer<PhysxInternalWrapper> wrapperPtr = m_physxWrapperContainer.findWrapperWithID(physicsComponentID);
 
         const auto& colliderModifyEvents = physicsComponentToProcess.physicsCompData.getGeneratedColliderModifyEvents();
@@ -695,7 +695,7 @@ namespace legion::physics
 
         auto& eventsGenerated = capsule.data.getModificationFlags();
 
-        for (size_type bitPos = 0; bitPos < eventsGenerated.size(); ++bitPos)
+        for (rsl::size_type bitPos = 0; bitPos < eventsGenerated.size(); ++bitPos)
         {
             if (eventsGenerated.test(bitPos))
             {
@@ -708,14 +708,14 @@ namespace legion::physics
 
     void PhysXPhysicsSystem::processPhysicsEnviromentEvents(ecs::entity ent, physics_enviroment& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo)
     {
-        size_type enviromentID = physicsComponentToProcess.physicsEnviromentID;
+        rsl::size_type enviromentID = physicsComponentToProcess.physicsEnviromentID;
         auto& eventsGenerated = physicsComponentToProcess.data.getGeneratedModifyEvents();
 
         pointer<PhysxInternalWrapper> wrapperPtr = m_physxWrapperContainer.findWrapperWithID(enviromentID);
 
         if (!wrapperPtr) { return; }
 
-        for (size_type bitPos = 0; bitPos < eventsGenerated.size(); ++bitPos)
+        for (rsl::size_type bitPos = 0; bitPos < eventsGenerated.size(); ++bitPos)
         {
             if (eventsGenerated.test(bitPos))
             {

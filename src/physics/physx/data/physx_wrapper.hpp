@@ -7,7 +7,7 @@ namespace physx
     class PxController;
 }
 
-namespace legion::physics
+namespace rythe::physics
 {
     class ControllerHitFeedback;
 

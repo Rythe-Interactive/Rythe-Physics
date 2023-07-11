@@ -2,11 +2,11 @@
 #include <physics/diviner/colliders/convexcollider.hpp>
 #include <physics/diviner/physics_statics.hpp>
 
-namespace legion::physics::diviner
+namespace rythe::physics::diviner
 {
     void physics_component::calculateNewLocalCenterOfMass()
     {
-        localCenterOfMass = math::vec3::zero;
+        localCenterOfMass = rsl::math::float3::zero;
 
         for (auto collider : colliders)
         {
@@ -16,7 +16,7 @@ namespace legion::physics::diviner
         localCenterOfMass /= static_cast<float>(colliders.size());
     }
 
-    std::shared_ptr<ConvexCollider> physics_component::constructConvexHullFromVertices(const std::vector<math::vec3>& vertices)
+    std::shared_ptr<ConvexCollider> physics_component::constructConvexHullFromVertices(const std::vector<rsl::math::float3>& vertices)
     {
         auto collider = PhysicsStatics::generateConvexHull(vertices);
 

@@ -2,7 +2,7 @@
 #include <physx/PxPhysicsAPI.h>
 #include <physics/components/capsule_controller.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     using namespace physx;
 

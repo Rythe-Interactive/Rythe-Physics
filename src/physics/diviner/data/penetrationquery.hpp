@@ -2,7 +2,7 @@
 
 #include <core/core.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     struct physics_manifold;
     class PhysicsCollider;
@@ -12,12 +12,12 @@ namespace legion::physics
     {
     public:
 
-        math::vec3 faceCentroid,normal;
+        rsl::math::float3 faceCentroid,normal;
         float penetration = 0.0f;
         bool isARef;
         std::string debugID = "na";
 
-        PenetrationQuery(math::vec3& pFaceCentroid,math::vec3& pNormal,float pPenetration,bool pIsARef) :
+        PenetrationQuery(rsl::math::float3& pFaceCentroid,rsl::math::float3& pNormal,float pPenetration,bool pIsARef) :
             faceCentroid(pFaceCentroid),normal(pNormal),penetration(pPenetration),isARef(pIsARef)
         {
 

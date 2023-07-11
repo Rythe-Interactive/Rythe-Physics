@@ -1,9 +1,9 @@
 #pragma once
 #include <physics/data/capsule_controller_data.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
-    constexpr size_t invalid_capsule_controller = std::numeric_limits<size_type>::max();
+    constexpr size_t invalid_capsule_controller = std::numeric_limits<rsl::size_type>::max();
 
     struct capsule_controller
     {

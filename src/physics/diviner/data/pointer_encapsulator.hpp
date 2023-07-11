@@ -1,6 +1,6 @@
 #pragma once
 
-namespace legion::physics
+namespace rythe::physics
 {
     template<class T>
     class PointerEncapsulator

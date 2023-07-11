@@ -9,7 +9,7 @@
 
 using namespace physx;
 
-namespace legion::physics
+namespace rythe::physics
 {
     void processAngularDragModification(rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity)
     {
@@ -29,7 +29,7 @@ namespace legion::physics
 
     void processVelocityModification(rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity)
     {
-        const math::vec3& vel = rigidbody.data.getVelocity();
+        const rsl::math::float3& vel = rigidbody.data.getVelocity();
 
         PxRigidDynamic* rigid = static_cast<PxRigidDynamic*>(wrapper.physicsActor);
         
@@ -39,7 +39,7 @@ namespace legion::physics
 
     void processAngularVelocityModification(rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity)
     {
-        const math::vec3& angularVel = rigidbody.data.getAngularVelocity();
+        const rsl::math::float3& angularVel = rigidbody.data.getAngularVelocity();
 
         PxRigidDynamic* rigid = static_cast<PxRigidDynamic*>(wrapper.physicsActor);
 
@@ -74,7 +74,7 @@ namespace legion::physics
             PxTransform localTransform;
             calculateLocalColliderTransform(localTransform, collider);
 
-            const math::vec3& extents = *collider.getBoxExtents();
+            const rsl::math::float3& extents = *collider.getBoxExtents();
 
             instantiateNextCollider<PxBoxGeometry,const PxVec3&>(getSDK(), wrapper, localTransform, sceneInfo, PxVec3(extents.x, extents.y, extents.z));
         }
@@ -89,7 +89,7 @@ namespace legion::physics
             if (collider.isRegisteredOrNotOfType(collider_type::box)) { continue; }
             collider.setRegistered(true);
             
-            const math::vec3& extents = *collider.getBoxExtents();
+            const rsl::math::float3& extents = *collider.getBoxExtents();
 
             PxTransform transform;
             PxTransform localTransform;
@@ -222,7 +222,7 @@ namespace legion::physics
 
         PxMaterial* newMaterial = sceneInfo.defaultMaterial;
 
-        size_type materialHash = modData.data.newMaterial;
+        rsl::size_type materialHash = modData.data.newMaterial;
         auto iter = sceneInfo.physicsMaterials->find(materialHash);
 
         if (iter != sceneInfo.physicsMaterials->end())
@@ -245,7 +245,7 @@ namespace legion::physics
         PxShape* shapes = static_cast<PxShape*>(_alloca(sizeof(PxShape*) * shapeCount));
         rigid->getShapes(&shapes, shapeCount);
 
-        const math::vec3& newExtents = modData.data.newBoxExtents;
+        const rsl::math::float3& newExtents = modData.data.newBoxExtents;
 
         PxBoxGeometry box;
         shapes[modData.colliderIndex].getBoxGeometry(box);
@@ -275,7 +275,7 @@ namespace legion::physics
 
     void processAddInfinitePlane(physics_enviroment& physicsEnviroment, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity)
     {
-        const math::vec3& normal = physicsEnviroment.data.getInfinitePlaneNormal();
+        const rsl::math::float3& normal = physicsEnviroment.data.getInfinitePlaneNormal();
         float distToPlane = physicsEnviroment.data.getInfinitePlaneDistanceToOrigin();
 
         wrapper.physicsActor = PxCreatePlane(*getSDK(), PxPlane(normal.x, normal.y, normal.z, distToPlane), *sceneInfo.defaultMaterial);
@@ -288,7 +288,7 @@ namespace legion::physics
     {
         CapsuleControllerData& capsuleData = capsule.data;
 
-        const math::vec3& disp = capsuleData.getCurrentDisplacement();
+        const rsl::math::float3& disp = capsuleData.getCurrentDisplacement();
         characterWrapper.characterController->move(PxVec3{ disp.x,disp.y,disp.z }, 0.0f, 0.016f, PxControllerFilters());
         capsuleData.resetDisplacement();
     }
@@ -300,13 +300,13 @@ namespace legion::physics
 
         gravityPreset->gravityAcc += gravityPreset->gravityValue * sceneInfo.timeStep;
 
-        const math::vec3& displacement = gravityPreset->gravityAcc;
+        const rsl::math::float3& displacement = gravityPreset->gravityAcc;
         const PxU32 flag = character.characterController->move(
             PxVec3(displacement.x, displacement.y, displacement.z), 0.0f, sceneInfo.timeStep, PxControllerFilters());
 
         if (flag & PxControllerCollisionFlag::eCOLLISION_DOWN)
         {
-            gravityPreset->gravityAcc = math::vec3(0.0f);
+            gravityPreset->gravityAcc = rsl::math::float3(0.0f);
         }
     }
 }

@@ -2,7 +2,7 @@
 #include <physics/diviner/physics_contact.hpp>
 
 
-namespace legion::physics
+namespace rythe::physics
 {
     const std::vector<std::vector<physics_manifold_precursor>>& BroadphaseUniformGrid::collectPairs(
         std::vector<physics_manifold_precursor>&& manifoldPrecursors)
@@ -16,7 +16,7 @@ namespace legion::physics
 
         for (auto& precursor : manifoldPrecursors)
         {
-            math::vec3 pos;
+            rsl::math::float3 pos;
             pos.x = precursor.worldTransform[3].x;
             pos.y = precursor.worldTransform[3].y;
             pos.z = precursor.worldTransform[3].z;
@@ -43,14 +43,14 @@ namespace legion::physics
             }
 
             // Get all the colliders of the entity
-            std::vector<legion::physics::PhysicsColliderPtr>& colliders = precursor.physicsComp->colliders;
+            std::vector<rythe::physics::PhysicsColliderPtr>& colliders = precursor.physicsComp->colliders;
             // If the entity has no colliders, we can skip it
             if (colliders.size() == 0) continue;
 
             // Get the biggest AABB collider of this physics component
             // If it has one collider we can simply retrieve it
             // Oherwise we have to combine the bounds of all its colliders
-            std::pair<math::vec3, math::vec3> aabb = colliders.at(0)->GetMinMaxWorldAABB();
+            std::pair<rsl::math::float3, rsl::math::float3> aabb = colliders.at(0)->GetMinMaxWorldAABB();
             for (int i = 1; i < colliders.size(); ++i)
             {
                 aabb = PhysicsStatics::CombineAABB(colliders.at(i)->GetMinMaxWorldAABB(), aabb);
@@ -148,13 +148,13 @@ namespace legion::physics
 
         for (auto& precursor : manifoldPrecursors)
         {
-            std::vector<legion::physics::PhysicsColliderPtr>& colliders = precursor.physicsComp->colliders;
+            std::vector<rythe::physics::PhysicsColliderPtr>& colliders = precursor.physicsComp->colliders;
             if (colliders.size() == 0) continue;
 
             // Get the biggest AABB collider of this physics component
             // If it has one collider we can simply retrieve it
             // Oherwise we have to combine the bounds of all its colliders
-            std::pair<math::vec3, math::vec3> aabb = colliders.at(0)->GetMinMaxWorldAABB();
+            std::pair<rsl::math::float3, rsl::math::float3> aabb = colliders.at(0)->GetMinMaxWorldAABB();
             for (int i = 1; i < colliders.size(); ++i)
             {
                 aabb = PhysicsStatics::CombineAABB(colliders.at(i)->GetMinMaxWorldAABB(), aabb);
@@ -188,10 +188,10 @@ namespace legion::physics
         return groupings;
     }
 
-    math::ivec3 BroadphaseUniformGrid::calculateCellIndex(const math::vec3 point)
+    math::ivec3 BroadphaseUniformGrid::calculateCellIndex(const rsl::math::float3 point)
     {
         // A point below 0 needs an extra 'push' since -0.5 will be cast to int as 0
-        math::vec3 temp = point;
+        rsl::math::float3 temp = point;
         if (temp.x < 0) temp.x-=m_cellSize.x;
         if (temp.y < 0) temp.y-=m_cellSize.y;
         if (temp.z < 0) temp.z-=m_cellSize.z;

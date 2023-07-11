@@ -7,7 +7,7 @@
 #include <physics/diviner/components/physics_component.hpp>
 #include <physics/diviner/data/penetrationquery.hpp>
 
-namespace legion::physics
+namespace rythe::physics
 {
     class PhysicsCollider;
 
