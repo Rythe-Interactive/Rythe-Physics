@@ -72,7 +72,7 @@ namespace rythe::physics
 
         void processPhysicsEnviromentEvents(ecs::entity ent, physics_enviroment& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
 
-        delegate<void(const physx::PxControllerShapeHit&)> initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum);
+        rsl::delegate<void(const physx::PxControllerShapeHit&)> initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum);
 
         static constexpr float m_timeStep = 0.02f;
         static constexpr rsl::size_type m_maxPhysicsStep = 3;
@@ -83,22 +83,22 @@ namespace rythe::physics
         PhysxWrapperContainer<PhysxInternalWrapper> m_physxWrapperContainer;
         PhysxWrapperContainer<PhysxCharacterWrapper> m_characterContainer;
 
-        using pcEventProcessFunc = delegate<void(physics_component&,const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
+        using pcEventProcessFunc = rsl::delegate<void(physics_component&,const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
         std::array< pcEventProcessFunc, physics_component_flag::pc_max> m_physicsComponentActionFuncs;
 
-        using rbEventProcessFunc = delegate<void(rigidbody&,const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
+        using rbEventProcessFunc = rsl::delegate<void(rigidbody&,const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
         std::array< rbEventProcessFunc, rigidbody_flag::rb_max> m_rigidbodyComponentActionFuncs;
 
-        using peEventProcessFunc = delegate<void(physics_enviroment&, const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
+        using peEventProcessFunc = rsl::delegate<void(physics_enviroment&, const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
         std::array< peEventProcessFunc, physics_enviroment_flag::pe_max> m_enviromentComponentActionFuncs;
 
-        using cmEventProcessFunc = delegate<void(const ColliderData&, const collider_modification_data&, const PhysxEnviromentInfo&, PhysxInternalWrapper&)>;
+        using cmEventProcessFunc = rsl::delegate<void(const ColliderData&, const collider_modification_data&, const PhysxEnviromentInfo&, PhysxInternalWrapper&)>;
         std::array<cmEventProcessFunc, collider_modification_flag::cm_max> m_colliderActionFuncs;
 
-        using ccEventProcessFunc = delegate<void(PhysxCharacterWrapper&, capsule_controller&) > ;
+        using ccEventProcessFunc = rsl::delegate<void(PhysxCharacterWrapper&, capsule_controller&) > ;
         std::array<ccEventProcessFunc, capsule_character_flag::cc_max> m_capsuleActionFuncs;
 
-        using characterPresetProcessFunc = delegate<void(controller_preset&, PhysxCharacterWrapper&, const PhysxEnviromentInfo&)>;
+        using characterPresetProcessFunc = rsl::delegate<void(controller_preset&, PhysxCharacterWrapper&, const PhysxEnviromentInfo&)>;
         std::unordered_map<rsl::size_type,characterPresetProcessFunc> m_hashToPresetProcessFunc;
 
         std::vector<rsl::size_type> m_wrapperPendingRemovalID;

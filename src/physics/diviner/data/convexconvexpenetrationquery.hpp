@@ -14,8 +14,8 @@ namespace rythe::physics
         ConvexConvexPenetrationQuery(HalfEdgeFace* pRefFace, HalfEdgeFace* pIncFace, rsl::math::float3& pFaceCentroid,
             rsl::math::float3& pNormal, float pPenetration, bool pIsARef);
 
-        virtual void populateContactList(physics_manifold& manifold,  math::mat4& refTransform,
-            math::mat4 incTransform , PhysicsCollider* refCollider) override;
+        virtual void populateContactList(physics_manifold& manifold,  math::float4x4& refTransform,
+            math::float4x4 incTransform , PhysicsCollider* refCollider) override;
 
     };
 }

@@ -55,12 +55,12 @@ namespace rythe::physics
         void debugDraw() override;
 
     private:
-        math::ivec3 m_cellSize;
+        math::int3 m_cellSize;
         rsl::size_type m_emptyCellDestroyThreshold = 0;
 
         /**@brief Calculates a cell index from a point. i.e. calculates in which cell in the uniform grid a point will be. 
          */
-        math::ivec3 calculateCellIndex(const rsl::math::float3 point);
+        math::int3 calculateCellIndex(const rsl::math::float3 point);
 
         // Stores the cell index (ivec3) to the index in the m_groupings list.
         std::unordered_map<math::ivec3, int> cellIndices;

@@ -77,8 +77,8 @@ namespace rythe::physics
         return (maxForwardLength + minForwardLength) + (maxRightLength + minRightLength);
     }
 
-    void HalfEdgeFace::forEachEdge(rythe::core::delegate< void(HalfEdgeEdge*)> functionToExecute,
-        rythe::core::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge )
+    void HalfEdgeFace::forEachEdge(rythe::core::rsl::delegate< void(HalfEdgeEdge*)> functionToExecute,
+        rythe::core::rsl::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge )
     {
         HalfEdgeEdge* initialEdge = startEdge;
         HalfEdgeEdge* currentEdge = startEdge;
@@ -96,7 +96,7 @@ namespace rythe::physics
         } while (initialEdge != currentEdge && getNextEdge(currentEdge) != nullptr);
     }
 
-    void HalfEdgeFace::forEachEdgeReverse(rythe::core::delegate<void(HalfEdgeEdge*)> functionToExecute)
+    void HalfEdgeFace::forEachEdgeReverse(rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute)
     {
         auto getPrevEdges = [](HalfEdgeEdge* current) {return current->prevEdge; };
 
@@ -131,7 +131,7 @@ namespace rythe::physics
         startEdge = edges.at(0);
     }
 
-    void HalfEdgeFace::DEBUG_DrawFace(const math::mat4& transform,const math::color& debugColor,float time)
+    void HalfEdgeFace::DEBUG_DrawFace(const math::float4x4& transform,const math::color& debugColor,float time)
     {
         auto drawFunc = [&transform,debugColor,time](HalfEdgeEdge* edge)
         {
@@ -139,21 +139,21 @@ namespace rythe::physics
 
         };
 
-        rsl::math::float3 worldStart = transform * math::vec4(centroid, 1);
-        rsl::math::float3 worldEnd = transform * math::vec4(centroid + normal * 0.1f, 1);
+        rsl::math::float3 worldStart = transform * math::float4(centroid, 1);
+        rsl::math::float3 worldEnd = transform * math::float4(centroid + normal * 0.1f, 1);
 
         forEachEdge(drawFunc);
     }
 
-    void HalfEdgeFace::DEBUG_DirectionDrawFace(const math::mat4& transform, const math::color& debugColor, float time)
+    void HalfEdgeFace::DEBUG_DirectionDrawFace(const math::float4x4& transform, const math::color& debugColor, float time)
     {
         auto drawFunc = [&transform, debugColor, time](HalfEdgeEdge* edge)
         {
             edge->DEBUG_directionDrawEdge(transform, debugColor, time, 5.0f);
         };
 
-        rsl::math::float3 worldStart = transform * math::vec4(centroid, 1);
-        rsl::math::float3 worldEnd = transform * math::vec4(centroid + normal * 0.1f, 1);
+        rsl::math::float3 worldStart = transform * math::float4(centroid, 1);
+        rsl::math::float3 worldEnd = transform * math::float4(centroid + normal * 0.1f, 1);
 
         debug::drawLine(worldStart, worldEnd, math::colors::green, 3.0f, time, false);
 

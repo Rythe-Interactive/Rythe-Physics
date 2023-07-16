@@ -67,11 +67,11 @@ namespace rythe::physics
          */
         void suicidalMergeWithPairing(std::vector<rsl::math::float3>& unmergedVertices, rsl::math::float3& normal, float scalingEpsilon);
        
-        void DEBUG_drawEdge(const math::mat4& transform, const math::color& debugColor, float time = 20.0f, float width = 5.0f);
+        void DEBUG_drawEdge(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f, float width = 5.0f);
         
         void DEBUG_drawInsetEdge(const rsl::math::float3 spacing, const math::color& debugColor, float time = 20.0f, float width = 5.0f);
 
-        void DEBUG_directionDrawEdge(const math::mat4& transform, const math::color& debugColor, float time, float width);
+        void DEBUG_directionDrawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width);
     };
 }
 

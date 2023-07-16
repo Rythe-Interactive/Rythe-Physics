@@ -29,10 +29,10 @@ namespace rythe::physics
         /** @brief given a function that takes in a HalfEdgeEdge*, 
         * executes the function on each edge connected to 'startEdge'
         */
-        void forEachEdge(rythe::core::delegate< void(HalfEdgeEdge*)> functionToExecute,
-            rythe::core::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge = [](HalfEdgeEdge* current) { return current->nextEdge; });
+        void forEachEdge(rythe::core::rsl::delegate< void(HalfEdgeEdge*)> functionToExecute,
+            rythe::core::rsl::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge = [](HalfEdgeEdge* current) { return current->nextEdge; });
 
-        void forEachEdgeReverse(rythe::core::delegate< void(HalfEdgeEdge*)> functionToExecute);
+        void forEachEdgeReverse(rythe::core::rsl::delegate< void(HalfEdgeEdge*)> functionToExecute);
 
         /**@brief Inverses the face
          * The edges will be stored in reverse and therefore the normal will point in the other direction
@@ -40,9 +40,9 @@ namespace rythe::physics
          */
         void inverse();
 
-        void DEBUG_DrawFace(const math::mat4& transform, const math::color& debugColor,  float time = 20.0f);
+        void DEBUG_DrawFace(const math::float4x4& transform, const math::color& debugColor,  float time = 20.0f);
 
-        void DEBUG_DirectionDrawFace(const math::mat4& transform, const math::color& debugColor, float time = 20.0f);
+        void DEBUG_DirectionDrawFace(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f);
 
         ~HalfEdgeFace();
     };

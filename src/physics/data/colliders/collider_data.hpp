@@ -30,13 +30,13 @@ namespace rythe::physics
 
     public:
 
-        ColliderData(rsl::size_type colliderIndex,pointer<std::vector<collider_modification_data>> modificationsRequests, collider_type colliderType, const rsl::math::float3& offset, const math::quat& rotation) noexcept;
+        ColliderData(rsl::size_type colliderIndex,pointer<std::vector<collider_modification_data>> modificationsRequests, collider_type colliderType, const rsl::math::float3& offset, const rsl::math::quat& rotation) noexcept;
 
         R_ALWAYS_INLINE void setRegistered(bool registeredState) noexcept { m_isRegistered = registeredState; }
         R_ALWAYS_INLINE bool isRegistered() const noexcept   { return m_isRegistered; }
 
         R_ALWAYS_INLINE const rsl::math::float3& getOffset() const noexcept   { return m_positionOffset; }
-        R_ALWAYS_INLINE const math::quat& getRotationOffset() const noexcept  { return m_rotationOffset; }
+        R_ALWAYS_INLINE const rsl::math::quat& getRotationOffset() const noexcept  { return m_rotationOffset; }
 
         R_ALWAYS_INLINE collider_type getColliderType() const noexcept  { return m_colliderType; }
 
@@ -122,7 +122,7 @@ namespace rythe::physics
 
         ColliderSpecifics m_colliderSpecifics;
 
-        math::quat m_rotationOffset{ math::identity<math::quat>()};
+        rsl::math::quat m_rotationOffset{ math::identity<rsl::math::quat>()};
         rsl::math::float3 m_positionOffset{0};
 
         rsl::size_type m_materialHash = defaultPhysicsMaterial;

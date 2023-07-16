@@ -10,14 +10,14 @@ namespace rythe::physics
     */
     struct physics_manifold_precursor
     {
-        math::mat4 worldTransform;
+        math::float4x4 worldTransform;
         diviner::physics_component* physicsComp = nullptr;
         id_type id;
         ecs::entity entity;
 
         physics_manifold_precursor() = default;
 
-        physics_manifold_precursor(math::mat4 pWorldTransform, diviner::physics_component* pPhysicsComp, id_type precursorID, ecs::entity entity) :
+        physics_manifold_precursor(math::float4x4 pWorldTransform, diviner::physics_component* pPhysicsComp, id_type precursorID, ecs::entity entity) :
             worldTransform(pWorldTransform), physicsComp(pPhysicsComp), id(precursorID), entity(entity)
         {
 

@@ -10,7 +10,7 @@ namespace rythe::physics
 
     class PhysicsComponentData
     {
-        using GenerateConvexDelegate = delegate<void* (const std::vector<rsl::math::float3>& vertices)>;
+        using GenerateConvexDelegate = rsl::delegate<void* (const std::vector<rsl::math::float3>& vertices)>;
 
     public:
 
@@ -50,7 +50,7 @@ namespace rythe::physics
             return *this;
         }
 
-        R_ALWAYS_INLINE void addBoxCollider(const rsl::math::float3& extents, const rsl::math::float3& offset, const math::quat& rotation)
+        R_ALWAYS_INLINE void addBoxCollider(const rsl::math::float3& extents, const rsl::math::float3& offset, const rsl::math::quat& rotation)
         {
             if (extents.x == 0.0f || extents.y == 0.0f || extents.z == 0.0f)
             {
@@ -66,10 +66,10 @@ namespace rythe::physics
 
         R_ALWAYS_INLINE void addBoxCollider(const rsl::math::float3& extents)
         {
-            addBoxCollider(extents, rsl::math::float3(0.0f), math::identity<math::quat>());
+            addBoxCollider(extents, rsl::math::float3(0.0f), math::identity<rsl::math::quat>());
         }
 
-        void addConvexCollider(const std::vector<rsl::math::float3>& vertices, const rsl::math::float3& offset, const math::quat& rotation)
+        void addConvexCollider(const std::vector<rsl::math::float3>& vertices, const rsl::math::float3& offset, const rsl::math::quat& rotation)
         {
             //convex colliders depend on an external vertex array, needs to be handled immediately 
             void* convexColliderPtr = m_generateConvexColliderFunc(vertices);
@@ -94,7 +94,7 @@ namespace rythe::physics
                 return;
            }
 
-           m_colliders.push_back(ColliderData(m_colliderCount, { &m_colliderModificationRequests }, collider_type::sphere, offset, math::identity<math::quat>() ));
+           m_colliders.push_back(ColliderData(m_colliderCount, { &m_colliderModificationRequests }, collider_type::sphere, offset, math::identity<rsl::math::quat>() ));
            m_colliders[m_colliderCount].setColliderToSphereCollider(radius);
            updateColliderRecords(physics_component_flag::pc_add_first_sphere, physics_component_flag::pc_add_next_sphere);
         }

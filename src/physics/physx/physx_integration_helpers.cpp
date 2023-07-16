@@ -11,7 +11,7 @@ namespace rythe::physics
         return PhysXPhysicsSystem::getSDK();
     }
 
-    static inline void toPhysxTransform(physx::PxTransform& pxTransform, const rsl::math::float3& pos, const math::quat& rot)
+    static inline void toPhysxTransform(physx::PxTransform& pxTransform, const rsl::math::float3& pos, const rsl::math::quat& rot)
     {
         pxTransform.p = { pos.x,pos.y,pos.z };
         pxTransform.q = { rot.x,rot.y,rot.z,rot.w };
@@ -20,7 +20,7 @@ namespace rythe::physics
     void calculateLocalColliderTransform(physx::PxTransform& outLocalTransform, const ColliderData& collider)
     {
         const rsl::math::float3& localOffset = collider.getOffset();
-        const math::quat& localRot = collider.getRotationOffset();
+        const rsl::math::quat& localRot = collider.getRotationOffset();
 
         toPhysxTransform(outLocalTransform, localOffset, localRot);
     }
@@ -28,9 +28,9 @@ namespace rythe::physics
     void calculateGlobalAndLocalTransforms(physx::PxTransform& outLocalTransform, physx::PxTransform& outGlobalTransform, const ColliderData& collider, ecs::entity ent)
     {
         transform trans = ent.get_component<transform>();
-        const math::mat4& globalTransform = trans.to_world_matrix();
+        const math::float4x4& globalTransform = trans.to_world_matrix();
 
-        rsl::math::float3 pos; math::quat rot; rsl::math::float3 tempScale;
+        rsl::math::float3 pos; rsl::math::quat rot; rsl::math::float3 tempScale;
         math::decompose(globalTransform, tempScale, rot, pos);
        
         calculateLocalColliderTransform(outLocalTransform, collider);

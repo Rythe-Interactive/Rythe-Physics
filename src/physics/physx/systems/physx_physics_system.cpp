@@ -302,7 +302,7 @@ namespace rythe::physics
 
         m_capsuleActionFuncs[capsule_character_flag::cc_move_to] = &processCapsuleMoveTo;
 
-        m_hashToPresetProcessFunc.insert({ typeHash<gravity_preset>(),&processGravityPreset });
+        m_hashToPresetProcessFunc.insert({ rsl::typeHash<gravity_preset>(),&processGravityPreset });
     }
 
     void PhysXPhysicsSystem::markPhysicsWrapperPendingRemove(events::component_destruction<physics_component>& event)
@@ -491,7 +491,7 @@ namespace rythe::physics
             const PxQuat& pxRotation = pxTransform.q;
 
             *entity.get_component<position>() = rsl::math::float3(pxPosition.x, pxPosition.y, pxPosition.z);
-            *entity.get_component<rotation>() = math::quat(pxRotation.w, pxRotation.x, pxRotation.y, pxRotation.z);
+            *entity.get_component<rotation>() = rsl::math::quat(pxRotation.w, pxRotation.x, pxRotation.y, pxRotation.z);
         }
 
         //[2] Transfer linear and angular velocity changes from PxRigidDynamics to actual entity rigidbody components
@@ -593,7 +593,7 @@ namespace rythe::physics
         controller->setUserData(ent.data);
     }
 
-    delegate<void(const PxControllerShapeHit&)> PhysXPhysicsSystem::initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum)
+    rsl::delegate<void(const PxControllerShapeHit&)> PhysXPhysicsSystem::initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum)
     {
         float force = forceAmount;
         float massMax = massMaximum;

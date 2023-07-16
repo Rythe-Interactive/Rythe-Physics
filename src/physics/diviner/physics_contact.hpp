@@ -26,8 +26,8 @@ namespace rythe::physics
         rsl::math::float3 refRBCentroid;
         rsl::math::float3 incRBCentroid;
 
-        math::mat4 refTransform;
-        math::mat4 incTransform;
+        math::float4x4 refTransform;
+        math::float4x4 incTransform;
 
         rsl::math::float3 collisionNormal;
         rsl::math::float3 tangentNormal1;
@@ -278,10 +278,10 @@ namespace rythe::physics
             float mbUnit = rbInc ? rbInc->inverseMass : 0.0f;
 
             //calculate M-1
-            math::mat3 ma = math::mat3(maUnit);
-            math::mat3 Ia = rbRef ? rbRef->globalInverseInertiaTensor : math::mat3(0.0f);
-            math::mat3 mb = math::mat3(mbUnit);                                
-            math::mat3 Ib = rbInc ? rbInc->globalInverseInertiaTensor : math::mat3(0.0f);
+            math::float3x3 ma = math::float3x3(maUnit);
+            math::float3x3 Ia = rbRef ? rbRef->globalInverseInertiaTensor : math::float3x3(0.0f);
+            math::float3x3 mb = math::float3x3(mbUnit);                                
+            math::float3x3 Ib = rbInc ? rbInc->globalInverseInertiaTensor : math::float3x3(0.0f);
 
             //calculate M^-1 J^T
             rsl::math::float3 jx = ma * -normal;

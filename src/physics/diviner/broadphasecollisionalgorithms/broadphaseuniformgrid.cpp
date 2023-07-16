@@ -57,8 +57,8 @@ namespace rythe::physics
             }
 
             // We get the start and end cell indices for this entity. This way we know which groupings/cells should contain this entity
-            math::ivec3 startCellIndex = calculateCellIndex(aabb.first);
-            math::ivec3 endCellIndex = calculateCellIndex(aabb.second);
+            math::int3 startCellIndex = calculateCellIndex(aabb.first);
+            math::int3 endCellIndex = calculateCellIndex(aabb.second);
 
             {
                 // We store visitedCellIndex since the entities old occupied cells may change and may have to be removed
@@ -71,7 +71,7 @@ namespace rythe::physics
                         for (int z = startCellIndex.z; z <= endCellIndex.z; ++z)
                         {
                             // Get current cell index
-                            math::ivec3 currentCellIndex = math::ivec3(x, y, z);
+                            math::int3 currentCellIndex = math::int3(x, y, z);
                             // Store cell in visited
                             visitedCells.insert(currentCellIndex);
 
@@ -159,8 +159,8 @@ namespace rythe::physics
             {
                 aabb = PhysicsStatics::CombineAABB(colliders.at(i)->GetMinMaxWorldAABB(), aabb);
             }
-            math::ivec3 startCellIndex = calculateCellIndex(aabb.first);
-            math::ivec3 endCellIndex = calculateCellIndex(aabb.second);
+            math::int3 startCellIndex = calculateCellIndex(aabb.first);
+            math::int3 endCellIndex = calculateCellIndex(aabb.second);
 
             {
                 for (int x = startCellIndex.x; x <= endCellIndex.x; ++x)
@@ -169,7 +169,7 @@ namespace rythe::physics
                     {
                         for (int z = startCellIndex.z; z <= endCellIndex.z; ++z)
                         {
-                            math::ivec3 currentCellIndex = math::ivec3(x, y, z);
+                            math::int3 currentCellIndex = math::int3(x, y, z);
                             if (cellIndices.count(currentCellIndex))
                             {
                                 groupings.at(cellIndices.at(currentCellIndex)).push_back(precursor);
@@ -188,7 +188,7 @@ namespace rythe::physics
         return groupings;
     }
 
-    math::ivec3 BroadphaseUniformGrid::calculateCellIndex(const rsl::math::float3 point)
+    math::int3 BroadphaseUniformGrid::calculateCellIndex(const rsl::math::float3 point)
     {
         // A point below 0 needs an extra 'push' since -0.5 will be cast to int as 0
         rsl::math::float3 temp = point;
@@ -196,7 +196,7 @@ namespace rythe::physics
         if (temp.y < 0) temp.y-=m_cellSize.y;
         if (temp.z < 0) temp.z-=m_cellSize.z;
 
-        math::ivec3 cellIndex = math::ivec3(temp.x / (float)m_cellSize.x, temp.y / (float)m_cellSize.y, temp.z / (float)m_cellSize.z);
+        math::int3 cellIndex = math::int3(temp.x / (float)m_cellSize.x, temp.y / (float)m_cellSize.y, temp.z / (float)m_cellSize.z);
 
         return cellIndex;
     }
@@ -206,7 +206,7 @@ namespace rythe::physics
         for (auto& [index, listIndex] : cellIndices)
         {
             int childCount = m_groupings.at(listIndex).size();
-            math::ivec3 pos = index * m_cellSize;
+            math::int3 pos = index * m_cellSize;
             debug::drawCube(pos, pos + m_cellSize, childCount > 1 ? math::colors::red : math::colors::blue, 5.0f);
         }
     }

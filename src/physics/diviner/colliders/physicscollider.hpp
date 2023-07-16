@@ -79,9 +79,9 @@ namespace rythe::physics
         * of the collider.
         * @note This is called internally by PhysicsSysten
         */
-        virtual void DrawColliderRepresentation(const math::mat4& transform, math::color usedColor, float width, float time, bool ignoreDepth = false) {};
+        virtual void DrawColliderRepresentation(const math::float4x4& transform, math::color usedColor, float width, float time, bool ignoreDepth = false) {};
 
-        virtual void UpdateTransformedTightBoundingVolume(const math::mat4& transform) {};
+        virtual void UpdateTransformedTightBoundingVolume(const math::float4x4& transform) {};
 
         inline virtual std::vector<HalfEdgeFace*>& GetHalfEdgeFaces()
         {

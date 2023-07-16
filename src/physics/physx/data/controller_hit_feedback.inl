@@ -9,17 +9,17 @@ namespace rythe::physics
     class ControllerHitFeedback : public PxUserControllerHitReport
     {
     public:
-        void setShapeHitDelegate(delegate<void(const PxControllerShapeHit&)> shapeHitDelegate)
+        void setShapeHitDelegate(rsl::delegate<void(const PxControllerShapeHit&)> shapeHitDelegate)
         {
             m_onShapeHit = shapeHitDelegate;
         }
 
-        void setControllerHitDelegate(delegate<void(const PxControllerHit& hit)> controllerHitDelegate)
+        void setControllerHitDelegate(rsl::delegate<void(const PxControllerHit& hit)> controllerHitDelegate)
         {
             m_onControllerHit = controllerHitDelegate;
         }
 
-        void setObstacleHitDelegate(delegate<void(const PxControllerObstacleHit& hit)> obstacleHitDelegate)
+        void setObstacleHitDelegate(rsl::delegate<void(const PxControllerObstacleHit& hit)> obstacleHitDelegate)
         {
             m_onObstacleHit = obstacleHitDelegate;
         }
@@ -43,8 +43,8 @@ namespace rythe::physics
 
     private:
 
-        delegate<void(const PxControllerShapeHit&)> m_onShapeHit;
-        delegate<void(const PxControllerHit& hit)> m_onControllerHit;
-        delegate<void(const PxControllerObstacleHit& hit)> m_onObstacleHit;
+        rsl::delegate<void(const PxControllerShapeHit&)> m_onShapeHit;
+        rsl::delegate<void(const PxControllerHit& hit)> m_onControllerHit;
+        rsl::delegate<void(const PxControllerObstacleHit& hit)> m_onObstacleHit;
     };
 }

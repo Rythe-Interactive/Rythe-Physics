@@ -5,7 +5,7 @@
 namespace rythe::physics
 {
     bool PhysicsStatics::FindSeperatingAxisByExtremePointProjection(ConvexCollider* convexA
-        , ConvexCollider* convexB, const math::mat4& transformA, const math::mat4& transformB,
+        , ConvexCollider* convexB, const math::float4x4& transformA, const math::float4x4& transformB,
         PointerEncapsulator<HalfEdgeFace>& refFace,
         float& maximumSeperation, bool shouldDebug )
     {
@@ -13,9 +13,9 @@ namespace rythe::physics
 
         for (auto face : convexB->GetHalfEdgeFaces())
         {
-            rsl::math::float3 seperatingAxis = math::normalize(transformB * math::vec4((face->normal), 0));
+            rsl::math::float3 seperatingAxis = math::normalize(transformB * math::float4((face->normal), 0));
 
-            rsl::math::float3 transformedPositionB = transformB * math::vec4(face->centroid, 1);
+            rsl::math::float3 transformedPositionB = transformB * math::float4(face->centroid, 1);
 
             //get extreme point of other face in normal direction
             rsl::math::float3 worldSupportPoint; 
@@ -62,18 +62,18 @@ namespace rythe::physics
         return currentMaximumSupportPoint;
     }
 
-    void PhysicsStatics::GetSupportPointNoTransform(rsl::math::float3 planePosition, rsl::math::float3 direction, ConvexCollider* collider, const math::mat4& colliderTransform
+    void PhysicsStatics::GetSupportPointNoTransform(rsl::math::float3 planePosition, rsl::math::float3 direction, ConvexCollider* collider, const math::float4x4& colliderTransform
         , rsl::math::float3& worldSupportPoint)
     {
         float largestDistanceInDirection = std::numeric_limits<float>::lowest();
-        planePosition = math::inverse(colliderTransform) * math::vec4(planePosition, 1);
-        direction = math::inverse(colliderTransform) * math::vec4(direction, 0);
+        planePosition = math::inverse(colliderTransform) * math::float4(planePosition, 1);
+        direction = math::inverse(colliderTransform) * math::float4(direction, 0);
 
         const auto& vertices = collider->GetVertices();
 
         for (rsl::size_type vertexIndex = 0 ; vertexIndex < vertices.size(); ++vertexIndex)
         {
-            rsl::math::float3 transformedVert = math::vec4(vertices.at(vertexIndex), 1);
+            rsl::math::float3 transformedVert = math::float4(vertices.at(vertexIndex), 1);
 
             float dotResult = math::dot(transformedVert - planePosition, direction);
 
@@ -84,16 +84,16 @@ namespace rythe::physics
             }
         }
 
-        worldSupportPoint = colliderTransform * math::vec4(worldSupportPoint, 1);
+        worldSupportPoint = colliderTransform * math::float4(worldSupportPoint, 1);
     }
 
-    bool PhysicsStatics::FindSeperatingAxisByGaussMapEdgeCheck(ConvexCollider* convexA, ConvexCollider* convexB, const math::mat4& transformA,
-        const math::mat4& transformB, PointerEncapsulator<HalfEdgeEdge>& refEdge, PointerEncapsulator<HalfEdgeEdge>& incEdge,
+    bool PhysicsStatics::FindSeperatingAxisByGaussMapEdgeCheck(ConvexCollider* convexA, ConvexCollider* convexB, const math::float4x4& transformA,
+        const math::float4x4& transformB, PointerEncapsulator<HalfEdgeEdge>& refEdge, PointerEncapsulator<HalfEdgeEdge>& incEdge,
         rsl::math::float3& seperatingAxisFound, float& maximumSeperation, bool shouldDebug)
     {
         float currentMaximumSeperation = std::numeric_limits<float>::lowest();
 
-        rsl::math::float3 centroidDir = transformA * math::vec4(convexA->GetLocalCentroid(), 0);
+        rsl::math::float3 centroidDir = transformA * math::float4(convexA->GetLocalCentroid(), 0);
         rsl::math::float3 positionA = rsl::math::float3(transformA[3]) + centroidDir;
 
         for (const auto faceA : convexA->GetHalfEdgeFaces())
@@ -128,8 +128,8 @@ namespace rythe::physics
                         if (attemptBuildMinkowskiFace(edgeA, edgeB, transformA, transformB))
                         {
                             //get world edge direction
-                            rsl::math::float3 edgeADirection = transformA * math::vec4(edgeA->getRobustEdgeDirection(), 0);
-                            rsl::math::float3 edgeBDirection = transformB * math::vec4(edgeB->getRobustEdgeDirection(), 0);
+                            rsl::math::float3 edgeADirection = transformA * math::float4(edgeA->getRobustEdgeDirection(), 0);
+                            rsl::math::float3 edgeBDirection = transformB * math::float4(edgeB->getRobustEdgeDirection(), 0);
 
                             edgeADirection = math::normalize( edgeADirection );
                             edgeBDirection = math::normalize( edgeBDirection );
@@ -144,8 +144,8 @@ namespace rythe::physics
                             rsl::math::float3 seperatingAxis = math::normalize(math::cross(edgeADirection, edgeBDirection));
 
                             //get world edge position
-                            rsl::math::float3 edgeAtransformedPosition = transformA * math::vec4(edgeA->edgePosition, 1);
-                            rsl::math::float3 edgeBtransformedPosition = transformB * math::vec4(edgeB->edgePosition, 1);
+                            rsl::math::float3 edgeAtransformedPosition = transformA * math::float4(edgeA->edgePosition, 1);
+                            rsl::math::float3 edgeBtransformedPosition = transformB * math::float4(edgeB->edgePosition, 1);
 
                             //check if its pointing in the right direction 
                             if (math::dot(seperatingAxis, edgeAtransformedPosition - positionA) < 0)
@@ -179,12 +179,12 @@ namespace rythe::physics
         return false;
     }
 
-    bool PhysicsStatics::DetectConvexSphereCollision(ConvexCollider* convexA, const math::mat4& transformA, rsl::math::float3 sphereWorldPosition, float sphereRadius,
+    bool PhysicsStatics::DetectConvexSphereCollision(ConvexCollider* convexA, const math::float4x4& transformA, rsl::math::float3 sphereWorldPosition, float sphereRadius,
         float& maximumSeperation)
     {
         //-----------------  check if the seperating axis is the line generated between the centroid of the hull and sphereWorldPosition ------------------//
 
-        rsl::math::float3 worldHullCentroid = transformA * math::vec4(convexA->GetLocalCentroid(), 1);
+        rsl::math::float3 worldHullCentroid = transformA * math::float4(convexA->GetLocalCentroid(), 1);
         rsl::math::float3 centroidSeperatingAxis = math::normalize(worldHullCentroid - sphereWorldPosition);
 
         rsl::math::float3 seperatingPlanePosition = sphereWorldPosition + centroidSeperatingAxis * sphereRadius;
@@ -206,8 +206,8 @@ namespace rythe::physics
 
         for (auto faceA : convexA->GetHalfEdgeFaces())
         {
-            rsl::math::float3 worldFaceCentroid = transformA * math::vec4(faceA->centroid, 1);
-            rsl::math::float3 worldFaceNormal = math::normalize(transformA * math::vec4(faceA->normal, 0));
+            rsl::math::float3 worldFaceCentroid = transformA * math::float4(faceA->centroid, 1);
+            rsl::math::float3 worldFaceNormal = math::normalize(transformA * math::float4(faceA->normal, 0));
 
             float seperation = PointDistanceToPlane(worldFaceNormal, worldFaceCentroid, seperatingPlanePosition );
 
@@ -227,41 +227,41 @@ namespace rythe::physics
         return true;
     }
 
-    std::pair<rsl::math::float3, rsl::math::float3> PhysicsStatics::ConstructAABBFromTransformedVertices(const std::vector<rsl::math::float3>& vertices, const math::mat4& transform)
+    std::pair<rsl::math::float3, rsl::math::float3> PhysicsStatics::ConstructAABBFromTransformedVertices(const std::vector<rsl::math::float3>& vertices, const math::float4x4& transform)
     {
         rsl::math::float3 min, max;
         rsl::math::float3 worldPos = transform[3];
 
         rsl::math::float3 outVec;
         //up
-        rsl::math::float3 invTransUp = math::normalize(math::inverse(transform) * math::vec4(0, 1, 0, 0));
+        rsl::math::float3 invTransUp = math::normalize(math::inverse(transform) * math::float4(0, 1, 0, 0));
         GetSupportPoint(vertices, invTransUp, outVec);
-        max.y = (transform * math::vec4( outVec,1)).y;
+        max.y = (transform * math::float4( outVec,1)).y;
 
         //down
-        rsl::math::float3 invTransDown = math::normalize(math::inverse(transform) * math::vec4(0, -1, 0, 0));
+        rsl::math::float3 invTransDown = math::normalize(math::inverse(transform) * math::float4(0, -1, 0, 0));
         GetSupportPoint(vertices, invTransDown, outVec);
-        min.y = (transform * math::vec4(outVec, 1)).y;
+        min.y = (transform * math::float4(outVec, 1)).y;
 
         //right
-        rsl::math::float3 invTransRight = math::normalize(math::inverse(transform) * math::vec4(1, 0, 0, 0));
+        rsl::math::float3 invTransRight = math::normalize(math::inverse(transform) * math::float4(1, 0, 0, 0));
         GetSupportPoint(vertices, invTransRight, outVec);
-        max.x = (transform * math::vec4(outVec, 1)).x;
+        max.x = (transform * math::float4(outVec, 1)).x;
 
         //left
-        rsl::math::float3 invTransLeft = math::normalize(math::inverse(transform) * math::vec4(-1, 0, 0, 0));
+        rsl::math::float3 invTransLeft = math::normalize(math::inverse(transform) * math::float4(-1, 0, 0, 0));
         GetSupportPoint(vertices, invTransLeft, outVec);
-        min.x = (transform * math::vec4(outVec, 1)).x;
+        min.x = (transform * math::float4(outVec, 1)).x;
 
         //forward
-        rsl::math::float3 invTransForward = math::normalize(math::inverse(transform) * math::vec4(0, 0, 1, 0));
+        rsl::math::float3 invTransForward = math::normalize(math::inverse(transform) * math::float4(0, 0, 1, 0));
         GetSupportPoint(vertices, invTransForward, outVec);
-        max.z = (transform * math::vec4(outVec, 1)).z;
+        max.z = (transform * math::float4(outVec, 1)).z;
 
         //backward
-        rsl::math::float3 invTransBackward = math::normalize(math::inverse(transform) * math::vec4(0, 0, -1, 0));
+        rsl::math::float3 invTransBackward = math::normalize(math::inverse(transform) * math::float4(0, 0, -1, 0));
         GetSupportPoint(vertices, invTransBackward, outVec);
-        min.z = (transform * math::vec4(outVec, 1)).z;
+        min.z = (transform * math::float4(outVec, 1)).z;
 
       
 
@@ -431,23 +431,23 @@ namespace rythe::physics
 
     }
 
-    bool PhysicsStatics::attemptBuildMinkowskiFace(HalfEdgeEdge* edgeA, HalfEdgeEdge* edgeB, const math::mat4& transformA, const math::mat4& transformB)
+    bool PhysicsStatics::attemptBuildMinkowskiFace(HalfEdgeEdge* edgeA, HalfEdgeEdge* edgeB, const math::float4x4& transformA, const math::float4x4& transformB)
     {
         const rsl::math::float3 transformedA1 = transformA *
-            math::vec4(edgeA->getLocalNormal(), 0);
+            math::float4(edgeA->getLocalNormal(), 0);
 
         const rsl::math::float3 transformedA2 = transformA *
-            math::vec4(edgeA->pairingEdge->getLocalNormal(), 0);
+            math::float4(edgeA->pairingEdge->getLocalNormal(), 0);
 
-        const rsl::math::float3 transformedEdgeDirectionA =  math::normalize(transformA * math::vec4(edgeA->getRobustEdgeDirection(), 0));
+        const rsl::math::float3 transformedEdgeDirectionA =  math::normalize(transformA * math::float4(edgeA->getRobustEdgeDirection(), 0));
 
         const rsl::math::float3 transformedB1 = transformB *
-            math::vec4(edgeB->getLocalNormal(), 0);
+            math::float4(edgeB->getLocalNormal(), 0);
 
         const rsl::math::float3 transformedB2 = transformB *
-            math::vec4(edgeB->pairingEdge->getLocalNormal(), 0);
+            math::float4(edgeB->pairingEdge->getLocalNormal(), 0);
 
-        const rsl::math::float3 transformedEdgeDirectionB = math::normalize(transformB * math::vec4(edgeB->getRobustEdgeDirection(), 0));
+        const rsl::math::float3 transformedEdgeDirectionB = math::normalize(transformB * math::float4(edgeB->getRobustEdgeDirection(), 0));
 
         return isMinkowskiFace(transformedA1, transformedA2, -transformedB1, -transformedB2
             , (transformedEdgeDirectionA), (transformedEdgeDirectionB));

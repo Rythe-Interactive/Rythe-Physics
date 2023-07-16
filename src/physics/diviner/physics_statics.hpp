@@ -29,14 +29,14 @@ namespace rythe::physics
          * @param worldSupportPoint [out] the resulting support point
          * @return returns true if a seperating axis was found
          */
-        static void GetSupportPoint(const rsl::math::float3& planePosition, const rsl::math::float3& direction, ConvexCollider* collider, const math::mat4& colliderTransform
+        static void GetSupportPoint(const rsl::math::float3& planePosition, const rsl::math::float3& direction, ConvexCollider* collider, const math::float4x4& colliderTransform
             , rsl::math::float3& worldSupportPoint) 
         {
             float largestDistanceInDirection = std::numeric_limits<float>::lowest();
 
             for (const auto& vert : collider->GetVertices())
             {
-                rsl::math::float3 transformedVert = colliderTransform * math::vec4(vert, 1);
+                rsl::math::float3 transformedVert = colliderTransform * math::float4(vert, 1);
 
                 float dotResult = math::dot(transformedVert - planePosition, direction);
 
@@ -57,7 +57,7 @@ namespace rythe::physics
         * @param worldSupportPoint [out] the resulting support point
         * @return returns true if a seperating axis was found
         */
-        static void GetSupportPointNoTransform(rsl::math::float3 planePosition, rsl::math::float3 direction, ConvexCollider* collider, const math::mat4& colliderTransform
+        static void GetSupportPointNoTransform(rsl::math::float3 planePosition, rsl::math::float3 direction, ConvexCollider* collider, const math::float4x4& colliderTransform
             , rsl::math::float3& worldSupportPoint);
        
 
@@ -77,7 +77,7 @@ namespace rythe::physics
          * @return returns true if a seperating axis was found
          */
         static bool FindSeperatingAxisByExtremePointProjection(ConvexCollider* convexA
-            , ConvexCollider* convexB, const math::mat4& transformA, const math::mat4& transformB,
+            , ConvexCollider* convexB, const math::float4x4& transformA, const math::float4x4& transformB,
             PointerEncapsulator<HalfEdgeFace>& refFace,
             float& maximumSeperation, bool shouldDebug = false);
       
@@ -95,15 +95,15 @@ namespace rythe::physics
          * @return returns true if a seperating axis was found
          */
         static bool FindSeperatingAxisByGaussMapEdgeCheck(ConvexCollider* convexA, ConvexCollider* convexB,
-            const math::mat4& transformA, const math::mat4& transformB, PointerEncapsulator<HalfEdgeEdge>& refEdge, PointerEncapsulator<HalfEdgeEdge>& incEdge,
+            const math::float4x4& transformA, const math::float4x4& transformB, PointerEncapsulator<HalfEdgeEdge>& refEdge, PointerEncapsulator<HalfEdgeEdge>& incEdge,
             rsl::math::float3& seperatingAxisFound, float& maximumSeperation, bool shouldDebug = false);
       
         /** @brief Given a ConvexCollider and sphere with a position and a readius, checks if these 2 shapes are colliding
         */
-        static bool DetectConvexSphereCollision(ConvexCollider* convexA, const math::mat4& transformA, rsl::math::float3 sphereWorldPosition, float sphereRadius,
+        static bool DetectConvexSphereCollision(ConvexCollider* convexA, const math::float4x4& transformA, rsl::math::float3 sphereWorldPosition, float sphereRadius,
              float& maximumSeperation);
 
-        static std::pair< rsl::math::float3, rsl::math::float3> ConstructAABBFromTransformedVertices(const std::vector<rsl::math::float3>& vertices,const math::mat4& transform);
+        static std::pair< rsl::math::float3, rsl::math::float3> ConstructAABBFromTransformedVertices(const std::vector<rsl::math::float3>& vertices,const math::float4x4& transform);
 
         /**@brief Creates one big AABB from two AABBs
          * The first element in the tuple will be the lower bounds
@@ -247,7 +247,7 @@ namespace rythe::physics
                 (p4.y - p3.y) * (p3.y - p1.y) +
                 (p4.z - p3.z) * (p3.z - p1.z);
 
-            math::vec2 interpolantVector = LinearSystemCramerSolver2D(a, b, c, d, e, f);
+            math::float2 interpolantVector = LinearSystemCramerSolver2D(a, b, c, d, e, f);
 
             outp1p2 = p1 + (p2 - p1) * math::clamp(interpolantVector.x,0.0f,1.0f);
             outp3p4 = p3 + (p4 - p3) * math::clamp(interpolantVector.y,0.0f,1.0f);
@@ -264,7 +264,7 @@ namespace rythe::physics
         * @param f The result of the linear transformation in the y axis
         * @note a,b,c,d is a column major matrix
         */
-        static math::vec2 LinearSystemCramerSolver2D(float a, float b, float c, float d, float e, float f)
+        static math::float2 LinearSystemCramerSolver2D(float a, float b, float c, float d, float e, float f)
         {
             //[ a c ] [x] [e]
             //[ b d ] [y] [f]
@@ -279,7 +279,7 @@ namespace rythe::physics
             //[ b f ] 
             float y = ((a * f) - (e * b)) / denom;
 
-            return math::vec2(x,-y);
+            return math::float2(x,-y);
         }
 
         /**@brief Finds the distance of a point given a 3D plane
@@ -371,8 +371,8 @@ namespace rythe::physics
         * @param initMem The initial memory amount.
         * @return A list of lists of vec4's
         */
-        static std::vector<std::vector<math::vec4>> GenerateVoronoi(std::vector<rsl::math::float3> points,math::vec2 xRange, math::vec2 yRange,
-            math::vec2 zRange, rsl::math::float3 containerResolution, bool xPeriodic = false, bool yPeriodic = false, bool zPeriodic = false, int initMem = 8)
+        static std::vector<std::vector<math::float4>> GenerateVoronoi(std::vector<rsl::math::float3> points,math::float2 xRange, math::float2 yRange,
+            math::float2 zRange, rsl::math::float3 containerResolution, bool xPeriodic = false, bool yPeriodic = false, bool zPeriodic = false, int initMem = 8)
         {
             return GenerateVoronoi(points,xRange.x,xRange.y,yRange.x,yRange.y,zRange.x,zRange.y,containerResolution.x,containerResolution.y,containerResolution.z,xPeriodic,yPeriodic,zPeriodic,initMem);
         }
@@ -394,7 +394,7 @@ namespace rythe::physics
         * @param initMem The initial memory amount.
         * @return A list of lists of vec4's
         */
-        static std::vector<std::vector<math::vec4>> GenerateVoronoi(std::vector<rsl::math::float3> points,const double xMin = -5, const double xMax = 5, const double yMin = -5, const double yMax = 5, const double zMin = -5, const double zMax = 5,const double conResX = 10,const double conResY = 10 , const double conResZ = 10,bool xPeriodic = false,bool yPeriodic = false,bool zPeriodic = false,int initMem = 8)
+        static std::vector<std::vector<math::float4>> GenerateVoronoi(std::vector<rsl::math::float3> points,const double xMin = -5, const double xMax = 5, const double yMin = -5, const double yMax = 5, const double zMin = -5, const double zMax = 5,const double conResX = 10,const double conResY = 10 , const double conResZ = 10,bool xPeriodic = false,bool yPeriodic = false,bool zPeriodic = false,int initMem = 8)
         {
             voro::container con(xMin, xMax, yMin, yMax, zMin, zMax, conResX, conResY, conResZ, xPeriodic, yPeriodic, zPeriodic, initMem);
             return GenerateVoronoi(con,points);
@@ -405,7 +405,7 @@ namespace rythe::physics
         * @param points A list of points these will serve as the points of the voronoi diagram.
         * @return A list of lists of vec4's
         */
-        static std::vector<std::vector<math::vec4>> GenerateVoronoi(voro::container& con,std::vector<rsl::math::float3> points)
+        static std::vector<std::vector<math::float4>> GenerateVoronoi(voro::container& con,std::vector<rsl::math::float3> points)
         {
             int i = 0;
             for (rsl::math::float3 point : points)
@@ -420,11 +420,11 @@ namespace rythe::physics
         * @param con The container that hold the parameters and generates the voronoi diagram.
         * @return A list of lists of vec4's
         */
-        static std::vector<std::vector<math::vec4>> GenerateVoronoi(voro::container& con)
+        static std::vector<std::vector<math::float4>> GenerateVoronoi(voro::container& con)
         {
             con.draw_cells_json("assets/voronoi/output/cells.json");
             std::ifstream f("assets/voronoi/output/cells.json");
-            return serialization::SerializationUtil::JSONDeserialize< std::vector<std::vector<math::vec4>>>(f);
+            return serialization::SerializationUtil::JSONDeserialize< std::vector<std::vector<math::float4>>>(f);
         }
 
         /**@brief Checks collision between two AABB colliders and returns whether there is collision
@@ -481,8 +481,8 @@ namespace rythe::physics
         /** @brief Given 2 HalfEdgeEdges and their respective transforms, transforms their normals and checks if they create a minkowski face
          * @return returns true if a minkowski face was succesfully constructed
          */
-        static bool attemptBuildMinkowskiFace(HalfEdgeEdge* edgeA, HalfEdgeEdge* edgeB, const math::mat4& transformA,
-            const math::mat4& transformB);
+        static bool attemptBuildMinkowskiFace(HalfEdgeEdge* edgeA, HalfEdgeEdge* edgeB, const math::float4x4& transformA,
+            const math::float4x4& transformB);
         
 
         /** @brief Given 2 arcs, one that starts from transformedA1 and ends at transformedA2 and another arc

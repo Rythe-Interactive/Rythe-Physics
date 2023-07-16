@@ -31,7 +31,7 @@ namespace rythe::physics
             registerComponentType<capsule_controller>();
         }
 
-        virtual priority_type priority() override
+        virtual rsl::priority_type priority() override
         {
             return 20;
         }

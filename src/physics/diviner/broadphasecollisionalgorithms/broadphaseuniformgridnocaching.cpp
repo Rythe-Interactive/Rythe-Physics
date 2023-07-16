@@ -23,15 +23,15 @@ namespace rythe::physics
             {
                 aabb = PhysicsStatics::CombineAABB(colliders.at(i)->GetMinMaxWorldAABB(), aabb);
             }
-            math::ivec3 startCellIndex = calculateCellIndex(std::get<0>(aabb));
-            math::ivec3 endCellIndex = calculateCellIndex(std::get<1>(aabb));
+            math::int3 startCellIndex = calculateCellIndex(std::get<0>(aabb));
+            math::int3 endCellIndex = calculateCellIndex(std::get<1>(aabb));
             for (int x = startCellIndex.x; x <= endCellIndex.x; ++x)
             {
                 for (int y = startCellIndex.y; y <= endCellIndex.y; ++y)
                 {
                     for (int z = startCellIndex.z; z <= endCellIndex.z; ++z)
                     {
-                        math::ivec3 currentCellIndex = math::ivec3(x, y, z);
+                        math::int3 currentCellIndex = math::int3(x, y, z);
                         if (cellIndices.find(currentCellIndex) != cellIndices.end())
                         {
                             manifoldPrecursorGrouping.at(cellIndices.at(currentCellIndex)).push_back(precursor);
@@ -51,7 +51,7 @@ namespace rythe::physics
 
     }
 
-    math::ivec3 BroadphaseUniformGridNoCaching::calculateCellIndex(const rsl::math::float3 point)
+    math::int3 BroadphaseUniformGridNoCaching::calculateCellIndex(const rsl::math::float3 point)
     {
         // A point below 0 needs an extra 'push' since -0.5 will be cast to int as 0
         rsl::math::float3 temp = point;
@@ -59,7 +59,7 @@ namespace rythe::physics
         if (temp.y < 0) --temp.y;
         if (temp.z < 0) --temp.z;
 
-        math::ivec3 cellIndex = math::ivec3(temp.x / (float)m_cellSize.x, temp.y / (float)m_cellSize.y, temp.z / (float)m_cellSize.z);
+        math::int3 cellIndex = math::int3(temp.x / (float)m_cellSize.x, temp.y / (float)m_cellSize.y, temp.z / (float)m_cellSize.z);
 
         return cellIndex;
     }

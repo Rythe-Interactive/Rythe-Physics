@@ -13,8 +13,8 @@ namespace rythe::physics
         debugID = "ConvexConvexPenetrationQuery";
     }
 
-    void ConvexConvexPenetrationQuery::populateContactList(physics_manifold& manifold, math::mat4& refTransform
-        , math::mat4 incTransform, PhysicsCollider* refCollider)
+    void ConvexConvexPenetrationQuery::populateContactList(physics_manifold& manifold, math::float4x4& refTransform
+        , math::float4x4 incTransform, PhysicsCollider* refCollider)
     {
         auto incCollider = isARef ? manifold.colliderB : manifold.colliderA;
         float largestDotResult = std::numeric_limits<float>::lowest();
@@ -23,7 +23,7 @@ namespace rythe::physics
 
         for (auto face : incCollider->GetHalfEdgeFaces())
         {
-            rsl::math::float3 worldFaceNormal = incTransform * math::vec4(face->normal, 0);
+            rsl::math::float3 worldFaceNormal = incTransform * math::float4(face->normal, 0);
             float currentDotResult = math::dot(-normal, worldFaceNormal);
             if (currentDotResult > largestDotResult)
             {
@@ -40,7 +40,7 @@ namespace rythe::physics
         auto sendToInitialOutput = [&outputContactPoints,&incTransform](HalfEdgeEdge* edge)
         {
             rsl::math::float3 localVertexPosition = edge->edgePosition;
-            rsl::math::float3 worldVertex = incTransform * math::vec4(localVertexPosition, 1);
+            rsl::math::float3 worldVertex = incTransform * math::float4(localVertexPosition, 1);
 
             outputContactPoints.push_back(ContactVertex(worldVertex,edge->label));
         };
@@ -51,8 +51,8 @@ namespace rythe::physics
         auto clipNeigboringFaceWithOutput = [&refTransform,&outputContactPoints](HalfEdgeEdge* edge)
         {
             HalfEdgeFace* neighborFace = edge->pairingEdge->face;
-            rsl::math::float3 planePosition = refTransform * math::vec4(neighborFace->centroid, 1);
-            rsl::math::float3 planeNormal = refTransform * math::vec4(neighborFace->normal, 0);
+            rsl::math::float3 planePosition = refTransform * math::float4(neighborFace->centroid, 1);
+            rsl::math::float3 planeNormal = refTransform * math::float4(neighborFace->normal, 0);
 
             auto inputContactList = outputContactPoints;
             outputContactPoints.clear();

@@ -3,7 +3,7 @@
 namespace rythe::physics
 {
     ColliderData::ColliderData(rsl::size_type colliderIndex, pointer<std::vector<collider_modification_data>> modificationsRequests, collider_type colliderType,
-        const rsl::math::float3& offset, const math::quat& rotation) noexcept
+        const rsl::math::float3& offset, const rsl::math::quat& rotation) noexcept
         :
         m_rotationOffset(rotation), m_positionOffset(offset), m_colliderIndex(colliderIndex),
         m_colliderType(colliderType),  m_modificationsRequests(modificationsRequests),m_isRegistered(false) { }

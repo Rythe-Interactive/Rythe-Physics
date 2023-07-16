@@ -27,7 +27,7 @@ namespace rythe::physics
 
         virtual void setup();
 
-        void fixedUpdate(time::time_span<fast_time> deltaTime)
+        void fixedUpdate(rsl::time_span<rsl::fast_time> deltaTime)
         {
             ecs::component_container<diviner::rigidbody> rigidbodies;
             std::vector<rsl::byte> hasRigidBodies;
@@ -83,7 +83,7 @@ namespace rythe::physics
 
             queueJobs(physComps.size(), [&]() {
                 id_type index = async::this_job::get_id();
-                math::mat4 transf = math::compose( scales[index].get(), rotations[index].get(), positions[index].get());
+                math::float4x4 transf = math::compose( scales[index].get(), rotations[index].get(), positions[index].get());
                 
                 diviner::physics_component& individualPhysicsComponent = physComps[index].get();
 
@@ -114,7 +114,7 @@ namespace rythe::physics
         static std::unique_ptr<BroadPhaseCollisionAlgorithm> m_broadPhase;
         const float m_timeStep = 0.02f;
      
-        math::ivec3 uniformGridCellSize = math::ivec3(1, 1, 1);
+        math::int3 uniformGridCellSize = math::int3(1, 1, 1);
 
         /** @brief Performs the entire physics pipeline (
          * Broadphase Collision Detection, Narrowphase Collision Detection, and the Collision Resolution)
@@ -212,7 +212,7 @@ namespace rythe::physics
                 {
                     rsl::math::float3 axis = math::normalize(rb.angularVelocity);
 
-                    math::quat glmQuat = math::angleAxis(dtAngle, axis);
+                    rsl::math::quat glmQuat = math::angleAxis(dtAngle, axis);
                     rot = glmQuat * rot;
                     rot = math::normalize(rot);
                 }

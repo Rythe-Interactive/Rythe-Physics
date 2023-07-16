@@ -74,13 +74,13 @@ namespace rythe::physics
 
         //TODO all penetration querys should supply a constructor that takes in a  ConvexConvexCollisionInfo
         
-        rsl::math::float3 worldFaceCentroidA = manifold.transformA * math::vec4(ARefFace.ptr->centroid, 1);
-        rsl::math::float3 worldFaceNormalA = manifold.transformA * math::vec4(ARefFace.ptr->normal, 0);
+        rsl::math::float3 worldFaceCentroidA = manifold.transformA * math::float4(ARefFace.ptr->centroid, 1);
+        rsl::math::float3 worldFaceNormalA = manifold.transformA * math::float4(ARefFace.ptr->normal, 0);
         
-        rsl::math::float3 worldFaceCentroidB = manifold.transformB * math::vec4(BRefFace.ptr->centroid, 1);
-        rsl::math::float3 worldFaceNormalB = manifold.transformB * math::vec4(BRefFace.ptr->normal, 0);
+        rsl::math::float3 worldFaceCentroidB = manifold.transformB * math::float4(BRefFace.ptr->centroid, 1);
+        rsl::math::float3 worldFaceNormalB = manifold.transformB * math::float4(BRefFace.ptr->normal, 0);
 
-        rsl::math::float3 worldEdgeAPosition = edgeRef.ptr? manifold.transformB * math::vec4(edgeRef.ptr->edgePosition, 1) : rsl::math::float3();
+        rsl::math::float3 worldEdgeAPosition = edgeRef.ptr? manifold.transformB * math::float4(edgeRef.ptr->edgePosition, 1) : rsl::math::float3();
         rsl::math::float3 worldEdgeNormal = edgeNormal;
 
         auto abPenetrationQuery =
@@ -119,8 +119,8 @@ namespace rythe::physics
 
     void ConvexCollider::PopulateContactPointsWith(ConvexCollider* convexCollider, physics_manifold& manifold)
     {
-        math::mat4& refTransform = manifold.penetrationInformation->isARef ? manifold.transformA : manifold.transformB;
-        math::mat4& incTransform = manifold.penetrationInformation->isARef ? manifold.transformB : manifold.transformA;
+        math::float4x4& refTransform = manifold.penetrationInformation->isARef ? manifold.transformA : manifold.transformB;
+        math::float4x4& incTransform = manifold.penetrationInformation->isARef ? manifold.transformB : manifold.transformA;
 
         diviner::physics_component* refPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompA : manifold.physicsCompB;
         diviner::physics_component* incPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompB : manifold.physicsCompA;
@@ -133,8 +133,8 @@ namespace rythe::physics
         diviner::rigidbody* refRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyA : manifold.rigidbodyB;
         diviner::rigidbody* incRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyB : manifold.rigidbodyA;
 
-        rsl::math::float3 refWorldCentroid = refTransform * math::vec4(refPhysicsComp->localCenterOfMass,1);
-        rsl::math::float3 incWorldCentroid = incTransform * math::vec4(incPhysicsComp->localCenterOfMass,1);
+        rsl::math::float3 refWorldCentroid = refTransform * math::float4(refPhysicsComp->localCenterOfMass,1);
+        rsl::math::float3 incWorldCentroid = incTransform * math::float4(incPhysicsComp->localCenterOfMass,1);
 
         for ( auto& contact : manifold.contacts)
         {
@@ -152,13 +152,13 @@ namespace rythe::physics
         }
     }
 
-    void ConvexCollider::UpdateTightAABB(const math::mat4& transform)
+    void ConvexCollider::UpdateTightAABB(const math::float4x4& transform)
     {
         minMaxWorldAABB = PhysicsStatics::ConstructAABBFromTransformedVertices
         (vertices, transform);
     }
 
-    void ConvexCollider::DrawColliderRepresentation(const math::mat4& transform,math::color usedColor, float width, float time,bool ignoreDepth)
+    void ConvexCollider::DrawColliderRepresentation(const math::float4x4& transform,math::color usedColor, float width, float time,bool ignoreDepth)
     {
         if (!shouldBeDrawn) { return; }
 
@@ -167,8 +167,8 @@ namespace rythe::physics
             physics::HalfEdgeEdge* initialEdge = face->startEdge;
             physics::HalfEdgeEdge* currentEdge = face->startEdge;
 
-            rsl::math::float3 faceStart = transform * math::vec4(face->centroid, 1);
-            rsl::math::float3 faceEnd = faceStart + rsl::math::float3((transform * math::vec4(face->normal, 0))) * 0.5f;
+            rsl::math::float3 faceStart = transform * math::float4(face->centroid, 1);
+            rsl::math::float3 faceEnd = faceStart + rsl::math::float3((transform * math::float4(face->normal, 0))) * 0.5f;
 
             debug::user_projectDrawLine(faceStart, faceEnd, math::colors::green, 2.0f);
 
@@ -179,8 +179,8 @@ namespace rythe::physics
                 physics::HalfEdgeEdge* edgeToExecuteOn = currentEdge;
                 currentEdge = currentEdge->nextEdge;
 
-                rsl::math::float3 worldStart = transform * math::vec4(edgeToExecuteOn->edgePosition, 1);
-                rsl::math::float3 worldEnd = transform * math::vec4(edgeToExecuteOn->nextEdge->edgePosition, 1);
+                rsl::math::float3 worldStart = transform * math::float4(edgeToExecuteOn->edgePosition, 1);
+                rsl::math::float3 worldEnd = transform * math::float4(edgeToExecuteOn->nextEdge->edgePosition, 1);
 
                 debug::user_projectDrawLine(worldStart, worldEnd, usedColor, width, time,ignoreDepth);
 

@@ -59,7 +59,7 @@ namespace rythe::physics
         template<class preset>
         pointer<const preset> getPreset() const noexcept
         {
-            static rsl::size_type searchHash = typeHash<preset>();
+            static rsl::size_type searchHash = rsl::typeHash<preset>();
 
             for (const controller_preset& contPreset : m_presets)
             {
@@ -76,7 +76,7 @@ namespace rythe::physics
         template<class preset>
         pointer<preset> getPreset() noexcept
         {
-            static rsl::size_type searchHash = typeHash<preset>();
+            static rsl::size_type searchHash = rsl::typeHash<preset>();
 
             for (controller_preset& contPreset : m_presets)
             {
@@ -94,7 +94,7 @@ namespace rythe::physics
         pointer<preset> addPreset(preset& presetSpecifics)
         {
             static_assert(std::is_standard_layout<preset>());
-            static rsl::size_type searchHash = typeHash<preset>();
+            static rsl::size_type searchHash = rsl::typeHash<preset>();
 
             for (controller_preset& contPreset : m_presets)
             {

@@ -31,11 +31,11 @@ namespace rythe::physics
         }
 
     private:
-        math::ivec3 m_cellSize;
+        math::int3 m_cellSize;
 
         /**@brief Calculates a cell index from a point. i.e. calculates in which cell in the uniform grid a point will be.
          */
-        math::ivec3 calculateCellIndex(const rsl::math::float3 point);
+        math::int3 calculateCellIndex(const rsl::math::float3 point);
 
         std::vector<std::vector<physics_manifold_precursor>> manifoldPrecursorGrouping;
     };

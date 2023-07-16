@@ -48,16 +48,16 @@ namespace rythe::physics
 
         void PopulateContactPointsWith(ConvexCollider* convexCollider, physics_manifold& manifold) override;
 
-        void UpdateTransformedTightBoundingVolume(const math::mat4& transform) override
+        void UpdateTransformedTightBoundingVolume(const math::float4x4& transform) override
         {
             UpdateTightAABB(transform);
         }
 
         /**@brief Given the current transform of the entity, creates a tight AABB of the collider;
         */
-        void UpdateTightAABB(const math::mat4& transform);
+        void UpdateTightAABB(const math::float4x4& transform);
        
-        virtual void DrawColliderRepresentation(const math::mat4& transform, math::color usedColor, float width,float time,bool ignoreDepth = false) override;
+        virtual void DrawColliderRepresentation(const math::float4x4& transform, math::color usedColor, float width,float time,bool ignoreDepth = false) override;
         
 
         /**@brief Does one step of the convex hull generation

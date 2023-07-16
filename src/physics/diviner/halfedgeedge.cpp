@@ -57,10 +57,10 @@ namespace rythe::physics
         return isVertexVisible(vert,epsilon) && !pairingEdge->isVertexVisible(vert,epsilon);
     }
 
-    void HalfEdgeEdge::DEBUG_drawEdge(const math::mat4& transform, const math::color& debugColor, float time, float width)
+    void HalfEdgeEdge::DEBUG_drawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width)
     {
-        rsl::math::float3 worldStart = transform * math::vec4(edgePosition, 1);
-        rsl::math::float3 worldEnd = transform * math::vec4(nextEdge->edgePosition, 1);
+        rsl::math::float3 worldStart = transform * math::float4(edgePosition, 1);
+        rsl::math::float3 worldEnd = transform * math::float4(nextEdge->edgePosition, 1);
 
         debug::drawLine(worldStart, worldEnd, debugColor, width, time, true);
     }
@@ -78,12 +78,12 @@ namespace rythe::physics
         debug::drawLine(worldStart + startDifference, worldEnd + endDifference, debugColor, width, time, true);
     }
 
-    void HalfEdgeEdge::DEBUG_directionDrawEdge(const math::mat4& transform, const math::color& debugColor, float time, float width)
+    void HalfEdgeEdge::DEBUG_directionDrawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width)
     {
-        rsl::math::float3 worldStart = transform * math::vec4(edgePosition, 1);
-        rsl::math::float3 worldEnd = transform * math::vec4(nextEdge->edgePosition, 1);
+        rsl::math::float3 worldStart = transform * math::float4(edgePosition, 1);
+        rsl::math::float3 worldEnd = transform * math::float4(nextEdge->edgePosition, 1);
 
-        rsl::math::float3 worldCentroid = transform * math::vec4(face->centroid, 1);
+        rsl::math::float3 worldCentroid = transform * math::float4(face->centroid, 1);
 
         rsl::math::float3 startDifference = (worldCentroid - worldStart) * 0.1f;
         rsl::math::float3 endDifference = (worldCentroid - worldEnd) * 0.1f;

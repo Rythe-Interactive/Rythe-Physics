@@ -16,7 +16,7 @@ namespace rythe::physics
             m_modificationFlags.set(rigidbody_flag::rb_mass);
         }
 
-        R_ALWAYS_INLINE void setInertiaTensor(const math::mat3& inertiaTensor)
+        R_ALWAYS_INLINE void setInertiaTensor(const math::float3x3& inertiaTensor)
         {
             m_inertiaTensor = inertiaTensor;
             m_modificationFlags.set(rigidbody_flag::rb_inertia_tensor);
@@ -48,7 +48,7 @@ namespace rythe::physics
         
         R_ALWAYS_INLINE float getMass() const noexcept { return m_mass; }
 
-        R_ALWAYS_INLINE math::mat3 getInertiaTensor() const noexcept { return m_inertiaTensor; }
+        R_ALWAYS_INLINE math::float3x3 getInertiaTensor() const noexcept { return m_inertiaTensor; }
 
         R_ALWAYS_INLINE rsl::math::float3 getVelocity() const noexcept { return m_velocity; }
 
@@ -89,7 +89,7 @@ namespace rythe::physics
         rsl::math::float3 m_velocity = rsl::math::float3(0.0);
         rsl::math::float3 m_angularVelocity = rsl::math::float3(0.0);
 
-        math::mat3 m_inertiaTensor = math::mat3(6.0f);
+        math::float3x3 m_inertiaTensor = math::float3x3(6.0f);
 
         float m_mass = 1.0f;
         float m_linearDrag;
