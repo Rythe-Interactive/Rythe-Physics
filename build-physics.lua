@@ -21,26 +21,24 @@ DEALINGS IN THE SOFTWARE.
 
 ]]--
 
+createProject("engine","physics","StaticLib")
+includedirs {
+    "include",
+    "include/*",
+    "include/*/src/",
+    "third_party/",
+    "third_party/*",
+    "third_party/*/src/",
+    "third_party/*/include/",
+    "src"
+}      
 
-group "engine"
-project "physics"
-    kind "StaticLib"
-    language "C++"
-    targetdir "../../../../../build/%{cfg.buildcfg}"
-    cppdialect "C++20"
-    includedirs { "../","../../third_party/"}
-	dependson { "core" }
+files { 
+    "src/%{prj.name}/**.h",
+    "src/%{prj.name}/**.hpp",
+    "src/%{prj.name}/**.inl",
+    "src/%{prj.name}/**.c",
+    "src/%{prj.name}/**.cpp" 
+}
 
-    files {"**.h", "**.hpp" ,"**.inl","**.c", "**.cpp"}
-
-    filter "configurations:Debug*"
-        defines {"DEBUG"}
-        symbols "On"
-
-    filter "configurations:Release*"
-        defines {"NDEBUG"}
-        optimize "On"
-		
-    filter "configurations:*64"
-       architecture "x86_64"
-group ""
+dofile "../core/include-core.lua"
