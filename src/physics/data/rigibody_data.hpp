@@ -16,73 +16,73 @@ namespace rythe::physics
             m_modificationFlags.set(rigidbody_flag::rb_mass);
         }
 
-        R_ALWAYS_INLINE void setInertiaTensor(const math::float3x3& inertiaTensor)
+        rythe_always_inline void setInertiaTensor(const math::float3x3& inertiaTensor)
         {
             m_inertiaTensor = inertiaTensor;
             m_modificationFlags.set(rigidbody_flag::rb_inertia_tensor);
         }
         
-        R_ALWAYS_INLINE void setVelocity(const rsl::math::float3& velocity)
+        rythe_always_inline void setVelocity(const rsl::math::float3& velocity)
         {
             m_velocity = velocity;
             m_modificationFlags.set(rigidbody_flag::rb_velocity);
         }
 
-        R_ALWAYS_INLINE void setAngularVelocity(const rsl::math::float3& velocity)
+        rythe_always_inline void setAngularVelocity(const rsl::math::float3& velocity)
         {
             m_angularVelocity = velocity;
             m_modificationFlags.set(rigidbody_flag::rb_angular_velocity);
         }
         
-        R_ALWAYS_INLINE void setLinearDrag(float linearDrag)
+        rythe_always_inline void setLinearDrag(float linearDrag)
         {
             m_linearDrag = linearDrag;
             m_modificationFlags.set(rigidbody_flag::rb_linear_drag);
         }
 
-        R_ALWAYS_INLINE void setAngularDrag(float angularDrag)
+        rythe_always_inline void setAngularDrag(float angularDrag)
         {
             m_angularDrag = angularDrag;
             m_modificationFlags.set(rigidbody_flag::rb_angular_drag);
         }
         
-        R_ALWAYS_INLINE float getMass() const noexcept { return m_mass; }
+        rythe_always_inline float getMass() const noexcept { return m_mass; }
 
-        R_ALWAYS_INLINE math::float3x3 getInertiaTensor() const noexcept { return m_inertiaTensor; }
+        rythe_always_inline math::float3x3 getInertiaTensor() const noexcept { return m_inertiaTensor; }
 
-        R_ALWAYS_INLINE rsl::math::float3 getVelocity() const noexcept { return m_velocity; }
+        rythe_always_inline rsl::math::float3 getVelocity() const noexcept { return m_velocity; }
 
-        R_ALWAYS_INLINE rsl::math::float3 getAngularVelocity() const noexcept { return m_angularVelocity; }
+        rythe_always_inline rsl::math::float3 getAngularVelocity() const noexcept { return m_angularVelocity; }
 
-        R_ALWAYS_INLINE float getLinearDrag() const noexcept { return m_linearDrag; }
+        rythe_always_inline float getLinearDrag() const noexcept { return m_linearDrag; }
 
-        R_ALWAYS_INLINE float getAngularDrag() const noexcept { return m_angularDrag; }
+        rythe_always_inline float getAngularDrag() const noexcept { return m_angularDrag; }
 
-        R_ALWAYS_INLINE float getDensity() const noexcept { return m_density; }
+        rythe_always_inline float getDensity() const noexcept { return m_density; }
 
-        R_ALWAYS_INLINE const std::bitset<rigidbody_flag::rb_max>& getGeneratedModifyEvents() const
+        rythe_always_inline const std::bitset<rigidbody_flag::rb_max>& getGeneratedModifyEvents() const
         {
             return m_modificationFlags;
         }
 
-        R_ALWAYS_INLINE void resetModificationFlags() { m_modificationFlags.reset(); }
+        rythe_always_inline void resetModificationFlags() { m_modificationFlags.reset(); }
 
         //-------------------------------------------- internal use functions ------------------------------------------------//
 
         /** @brief Internal use only. Sets the mass of the rigidbody without updating its bitset*/
-        R_ALWAYS_INLINE void setMassDirect(float newMass) noexcept { m_mass = newMass; }
+        rythe_always_inline void setMassDirect(float newMass) noexcept { m_mass = newMass; }
 
         /** @brief Internal use only. Sets the density of the rigidbody without updating its bitset.
          * The currently active active physics engine should be responsible for setting this value */
-        R_ALWAYS_INLINE void setDensityDirect(float newDensity) noexcept { m_density = newDensity; }
+        rythe_always_inline void setDensityDirect(float newDensity) noexcept { m_density = newDensity; }
 
         /** @brief Internal use only. Sets the density of the rigidbody without updating its bitset.
          * The currently active active physics engine should be responsible for setting this value */
-        R_ALWAYS_INLINE void setLinearVelocityDirect(const rsl::math::float3& linearVelocity) noexcept { m_velocity = linearVelocity; }
+        rythe_always_inline void setLinearVelocityDirect(const rsl::math::float3& linearVelocity) noexcept { m_velocity = linearVelocity; }
 
         /** @brief Internal use only. Sets the density of the rigidbody without updating its bitset.
          * The currently active active physics engine should be responsible for setting this value */
-        R_ALWAYS_INLINE void setAngularVelocityDirect(const rsl::math::float3& angularVelocity) noexcept { m_velocity = angularVelocity; }
+        rythe_always_inline void setAngularVelocityDirect(const rsl::math::float3& angularVelocity) noexcept { m_velocity = angularVelocity; }
 
     private:
 
