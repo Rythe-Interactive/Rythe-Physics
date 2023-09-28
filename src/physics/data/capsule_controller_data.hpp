@@ -26,35 +26,35 @@ namespace rythe::physics
     {
     public:
 
-        R_ALWAYS_INLINE void moveTo(const rsl::math::float3& displacement)
+        rythe_always_inline void moveTo(const rsl::math::float3& displacement)
         {
             m_modificationFlags.set(capsule_character_flag::cc_move_to, true);
             m_currentDisplacement += displacement;
         }
 
-        R_ALWAYS_INLINE void setRadius(float radius)
+        rythe_always_inline void setRadius(float radius)
         {
             m_modificationFlags.set(capsule_character_flag::cc_set_radius, true);
             m_radius = radius;
         }
 
-        R_ALWAYS_INLINE float getRadius() const noexcept { return m_radius; }
+        rythe_always_inline float getRadius() const noexcept { return m_radius; }
 
-        R_ALWAYS_INLINE void setHeight(float height)
+        rythe_always_inline void setHeight(float height)
         {
             m_modificationFlags.set(capsule_character_flag::cc_set_height, true);
             m_height = height;
         }
 
-        R_ALWAYS_INLINE float getHeight() const noexcept { return m_height; }
+        rythe_always_inline float getHeight() const noexcept { return m_height; }
 
-        R_ALWAYS_INLINE const rsl::math::float3& getCurrentDisplacement() const noexcept { return m_currentDisplacement; }
+        rythe_always_inline const rsl::math::float3& getCurrentDisplacement() const noexcept { return m_currentDisplacement; }
 
-        R_ALWAYS_INLINE void resetDisplacement() { m_currentDisplacement = rsl::math::float3(0); }
+        rythe_always_inline void resetDisplacement() { m_currentDisplacement = rsl::math::float3(0); }
 
-        R_ALWAYS_INLINE const std::bitset<capsule_character_flag::cc_max>& getModificationFlags() const noexcept { return m_modificationFlags; }
+        rythe_always_inline const std::bitset<capsule_character_flag::cc_max>& getModificationFlags() const noexcept { return m_modificationFlags; }
 
-        R_ALWAYS_INLINE void resetModificationFlags() { m_modificationFlags.reset(); }
+        rythe_always_inline void resetModificationFlags() { m_modificationFlags.reset(); }
 
         template<class preset>
         pointer<const preset> getPreset() const noexcept
@@ -122,9 +122,9 @@ namespace rythe::physics
             return { static_cast<preset*>(specificsPtr) };
         }
 
-        R_ALWAYS_INLINE std::vector<controller_preset>& getControllerPresets() noexcept { return m_presets; }
+        rythe_always_inline std::vector<controller_preset>& getControllerPresets() noexcept { return m_presets; }
 
-        R_ALWAYS_INLINE const std::vector<controller_preset>& getControllerPresets() const noexcept { return m_presets; }
+        rythe_always_inline const std::vector<controller_preset>& getControllerPresets() const noexcept { return m_presets; }
 
     private:
 

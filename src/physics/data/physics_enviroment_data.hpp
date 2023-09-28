@@ -22,16 +22,16 @@ namespace rythe::physics
             }
         }
 
-        R_ALWAYS_INLINE void resetModificationFlags() { m_modificationFlags.reset(); }
+        rythe_always_inline void resetModificationFlags() { m_modificationFlags.reset(); }
 
-        R_ALWAYS_INLINE const std::bitset<physics_enviroment_flag::pe_max>& getGeneratedModifyEvents() const noexcept
+        rythe_always_inline const std::bitset<physics_enviroment_flag::pe_max>& getGeneratedModifyEvents() const noexcept
         {
             return m_modificationFlags;
         };
 
-        R_ALWAYS_INLINE const rsl::math::float3& getInfinitePlaneNormal() const noexcept { return m_planeNormal; }
+        rythe_always_inline const rsl::math::float3& getInfinitePlaneNormal() const noexcept { return m_planeNormal; }
 
-        R_ALWAYS_INLINE float getInfinitePlaneDistanceToOrigin() const noexcept { return m_distFromOrigin; }
+        rythe_always_inline float getInfinitePlaneDistanceToOrigin() const noexcept { return m_distFromOrigin; }
     private:
 
         rsl::math::float3 m_planeNormal;

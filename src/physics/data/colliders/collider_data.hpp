@@ -32,25 +32,25 @@ namespace rythe::physics
 
         ColliderData(rsl::size_type colliderIndex,pointer<std::vector<collider_modification_data>> modificationsRequests, collider_type colliderType, const rsl::math::float3& offset, const rsl::math::quat& rotation) noexcept;
 
-        R_ALWAYS_INLINE void setRegistered(bool registeredState) noexcept { m_isRegistered = registeredState; }
-        R_ALWAYS_INLINE bool isRegistered() const noexcept   { return m_isRegistered; }
+        rythe_always_inline void setRegistered(bool registeredState) noexcept { m_isRegistered = registeredState; }
+        rythe_always_inline bool isRegistered() const noexcept   { return m_isRegistered; }
 
-        R_ALWAYS_INLINE const rsl::math::float3& getOffset() const noexcept   { return m_positionOffset; }
-        R_ALWAYS_INLINE const rsl::math::quat& getRotationOffset() const noexcept  { return m_rotationOffset; }
+        rythe_always_inline const rsl::math::float3& getOffset() const noexcept   { return m_positionOffset; }
+        rythe_always_inline const rsl::math::quat& getRotationOffset() const noexcept  { return m_rotationOffset; }
 
-        R_ALWAYS_INLINE collider_type getColliderType() const noexcept  { return m_colliderType; }
+        rythe_always_inline collider_type getColliderType() const noexcept  { return m_colliderType; }
 
-        R_ALWAYS_INLINE bool isRegisteredOrNotOfType(collider_type colliderType) const noexcept
+        rythe_always_inline bool isRegisteredOrNotOfType(collider_type colliderType) const noexcept
         {
             return m_isRegistered || colliderType != m_colliderType;
         }
 
-        R_ALWAYS_INLINE rsl::size_type getMaterialHash() const noexcept { return m_materialHash; }
+        rythe_always_inline rsl::size_type getMaterialHash() const noexcept { return m_materialHash; }
 
         void setMaterialHash(rsl::size_type materialHash) noexcept;
         
 
-        R_ALWAYS_INLINE pointer<const rsl::math::float3> getBoxExtents() const
+        rythe_always_inline pointer<const rsl::math::float3> getBoxExtents() const
         {
             if (m_colliderType != collider_type::box)
             {
@@ -63,7 +63,7 @@ namespace rythe::physics
 
         void setBoxExtents(const rsl::math::float3& newExtents) noexcept;
         
-        R_ALWAYS_INLINE pointer<const float> getSphereRadius() const 
+        rythe_always_inline pointer<const float> getSphereRadius() const 
         {
             if (m_colliderType != collider_type::sphere)
             {
@@ -76,7 +76,7 @@ namespace rythe::physics
 
         void setSphereRadius(float newRadius) noexcept;
         
-        R_ALWAYS_INLINE InternalConvexColliderPtr getConvexCollider() const 
+        rythe_always_inline InternalConvexColliderPtr getConvexCollider() const 
         {
             if (m_colliderType != collider_type::quickhull_convex)
             {
@@ -87,26 +87,26 @@ namespace rythe::physics
             return m_colliderSpecifics.internalConvexStructure;
         }
 
-        R_ALWAYS_INLINE rsl::size_type getColliderIndex() const noexcept { return m_colliderIndex; }
+        rythe_always_inline rsl::size_type getColliderIndex() const noexcept { return m_colliderIndex; }
 
     private:
 
-        R_ALWAYS_INLINE void setModificationRequestVector(pointer<std::vector<collider_modification_data>> modificationsRequests) noexcept
+        rythe_always_inline void setModificationRequestVector(pointer<std::vector<collider_modification_data>> modificationsRequests) noexcept
         {
             m_modificationsRequests = modificationsRequests;
         }
 
-        R_ALWAYS_INLINE void setColliderToBoxCollider(const rsl::math::float3& boxExtents)
+        rythe_always_inline void setColliderToBoxCollider(const rsl::math::float3& boxExtents)
         {
             m_colliderSpecifics.boxExtents = { boxExtents };
         }
 
-        R_ALWAYS_INLINE void setColliderToConvexCollider(InternalConvexColliderPtr convexMesh)
+        rythe_always_inline void setColliderToConvexCollider(InternalConvexColliderPtr convexMesh)
         {
             m_colliderSpecifics.internalConvexStructure = { convexMesh };
         }
 
-        R_ALWAYS_INLINE void setColliderToSphereCollider(float radius)
+        rythe_always_inline void setColliderToSphereCollider(float radius)
         {
             m_colliderSpecifics.sphereRadius = { radius };
         }

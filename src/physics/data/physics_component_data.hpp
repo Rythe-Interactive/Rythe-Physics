@@ -50,7 +50,7 @@ namespace rythe::physics
             return *this;
         }
 
-        R_ALWAYS_INLINE void addBoxCollider(const rsl::math::float3& extents, const rsl::math::float3& offset, const rsl::math::quat& rotation)
+        rythe_always_inline void addBoxCollider(const rsl::math::float3& extents, const rsl::math::float3& offset, const rsl::math::quat& rotation)
         {
             if (extents.x == 0.0f || extents.y == 0.0f || extents.z == 0.0f)
             {
@@ -64,7 +64,7 @@ namespace rythe::physics
             updateColliderRecords(physics_component_flag::pc_add_first_box, physics_component_flag::pc_add_next_box);
         }
 
-        R_ALWAYS_INLINE void addBoxCollider(const rsl::math::float3& extents)
+        rythe_always_inline void addBoxCollider(const rsl::math::float3& extents)
         {
             addBoxCollider(extents, rsl::math::float3(0.0f), math::identity<rsl::math::quat>());
         }
@@ -86,7 +86,7 @@ namespace rythe::physics
             }
         }
         
-        R_ALWAYS_INLINE void addSphereCollider(float radius, const rsl::math::float3& offset = rsl::math::float3(0.0f))
+        rythe_always_inline void addSphereCollider(float radius, const rsl::math::float3& offset = rsl::math::float3(0.0f))
         {
            if (radius == 0.0f)
            {
@@ -99,24 +99,24 @@ namespace rythe::physics
            updateColliderRecords(physics_component_flag::pc_add_first_sphere, physics_component_flag::pc_add_next_sphere);
         }
 
-        R_ALWAYS_INLINE std::vector<ColliderData>& getColliders() noexcept
+        rythe_always_inline std::vector<ColliderData>& getColliders() noexcept
         {
             return m_colliders;
         }
 
-        R_ALWAYS_INLINE const std::bitset<physics_component_flag::pc_max>& getGeneratedModifyEvents() const noexcept
+        rythe_always_inline const std::bitset<physics_component_flag::pc_max>& getGeneratedModifyEvents() const noexcept
         {
             return m_modificationFlags;
         };
 
-        R_ALWAYS_INLINE const std::vector<collider_modification_data>& getGeneratedColliderModifyEvents() const noexcept
+        rythe_always_inline const std::vector<collider_modification_data>& getGeneratedColliderModifyEvents() const noexcept
         {
             return m_colliderModificationRequests;
         };
 
-        R_ALWAYS_INLINE void resetModificationFlags() { m_modificationFlags.reset(); }
+        rythe_always_inline void resetModificationFlags() { m_modificationFlags.reset(); }
 
-        R_ALWAYS_INLINE void resetColliderModificationFlags() { m_colliderModificationRequests.clear(); }
+        rythe_always_inline void resetColliderModificationFlags() { m_colliderModificationRequests.clear(); }
         
         static void setConvexGeneratorDelegate(GenerateConvexDelegate generateConvexFunc)
         {
@@ -125,7 +125,7 @@ namespace rythe::physics
 
     private:
 
-        R_ALWAYS_INLINE void updateColliderRecords(physics_component_flag firstColliderFlag, physics_component_flag nextColliderFlag) noexcept
+        rythe_always_inline void updateColliderRecords(physics_component_flag firstColliderFlag, physics_component_flag nextColliderFlag) noexcept
         {
             m_colliderCount == 0 ?
                 m_modificationFlags.set(firstColliderFlag) :
