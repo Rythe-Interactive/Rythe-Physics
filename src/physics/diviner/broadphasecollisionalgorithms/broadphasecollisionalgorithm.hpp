@@ -17,7 +17,7 @@ namespace rythe::physics
          * @param manifoldPrecursorGrouping a list-list of colliders that have a chance of colliding and should be checked
          */
         virtual const std::vector<std::vector<physics_manifold_precursor>>& collectPairs(
-            std::vector<physics_manifold_precursor>&& manifoldPrecursors) RYTHE_PURE;
+            std::vector<physics_manifold_precursor>&& manifoldPrecursors) =0;
 
         virtual void debugDraw()
         {

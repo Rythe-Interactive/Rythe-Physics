@@ -88,7 +88,7 @@ namespace rythe::physics
             return dummyHalfEdges;
         }
 
-        R_NODISCARD rsl::math::float3 GetLocalCentroid() const noexcept
+        [[nodiscard]] rsl::math::float3 GetLocalCentroid() const noexcept
         {
             return localColliderCentroid;
         }

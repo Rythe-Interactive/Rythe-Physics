@@ -22,7 +22,7 @@ namespace rythe::physics {
          *         of this collision.
          */
 
-        R_NODISCARD std::pair<ecs::entity,ecs::entity> participants() const
+        [[nodiscard]] std::pair<ecs::entity,ecs::entity> participants() const
         {
             return std::make_pair(
                 manifold->entityA,
@@ -32,7 +32,7 @@ namespace rythe::physics {
 
         /** @brief gets the centers of the colliders in local space
          */
-        R_NODISCARD std::pair<rsl::math::float3,rsl::math::float3> centers() const noexcept
+        [[nodiscard]] std::pair<rsl::math::float3,rsl::math::float3> centers() const noexcept
         {
             return std::make_pair(
                 manifold->colliderA->GetLocalCentroid(),
@@ -42,7 +42,7 @@ namespace rythe::physics {
 
         /** @brief gets the colliders themselves
          */
-        R_NODISCARD std::pair<PhysicsCollider*,
+        [[nodiscard]] std::pair<PhysicsCollider*,
                              PhysicsCollider*> colliders() const noexcept
         {
             return std::make_pair(manifold->colliderA, manifold->colliderB);
