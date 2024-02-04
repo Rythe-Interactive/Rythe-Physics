@@ -5,45 +5,45 @@
 
 namespace rythe::physics
 {
-    struct ColliderFaceToVert;
+	struct ColliderFaceToVert;
 
-    struct HalfEdgeFace
-    {
-        rsl::math::float3 normal;
-        rsl::math::float3 centroid;
+	struct HalfEdgeFace
+	{
+		rsl::math::float3 normal;
+		rsl::math::float3 centroid;
 
-        HalfEdgeEdge* startEdge = nullptr;
-        ColliderFaceToVert* faceToVert = nullptr; 
-        
-        HalfEdgeFace(HalfEdgeEdge* newStartEdge, rsl::math::float3 newNormal);
+		HalfEdgeEdge* startEdge = nullptr;
+		ColliderFaceToVert* faceToVert = nullptr;
 
-        /**@brief Given that the face has a startEdge,a normal, and a centroid,
-         * initializes the face so that it can be used for collision detection in a convex hull
-         */
-        void initializeFace();
+		HalfEdgeFace(HalfEdgeEdge* newStartEdge, rsl::math::float3 newNormal);
 
-        /**@brief Calculates the sum of the width and height of the rectangle that envelops this face
-         */
-        float calculateFaceExtents();
+		/**@brief Given that the face has a startEdge,a normal, and a centroid,
+		 * initializes the face so that it can be used for collision detection in a convex hull
+		 */
+		void initializeFace();
 
-        /** @brief given a function that takes in a HalfEdgeEdge*, 
-        * executes the function on each edge connected to 'startEdge'
-        */
-        void forEachEdge(rythe::core::rsl::delegate< void(HalfEdgeEdge*)> functionToExecute,
-            rythe::core::rsl::delegate <HalfEdgeEdge* (HalfEdgeEdge*)> getNextEdge = [](HalfEdgeEdge* current) { return current->nextEdge; });
+		/**@brief Calculates the sum of the width and height of the rectangle that envelops this face
+		 */
+		float calculateFaceExtents();
 
-        void forEachEdgeReverse(rythe::core::rsl::delegate< void(HalfEdgeEdge*)> functionToExecute);
+		/** @brief given a function that takes in a HalfEdgeEdge*,
+		 * executes the function on each edge connected to 'startEdge'
+		 */
+		void forEachEdge(rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute, rythe::core::rsl::delegate<HalfEdgeEdge*(HalfEdgeEdge*)> getNextEdge = [](HalfEdgeEdge* current)
+		{ return current->nextEdge; });
 
-        /**@brief Inverses the face
-         * The edges will be stored in reverse and therefore the normal will point in the other direction
-         * The normal will be changed 
-         */
-        void inverse();
+		void forEachEdgeReverse(rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute);
 
-        void DEBUG_DrawFace(const math::float4x4& transform, const math::color& debugColor,  float time = 20.0f);
+		/**@brief Inverses the face
+		 * The edges will be stored in reverse and therefore the normal will point in the other direction
+		 * The normal will be changed
+		 */
+		void inverse();
 
-        void DEBUG_DirectionDrawFace(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f);
+		void DEBUG_DrawFace(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f);
 
-        ~HalfEdgeFace();
-    };
-}
+		void DEBUG_DirectionDrawFace(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f);
+
+		~HalfEdgeFace();
+	};
+} // namespace rythe::physics

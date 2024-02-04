@@ -3,11 +3,11 @@
 
 namespace rythe::physics
 {
-    constexpr size_t invalid_physics_component = std::numeric_limits<rsl::size_type>::max();
+	constexpr size_t invalid_physics_component = std::numeric_limits<rsl::size_type>::max();
 
-    struct physics_component
-    {
-        PhysicsComponentData physicsCompData;
-        size_t physicsComponentID = invalid_physics_component;
-    };
-}
+	struct physics_component
+	{
+		PhysicsComponentData physicsCompData;
+		size_t physicsComponentID = invalid_physics_component;
+	};
+} // namespace rythe::physics

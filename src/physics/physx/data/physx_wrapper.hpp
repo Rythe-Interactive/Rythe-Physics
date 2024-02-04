@@ -3,54 +3,54 @@
 
 namespace physx
 {
-    class PxActor;
-    class PxController;
-}
+	class PxActor;
+	class PxController;
+} // namespace physx
 
 namespace rythe::physics
 {
-    class ControllerHitFeedback;
+	class ControllerHitFeedback;
 
-    enum class physics_body_type
-    {
-        none,
-        static_collider,
-        rigidbody
-    };
+	enum class physics_body_type
+	{
+		none,
+		static_collider,
+		rigidbody
+	};
 
-    struct PhysxInternalWrapper
-    {
-        physx::PxActor* physicsActor = nullptr;
+	struct PhysxInternalWrapper
+	{
+		physx::PxActor* physicsActor = nullptr;
 
-        physics_body_type bodyType = physics_body_type::static_collider;
+		physics_body_type bodyType = physics_body_type::static_collider;
 
-        PhysxInternalWrapper() noexcept = default;
+		PhysxInternalWrapper() noexcept = default;
 
-        ~PhysxInternalWrapper();
+		~PhysxInternalWrapper();
 
-        PhysxInternalWrapper(PhysxInternalWrapper&& other) noexcept;
+		PhysxInternalWrapper(PhysxInternalWrapper&& other) noexcept;
 
-        PhysxInternalWrapper& operator= (PhysxInternalWrapper&& other) noexcept;
+		PhysxInternalWrapper& operator=(PhysxInternalWrapper&& other) noexcept;
 
-        PhysxInternalWrapper& operator= (const PhysxInternalWrapper& other) = delete;
+		PhysxInternalWrapper& operator=(const PhysxInternalWrapper& other) = delete;
 
-        PhysxInternalWrapper(const PhysxInternalWrapper& other) = delete;
-    };
+		PhysxInternalWrapper(const PhysxInternalWrapper& other) = delete;
+	};
 
-    struct PhysxCharacterWrapper
-    {
-        physx::PxController* characterController = nullptr;
-        std::unique_ptr<ControllerHitFeedback> controllerFeedback;
+	struct PhysxCharacterWrapper
+	{
+		physx::PxController* characterController = nullptr;
+		std::unique_ptr<ControllerHitFeedback> controllerFeedback;
 
-        PhysxCharacterWrapper();
-        ~PhysxCharacterWrapper();
+		PhysxCharacterWrapper();
+		~PhysxCharacterWrapper();
 
-        PhysxCharacterWrapper& operator= (PhysxCharacterWrapper& other) = delete;
+		PhysxCharacterWrapper& operator=(PhysxCharacterWrapper& other) = delete;
 
-        PhysxCharacterWrapper(PhysxCharacterWrapper& other) = delete;
+		PhysxCharacterWrapper(PhysxCharacterWrapper& other) = delete;
 
-        PhysxCharacterWrapper& operator= (PhysxCharacterWrapper&& other) noexcept;
+		PhysxCharacterWrapper& operator=(PhysxCharacterWrapper&& other) noexcept;
 
-        PhysxCharacterWrapper(PhysxCharacterWrapper&& other) noexcept;
-    };
-}
+		PhysxCharacterWrapper(PhysxCharacterWrapper&& other) noexcept;
+	};
+} // namespace rythe::physics

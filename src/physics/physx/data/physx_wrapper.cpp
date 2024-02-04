@@ -1,53 +1,55 @@
 #include "physx_wrapper.hpp"
-#include <physx/PxPhysicsAPI.h>
 #include <physics/physx/data/controller_hit_feedback.inl>
+#include <physx/PxPhysicsAPI.h>
 
 namespace rythe::physics
 {
-    PhysxInternalWrapper::~PhysxInternalWrapper()
-    {
-        if (physicsActor)
-        {
-            physicsActor->release();
-            physicsActor = nullptr;
-        }
-    }
+	PhysxInternalWrapper::~PhysxInternalWrapper()
+	{
+		if (physicsActor)
+		{
+			physicsActor->release();
+			physicsActor = nullptr;
+		}
+	}
 
-    PhysxInternalWrapper::PhysxInternalWrapper(PhysxInternalWrapper&& other) noexcept
-        : bodyType(other.bodyType), physicsActor(other.physicsActor)
-    {
-        other.bodyType = physics_body_type::none;
-        other.physicsActor = nullptr;
-    }
+	PhysxInternalWrapper::PhysxInternalWrapper(PhysxInternalWrapper&& other) noexcept
+		: bodyType(other.bodyType),
+		  physicsActor(other.physicsActor)
+	{
+		other.bodyType = physics_body_type::none;
+		other.physicsActor = nullptr;
+	}
 
-    PhysxInternalWrapper& PhysxInternalWrapper::operator=(PhysxInternalWrapper&& other) noexcept
-    {
-        bodyType = other.bodyType;
-        physicsActor = other.physicsActor;
+	PhysxInternalWrapper& PhysxInternalWrapper::operator=(PhysxInternalWrapper&& other) noexcept
+	{
+		bodyType = other.bodyType;
+		physicsActor = other.physicsActor;
 
-        other.bodyType = physics_body_type::none;
-        other.physicsActor = nullptr;
+		other.bodyType = physics_body_type::none;
+		other.physicsActor = nullptr;
 
-        return *this;
-    }
+		return *this;
+	}
 
-    PhysxCharacterWrapper::PhysxCharacterWrapper() { }
+	PhysxCharacterWrapper::PhysxCharacterWrapper() {}
 
-    PhysxCharacterWrapper::~PhysxCharacterWrapper() { }
+	PhysxCharacterWrapper::~PhysxCharacterWrapper() {}
 
-    PhysxCharacterWrapper& PhysxCharacterWrapper::operator= (PhysxCharacterWrapper&& other) noexcept
-    {
-        characterController = other.characterController;
-        controllerFeedback = std::move(other.controllerFeedback);
+	PhysxCharacterWrapper& PhysxCharacterWrapper::operator=(PhysxCharacterWrapper&& other) noexcept
+	{
+		characterController = other.characterController;
+		controllerFeedback = std::move(other.controllerFeedback);
 
-        other.characterController = nullptr;
+		other.characterController = nullptr;
 
-        return *this;
-    }
+		return *this;
+	}
 
-    PhysxCharacterWrapper::PhysxCharacterWrapper(PhysxCharacterWrapper&& other) noexcept
-        : characterController(other.characterController), controllerFeedback(std::move(other.controllerFeedback))
-    {
-        other.characterController = nullptr;
-    }
-}
+	PhysxCharacterWrapper::PhysxCharacterWrapper(PhysxCharacterWrapper&& other) noexcept
+		: characterController(other.characterController),
+		  controllerFeedback(std::move(other.controllerFeedback))
+	{
+		other.characterController = nullptr;
+	}
+} // namespace rythe::physics

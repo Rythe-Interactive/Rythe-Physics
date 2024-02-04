@@ -3,11 +3,11 @@
 
 namespace rythe::physics
 {
-    constexpr size_t invalid_capsule_controller = std::numeric_limits<rsl::size_type>::max();
+	constexpr size_t invalid_capsule_controller = std::numeric_limits<rsl::size_type>::max();
 
-    struct capsule_controller
-    {
-        CapsuleControllerData data;
-        size_t id = invalid_capsule_controller;
-    };
-}
+	struct capsule_controller
+	{
+		CapsuleControllerData data;
+		size_t id = invalid_capsule_controller;
+	};
+} // namespace rythe::physics

@@ -3,8 +3,8 @@
 
 namespace rythe::physics
 {
-    struct rigidbody
-    {
-        RigidbodyData data;
-    };
-}
+	struct rigidbody
+	{
+		RigidbodyData data;
+	};
+} // namespace rythe::physics

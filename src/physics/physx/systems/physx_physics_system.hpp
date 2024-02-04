@@ -1,117 +1,115 @@
 #pragma once
 #include <core/core.hpp>
-#include <physics/physx/data/physx_wrapper_container.hpp>
+#include <physics/components/physics_component.hpp>
+#include <physics/components/rigidbody.hpp>
+#include <physics/physics_helpers.hpp>
 #include <physics/physx/data/physx_wrapper.hpp>
+#include <physics/physx/data/physx_wrapper_container.hpp>
 #include <physics/physx/physx_integration_helpers.hpp>
 #include <rsl/delegate>
-#include <physics/components/rigidbody.hpp>
-#include <physics/components/physics_component.hpp>
-#include <physics/physics_helpers.hpp>
 
 namespace physx
 {
-    class PxScene;
-    class PxControllerManager;
-    class PxPhysics;
-    class PxMaterial;
-    struct PxControllerShapeHit;
-};
+	class PxScene;
+	class PxControllerManager;
+	class PxPhysics;
+	class PxMaterial;
+	struct PxControllerShapeHit;
+}; // namespace physx
 
 namespace rythe::physics
 {
-    class CapsuleControllerData;
-    struct controller_preset;
-   
-    class PhysXPhysicsSystem final : public System<PhysXPhysicsSystem>
-    {
-    public:
+	class CapsuleControllerData;
+	struct controller_preset;
 
-        virtual void setup();
+	class PhysXPhysicsSystem final : public System<PhysXPhysicsSystem>
+	{
+	public:
+		virtual void setup();
 
-        virtual void shutdown();
+		virtual void shutdown();
 
-        void physicsStep();
+		void physicsStep();
 
-        void update(rythe::rsl::span deltaTime);
+		void update(rythe::rsl::span deltaTime);
 
-        static physx::PxPhysics* getSDK();
+		static physx::PxPhysics* getSDK();
 
-    private:
+	private:
+		float m_accumulation;
 
-        float m_accumulation;
-        
-        static void* physxGenerateConvexMesh(const std::vector<rsl::math::float3>& vertices);
+		static void* physxGenerateConvexMesh(const std::vector<rsl::math::float3>& vertices);
 
-        void lazyInitPhysXVariables();
+		void lazyInitPhysXVariables();
 
-        void releasePhysXVariables();
+		void releasePhysXVariables();
 
-        void setupDefaultScene();
+		void setupDefaultScene();
 
-        void bindEventsToEventProcessors();
+		void bindEventsToEventProcessors();
 
-        void markPhysicsWrapperPendingRemove(events::component_destruction<physics_component>& event);
-        
-        void onRequestCreatePhysicsMaterial(request_create_physics_material& physicsMaterialRequest);
+		void markPhysicsWrapperPendingRemove(events::component_destruction<physics_component>& event);
 
-        void executePreSimulationActions();
+		void onRequestCreatePhysicsMaterial(request_create_physics_material& physicsMaterialRequest);
 
-        void executePostSimulationActions();
+		void executePreSimulationActions();
 
-        void executePreTimeStepActions();
+		void executePostSimulationActions();
 
-        void instantiateCharacterController(ecs::entity ent,const CapsuleControllerData& capsuleData, PhysxCharacterWrapper& outCharacterWrapper);
+		void executePreTimeStepActions();
 
-        void processPhysicsComponentEvents(ecs::entity ent, physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
+		void instantiateCharacterController(ecs::entity ent, const CapsuleControllerData& capsuleData, PhysxCharacterWrapper& outCharacterWrapper);
 
-        void processRigidbodyComponentEvents(ecs::entity ent, rigidbody& rigidbody, physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
+		void processPhysicsComponentEvents(ecs::entity ent, physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
 
-        void processColliderModificationEvents(physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
+		void processRigidbodyComponentEvents(ecs::entity ent, rigidbody& rigidbody, physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
 
-        void processCapsuleCharacterModificationEvents(capsule_controller& capsule);
+		void processColliderModificationEvents(physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
 
-        void processPhysicsEnviromentEvents(ecs::entity ent, physics_enviroment& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
+		void processCapsuleCharacterModificationEvents(capsule_controller& capsule);
 
-        rsl::delegate<void(const physx::PxControllerShapeHit&)> initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum);
+		void processPhysicsEnviromentEvents(ecs::entity ent, physics_enviroment& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo);
 
-        static constexpr float m_timeStep = 0.02f;
-        static constexpr rsl::size_type m_maxPhysicsStep = 3;
+		rsl::delegate<void(const physx::PxControllerShapeHit&)> initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum);
 
-        physx::PxScene* m_physxScene = nullptr;
-        physx::PxControllerManager* m_characterManager = nullptr;
+		static constexpr float m_timeStep = 0.02f;
+		static constexpr rsl::size_type m_maxPhysicsStep = 3;
 
-        PhysxWrapperContainer<PhysxInternalWrapper> m_physxWrapperContainer;
-        PhysxWrapperContainer<PhysxCharacterWrapper> m_characterContainer;
+		physx::PxScene* m_physxScene = nullptr;
+		physx::PxControllerManager* m_characterManager = nullptr;
 
-        using pcEventProcessFunc = rsl::delegate<void(physics_component&,const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
-        std::array< pcEventProcessFunc, physics_component_flag::pc_max> m_physicsComponentActionFuncs;
+		PhysxWrapperContainer<PhysxInternalWrapper> m_physxWrapperContainer;
+		PhysxWrapperContainer<PhysxCharacterWrapper> m_characterContainer;
 
-        using rbEventProcessFunc = rsl::delegate<void(rigidbody&,const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
-        std::array< rbEventProcessFunc, rigidbody_flag::rb_max> m_rigidbodyComponentActionFuncs;
+		using pcEventProcessFunc = rsl::delegate<void(physics_component&, const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
+		std::array<pcEventProcessFunc, physics_component_flag::pc_max> m_physicsComponentActionFuncs;
 
-        using peEventProcessFunc = rsl::delegate<void(physics_enviroment&, const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
-        std::array< peEventProcessFunc, physics_enviroment_flag::pe_max> m_enviromentComponentActionFuncs;
+		using rbEventProcessFunc = rsl::delegate<void(rigidbody&, const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
+		std::array<rbEventProcessFunc, rigidbody_flag::rb_max> m_rigidbodyComponentActionFuncs;
 
-        using cmEventProcessFunc = rsl::delegate<void(const ColliderData&, const collider_modification_data&, const PhysxEnviromentInfo&, PhysxInternalWrapper&)>;
-        std::array<cmEventProcessFunc, collider_modification_flag::cm_max> m_colliderActionFuncs;
+		using peEventProcessFunc = rsl::delegate<void(physics_enviroment&, const PhysxEnviromentInfo&, PhysxInternalWrapper&, ecs::entity)>;
+		std::array<peEventProcessFunc, physics_enviroment_flag::pe_max> m_enviromentComponentActionFuncs;
 
-        using ccEventProcessFunc = rsl::delegate<void(PhysxCharacterWrapper&, capsule_controller&) > ;
-        std::array<ccEventProcessFunc, capsule_character_flag::cc_max> m_capsuleActionFuncs;
+		using cmEventProcessFunc = rsl::delegate<void(const ColliderData&, const collider_modification_data&, const PhysxEnviromentInfo&, PhysxInternalWrapper&)>;
+		std::array<cmEventProcessFunc, collider_modification_flag::cm_max> m_colliderActionFuncs;
 
-        using characterPresetProcessFunc = rsl::delegate<void(controller_preset&, PhysxCharacterWrapper&, const PhysxEnviromentInfo&)>;
-        std::unordered_map<rsl::size_type,characterPresetProcessFunc> m_hashToPresetProcessFunc;
+		using ccEventProcessFunc = rsl::delegate<void(PhysxCharacterWrapper&, capsule_controller&)>;
+		std::array<ccEventProcessFunc, capsule_character_flag::cc_max> m_capsuleActionFuncs;
 
-        std::vector<rsl::size_type> m_wrapperPendingRemovalID;
+		using characterPresetProcessFunc = rsl::delegate<void(controller_preset&, PhysxCharacterWrapper&, const PhysxEnviromentInfo&)>;
+		std::unordered_map<rsl::size_type, characterPresetProcessFunc> m_hashToPresetProcessFunc;
 
-        std::unordered_map<rsl::size_type, physx::PxMaterial*> m_physicsMaterials;
+		std::vector<rsl::size_type> m_wrapperPendingRemovalID;
 
-        //------------------------------------------------ Debugging Related --------------------------------------------------------------//
+		std::unordered_map<rsl::size_type, physx::PxMaterial*> m_physicsMaterials;
 
-        bool m_isContinuousStepActive = true;
-        bool m_isSingleStepContinueAcitve = false;
+		//------------------------------------------------ Debugging Related --------------------------------------------------------------//
 
-        void flipPhysicsContinuousState(request_flip_physics_continuous& request) { m_isContinuousStepActive = request.newContinuousState; }
+		bool m_isContinuousStepActive = true;
+		bool m_isSingleStepContinueAcitve = false;
 
-        void activateSingleStepContinue(request_single_physics_tick& request) { m_isSingleStepContinueAcitve = true; }
-    };
-};
+		void flipPhysicsContinuousState(request_flip_physics_continuous& request) { m_isContinuousStepActive = request.newContinuousState; }
+
+		void activateSingleStepContinue(request_single_physics_tick& request) { m_isSingleStepContinueAcitve = true; }
+	};
+}; // namespace rythe::physics

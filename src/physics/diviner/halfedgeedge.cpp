@@ -1,236 +1,240 @@
+#include <physics/diviner/data/collider_face_to_vert.hpp>
 #include <physics/diviner/halfedgeedge.hpp>
 #include <physics/diviner/halfedgeface.hpp>
-#include <physics/diviner/data/collider_face_to_vert.hpp>
 #include <physics/diviner/physics_statics.hpp>
 
 namespace rythe::physics
 {
-    HalfEdgeEdge::HalfEdgeEdge(rsl::math::float3 newEdgePositionPtr) : edgePosition{ newEdgePositionPtr } {}
+	HalfEdgeEdge::HalfEdgeEdge(rsl::math::float3 newEdgePositionPtr)
+		: edgePosition{newEdgePositionPtr}
+	{
+	}
 
-    void HalfEdgeEdge::setNextAndPrevEdge(HalfEdgeEdge* newPrevEdge, HalfEdgeEdge* newNextEdge)
-    {
-        nextEdge = newNextEdge;
-        prevEdge = newPrevEdge;
-    }
+	void HalfEdgeEdge::setNextAndPrevEdge(HalfEdgeEdge* newPrevEdge, HalfEdgeEdge* newNextEdge)
+	{
+		nextEdge = newNextEdge;
+		prevEdge = newPrevEdge;
+	}
 
-    void HalfEdgeEdge::setNext(HalfEdgeEdge* newNextEdge)
-    {
-        nextEdge = newNextEdge;
-        newNextEdge->prevEdge = this;
-    }
+	void HalfEdgeEdge::setNext(HalfEdgeEdge* newNextEdge)
+	{
+		nextEdge = newNextEdge;
+		newNextEdge->prevEdge = this;
+	}
 
-    void HalfEdgeEdge::setPrev(HalfEdgeEdge* newPrevEdge)
-    {
-        prevEdge = newPrevEdge;
-        newPrevEdge->nextEdge = this;
-    }
+	void HalfEdgeEdge::setPrev(HalfEdgeEdge* newPrevEdge)
+	{
+		prevEdge = newPrevEdge;
+		newPrevEdge->nextEdge = this;
+	}
 
-    void HalfEdgeEdge::setPairingEdge(HalfEdgeEdge* edge)
-    {
-        pairingEdge = edge;
-        edge->pairingEdge = this;
-    }
+	void HalfEdgeEdge::setPairingEdge(HalfEdgeEdge* edge)
+	{
+		pairingEdge = edge;
+		edge->pairingEdge = this;
+	}
 
-    rsl::math::float3 HalfEdgeEdge::getLocalNormal() const
-    {
-        return face->normal;
-    }
+	rsl::math::float3 HalfEdgeEdge::getLocalNormal() const
+	{
+		return face->normal;
+	}
 
-    void HalfEdgeEdge::calculateRobustEdgeDirection() 
-    {
-        rsl::math::float3 firstNormal = face->normal;
-        rsl::math::float3 secondNormal = pairingEdge->face->normal;
+	void HalfEdgeEdge::calculateRobustEdgeDirection()
+	{
+		rsl::math::float3 firstNormal = face->normal;
+		rsl::math::float3 secondNormal = pairingEdge->face->normal;
 
-        robustEdgeDirection = math::cross(firstNormal, secondNormal);
-    }
+		robustEdgeDirection = math::cross(firstNormal, secondNormal);
+	}
 
-    bool HalfEdgeEdge::isVertexVisible(const rsl::math::float3& vert,float epsilon)
-    {
-        float distanceToPlane =
-            math::pointToPlane(vert, face->centroid, face->normal);
+	bool HalfEdgeEdge::isVertexVisible(const rsl::math::float3& vert, float epsilon)
+	{
+		float distanceToPlane =
+			math::pointToPlane(vert, face->centroid, face->normal);
 
-        return distanceToPlane > epsilon;
-    }
+		return distanceToPlane > epsilon;
+	}
 
-    bool HalfEdgeEdge::isEdgeHorizonFromVertex(const rsl::math::float3& vert, float epsilon)
-    {
-        return isVertexVisible(vert,epsilon) && !pairingEdge->isVertexVisible(vert,epsilon);
-    }
+	bool HalfEdgeEdge::isEdgeHorizonFromVertex(const rsl::math::float3& vert, float epsilon)
+	{
+		return isVertexVisible(vert, epsilon) && !pairingEdge->isVertexVisible(vert, epsilon);
+	}
 
-    void HalfEdgeEdge::DEBUG_drawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width)
-    {
-        rsl::math::float3 worldStart = transform * math::float4(edgePosition, 1);
-        rsl::math::float3 worldEnd = transform * math::float4(nextEdge->edgePosition, 1);
+	void HalfEdgeEdge::DEBUG_drawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width)
+	{
+		rsl::math::float3 worldStart = transform * math::float4(edgePosition, 1);
+		rsl::math::float3 worldEnd = transform * math::float4(nextEdge->edgePosition, 1);
 
-        debug::drawLine(worldStart, worldEnd, debugColor, width, time, true);
-    }
+		debug::drawLine(worldStart, worldEnd, debugColor, width, time, true);
+	}
 
-    void HalfEdgeEdge::DEBUG_drawInsetEdge(const rsl::math::float3 spacing, const math::color& debugColor, float time, float width)
-    {
-        rsl::math::float3 worldCentroid = face->centroid + spacing;
+	void HalfEdgeEdge::DEBUG_drawInsetEdge(const rsl::math::float3 spacing, const math::color& debugColor, float time, float width)
+	{
+		rsl::math::float3 worldCentroid = face->centroid + spacing;
 
-        rsl::math::float3 worldStart = edgePosition + spacing;
-        rsl::math::float3 startDifference = (worldCentroid - worldStart) * 0.1f;
+		rsl::math::float3 worldStart = edgePosition + spacing;
+		rsl::math::float3 startDifference = (worldCentroid - worldStart) * 0.1f;
 
-        rsl::math::float3 worldEnd = nextEdge->edgePosition + spacing;
-        rsl::math::float3 endDifference = (worldCentroid - worldEnd) * 0.1f;
+		rsl::math::float3 worldEnd = nextEdge->edgePosition + spacing;
+		rsl::math::float3 endDifference = (worldCentroid - worldEnd) * 0.1f;
 
-        debug::drawLine(worldStart + startDifference, worldEnd + endDifference, debugColor, width, time, true);
-    }
+		debug::drawLine(worldStart + startDifference, worldEnd + endDifference, debugColor, width, time, true);
+	}
 
-    void HalfEdgeEdge::DEBUG_directionDrawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width)
-    {
-        rsl::math::float3 worldStart = transform * math::float4(edgePosition, 1);
-        rsl::math::float3 worldEnd = transform * math::float4(nextEdge->edgePosition, 1);
+	void HalfEdgeEdge::DEBUG_directionDrawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width)
+	{
+		rsl::math::float3 worldStart = transform * math::float4(edgePosition, 1);
+		rsl::math::float3 worldEnd = transform * math::float4(nextEdge->edgePosition, 1);
 
-        rsl::math::float3 worldCentroid = transform * math::float4(face->centroid, 1);
+		rsl::math::float3 worldCentroid = transform * math::float4(face->centroid, 1);
 
-        rsl::math::float3 startDifference = (worldCentroid - worldStart) * 0.1f;
-        rsl::math::float3 endDifference = (worldCentroid - worldEnd) * 0.1f;
+		rsl::math::float3 startDifference = (worldCentroid - worldStart) * 0.1f;
+		rsl::math::float3 endDifference = (worldCentroid - worldEnd) * 0.1f;
 
-        debug::drawLine(worldStart + startDifference, worldEnd + endDifference, debugColor, width, time, true);
+		debug::drawLine(worldStart + startDifference, worldEnd + endDifference, debugColor, width, time, true);
 
-        rsl::math::float3 pointStart = worldStart + startDifference;
-        rsl::math::float3 diff = worldEnd + endDifference - (worldStart + startDifference);
+		rsl::math::float3 pointStart = worldStart + startDifference;
+		rsl::math::float3 diff = worldEnd + endDifference - (worldStart + startDifference);
 
-        debug::drawLine(pointStart + diff * 0.75f, worldCentroid, math::colors::red, width, time, true);
-    }
+		debug::drawLine(pointStart + diff * 0.75f, worldCentroid, math::colors::red, width, time, true);
+	}
 
-    void HalfEdgeEdge::suicidalMergeWithPairing(std::vector<rsl::math::float3>& unmergedVertices, rsl::math::float3& normal, float scalingEpsilon)
-    {
-        //[1] identify connecting edges of this face and merge face and connect them together
-        //[2] Handle possible issue where merging this face and merge faces causes the new face to have 2 edges with the same neighbors
-        //[3] re-Initialize to account for new edges
-        //[4] delete pairing and 'this' edge. These edges are no longer part of this face
+	void HalfEdgeEdge::suicidalMergeWithPairing(std::vector<rsl::math::float3>& unmergedVertices, rsl::math::float3& normal, float scalingEpsilon)
+	{
+		//[1] identify connecting edges of this face and merge face and connect them together
+		//[2] Handle possible issue where merging this face and merge faces causes the new face to have 2 edges with the same neighbors
+		//[3] re-Initialize to account for new edges
+		//[4] delete pairing and 'this' edge. These edges are no longer part of this face
 
 
-        auto releaseFaceToVert = [&unmergedVertices](HalfEdgeFace* face)
-        {
-            ColliderFaceToVert* otherFaceToVert = face->faceToVert;
-            otherFaceToVert->populateVectorWithVerts(unmergedVertices);
-            otherFaceToVert->face = nullptr;
-        };
+		auto releaseFaceToVert = [&unmergedVertices](HalfEdgeFace* face)
+		{
+			ColliderFaceToVert* otherFaceToVert = face->faceToVert;
+			otherFaceToVert->populateVectorWithVerts(unmergedVertices);
+			otherFaceToVert->face = nullptr;
+		};
 
-        //[1] identify connecting edges of this face and merge face and connect them together
-        //------------------------------------------------------------------//
-        //                                                                  //
-        // prevFromCurrentConnection    prevFromCurrent                     //
-        //       ___|_______________   ___|_______________                  //
-        //                          | |                                     //
-        //                         -| |                                     //
-        //                   'this' | | pairingEdge                         //
-        //                          | |-                                    //
-        //                          | |                                     //
-        //       _____________|_____| |____________|______                  //
-        // nextFromCurrentConnection    nextFromCurrent                     //
-        //                                                                  //
-        //       [face of 'this']           [merge face]                    //
-        //                                                                  //
-        //------------------------------------------------------------------//
+		//[1] identify connecting edges of this face and merge face and connect them together
+		//------------------------------------------------------------------//
+		//                                                                  //
+		// prevFromCurrentConnection    prevFromCurrent                     //
+		//       ___|_______________   ___|_______________                  //
+		//                          | |                                     //
+		//                         -| |                                     //
+		//                   'this' | | pairingEdge                         //
+		//                          | |-                                    //
+		//                          | |                                     //
+		//       _____________|_____| |____________|______                  //
+		// nextFromCurrentConnection    nextFromCurrent                     //
+		//                                                                  //
+		//       [face of 'this']           [merge face]                    //
+		//                                                                  //
+		//------------------------------------------------------------------//
 
-        HalfEdgeFace* mergeFace = pairingEdge->face;
-        releaseFaceToVert(mergeFace);
-        
-        HalfEdgeEdge* prevFromCurrent =  pairingEdge->prevEdge;
-        HalfEdgeEdge* prevFromCurrentConnection = prevFromCurrent->nextEdge->pairingEdge->nextEdge;
-        prevFromCurrent->setNext(prevFromCurrentConnection); 
+		HalfEdgeFace* mergeFace = pairingEdge->face;
+		releaseFaceToVert(mergeFace);
 
-        HalfEdgeEdge* nextFromCurrent =  pairingEdge->nextEdge;
-        HalfEdgeEdge* nextFromCurrentConnection = nextFromCurrent->prevEdge->pairingEdge->prevEdge;
+		HalfEdgeEdge* prevFromCurrent = pairingEdge->prevEdge;
+		HalfEdgeEdge* prevFromCurrentConnection = prevFromCurrent->nextEdge->pairingEdge->nextEdge;
+		prevFromCurrent->setNext(prevFromCurrentConnection);
 
-        nextFromCurrent->setPrev(nextFromCurrentConnection); 
+		HalfEdgeEdge* nextFromCurrent = pairingEdge->nextEdge;
+		HalfEdgeEdge* nextFromCurrentConnection = nextFromCurrent->prevEdge->pairingEdge->prevEdge;
 
-        face->startEdge = prevFromCurrent;
-        face->normal = normal;
+		nextFromCurrent->setPrev(nextFromCurrentConnection);
 
-        mergeFace->startEdge = nullptr;
-        delete mergeFace;
+		face->startEdge = prevFromCurrent;
+		face->normal = normal;
 
-        //[2] Handle possible issue where merging this face and merge faces causes the new face to have 2 edges that neighbor the same face
+		mergeFace->startEdge = nullptr;
+		delete mergeFace;
 
-        //----------------------------------------------------------------------//
-        //                        [invariantMergeFace]                          //
-        //   |                                                  |               //
-        //   |newPrevFromFCC                      newNextFromPFC| -             //
-        //   |                                                  |               //
-        //  -|                                                  |               //
-        //   |_________________________|_   _________________|__|               //
-        //    ___|________________________   ___|_______________                //
-        //   |  prevFromCurrentConnection | | prevFromCurrent   |               //
-        //   |                           -| |                   |-              //
-        //   |                     'this' | | pairingEdge       | prevFromPFC   //
-        //   | nextFromFCC                | |-                  |               //
-        //  -|                            | |                   |               //
-        //   |______________________|_____| |____________|______|               //
-        //       nextFromCurrentConnection    nextFromCurrent                   //
-        //                                                                      //
-        //             [face of 'this']           [merge face]                  //
-        //                                                                      //
-        //----------------------------------------------------------------------//
+		//[2] Handle possible issue where merging this face and merge faces causes the new face to have 2 edges that neighbor the same face
 
-        auto handleDoubleAdjacentMergeResult = [this,releaseFaceToVert](HalfEdgeEdge* prevFromCurrent, HalfEdgeEdge* prevFromCurrentConnection)
-        {
-            HalfEdgeFace* invariantMergeFace = prevFromCurrent->pairingEdge->face;
-            releaseFaceToVert(invariantMergeFace);
+		//----------------------------------------------------------------------//
+		//                        [invariantMergeFace]                          //
+		//   |                                                  |               //
+		//   |newPrevFromFCC                      newNextFromPFC| -             //
+		//   |                                                  |               //
+		//  -|                                                  |               //
+		//   |_________________________|_   _________________|__|               //
+		//    ___|________________________   ___|_______________                //
+		//   |  prevFromCurrentConnection | | prevFromCurrent   |               //
+		//   |                           -| |                   |-              //
+		//   |                     'this' | | pairingEdge       | prevFromPFC   //
+		//   | nextFromFCC                | |-                  |               //
+		//  -|                            | |                   |               //
+		//   |______________________|_____| |____________|______|               //
+		//       nextFromCurrentConnection    nextFromCurrent                   //
+		//                                                                      //
+		//             [face of 'this']           [merge face]                  //
+		//                                                                      //
+		//----------------------------------------------------------------------//
 
-            HalfEdgeEdge* prevFromPFC = prevFromCurrent->prevEdge;
-            HalfEdgeEdge* newNextFromPFC = prevFromCurrent->pairingEdge->nextEdge;
-            prevFromPFC->setNext(newNextFromPFC); 
+		auto handleDoubleAdjacentMergeResult = [this, releaseFaceToVert](HalfEdgeEdge* prevFromCurrent, HalfEdgeEdge* prevFromCurrentConnection)
+		{
+			HalfEdgeFace* invariantMergeFace = prevFromCurrent->pairingEdge->face;
+			releaseFaceToVert(invariantMergeFace);
 
-            HalfEdgeEdge* nextFromFCC = prevFromCurrentConnection->nextEdge;
-            HalfEdgeEdge* newPrevFromFCC = prevFromCurrentConnection->pairingEdge->prevEdge;
-            nextFromFCC->setPrev(newPrevFromFCC); 
+			HalfEdgeEdge* prevFromPFC = prevFromCurrent->prevEdge;
+			HalfEdgeEdge* newNextFromPFC = prevFromCurrent->pairingEdge->nextEdge;
+			prevFromPFC->setNext(newNextFromPFC);
 
-            delete prevFromCurrent->pairingEdge;
-            delete prevFromCurrent;
+			HalfEdgeEdge* nextFromFCC = prevFromCurrentConnection->nextEdge;
+			HalfEdgeEdge* newPrevFromFCC = prevFromCurrentConnection->pairingEdge->prevEdge;
+			nextFromFCC->setPrev(newPrevFromFCC);
 
-            delete prevFromCurrentConnection->pairingEdge;
-            delete prevFromCurrentConnection;
+			delete prevFromCurrent->pairingEdge;
+			delete prevFromCurrent;
 
-            face->startEdge = prevFromPFC;
+			delete prevFromCurrentConnection->pairingEdge;
+			delete prevFromCurrentConnection;
 
-            std::vector<rsl::math::float3> vertices;
-            auto collectVertices = [&vertices](HalfEdgeEdge* currentEdge) { vertices.push_back(currentEdge->edgePosition); };
-            face->forEachEdge(collectVertices);
+			face->startEdge = prevFromPFC;
 
-            float tempDis;
-            PhysicsStatics::calculateNewellPlane(vertices, face->normal, tempDis);
+			std::vector<rsl::math::float3> vertices;
+			auto collectVertices = [&vertices](HalfEdgeEdge* currentEdge)
+			{ vertices.push_back(currentEdge->edgePosition); };
+			face->forEachEdge(collectVertices);
 
-            invariantMergeFace->startEdge = nullptr;
-            delete invariantMergeFace;
-        };
+			float tempDis;
+			PhysicsStatics::calculateNewellPlane(vertices, face->normal, tempDis);
 
-        HalfEdgeFace* currentFace = face;
-        auto setEdgeFace = [&currentFace](HalfEdgeEdge* edge) {edge->face = currentFace; };
+			invariantMergeFace->startEdge = nullptr;
+			delete invariantMergeFace;
+		};
 
-        if (prevFromCurrent->pairingEdge->face == prevFromCurrentConnection->pairingEdge->face)
-        {
-            face->forEachEdge(setEdgeFace);
+		HalfEdgeFace* currentFace = face;
+		auto setEdgeFace = [&currentFace](HalfEdgeEdge* edge)
+		{ edge->face = currentFace; };
 
-            rsl::math::float3 norm;
-            if (PhysicsStatics::isNewellFacesCoplanar(face, prevFromCurrent->pairingEdge->face, prevFromCurrent, scalingEpsilon, norm,2))
-            {
-                handleDoubleAdjacentMergeResult(prevFromCurrent, prevFromCurrentConnection);
-            }
-        }
+		if (prevFromCurrent->pairingEdge->face == prevFromCurrentConnection->pairingEdge->face)
+		{
+			face->forEachEdge(setEdgeFace);
 
-        if (nextFromCurrent->pairingEdge->face == nextFromCurrentConnection->pairingEdge->face)
-        {
-            face->forEachEdge(setEdgeFace);
+			rsl::math::float3 norm;
+			if (PhysicsStatics::isNewellFacesCoplanar(face, prevFromCurrent->pairingEdge->face, prevFromCurrent, scalingEpsilon, norm, 2))
+			{
+				handleDoubleAdjacentMergeResult(prevFromCurrent, prevFromCurrentConnection);
+			}
+		}
 
-            rsl::math::float3 norm;
-            if (PhysicsStatics::isNewellFacesCoplanar(face, nextFromCurrent->pairingEdge->face, nextFromCurrentConnection, scalingEpsilon, norm,2))
-            {
-                handleDoubleAdjacentMergeResult(nextFromCurrentConnection, nextFromCurrent);
-            }
-        }
+		if (nextFromCurrent->pairingEdge->face == nextFromCurrentConnection->pairingEdge->face)
+		{
+			face->forEachEdge(setEdgeFace);
 
-        //[3] re-Initialize to account for new edges
-        face->initializeFace();
+			rsl::math::float3 norm;
+			if (PhysicsStatics::isNewellFacesCoplanar(face, nextFromCurrent->pairingEdge->face, nextFromCurrentConnection, scalingEpsilon, norm, 2))
+			{
+				handleDoubleAdjacentMergeResult(nextFromCurrentConnection, nextFromCurrent);
+			}
+		}
 
-        //[4] delete pairing and 'this' edge. These edges are no longer part of this face
-        delete pairingEdge;
-        delete this;
+		//[3] re-Initialize to account for new edges
+		face->initializeFace();
 
-    }
-}
+		//[4] delete pairing and 'this' edge. These edges are no longer part of this face
+		delete pairingEdge;
+		delete this;
+	}
+} // namespace rythe::physics

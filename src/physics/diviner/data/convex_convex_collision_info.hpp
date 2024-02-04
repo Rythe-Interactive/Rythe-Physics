@@ -6,18 +6,18 @@
 
 namespace rythe::physics
 {
-    struct ConvexConvexCollisionInfo
-    {
-        rsl::math::float3 edgeNormal;
+	struct ConvexConvexCollisionInfo
+	{
+		rsl::math::float3 edgeNormal;
 
-        float ARefSeperation, BRefSeperation, aToBEdgeSeperation;
+		float ARefSeperation, BRefSeperation, aToBEdgeSeperation;
 
-        PointerEncapsulator < HalfEdgeFace> ARefFace;
-        PointerEncapsulator < HalfEdgeFace> BRefFace;
+		PointerEncapsulator<HalfEdgeFace> ARefFace;
+		PointerEncapsulator<HalfEdgeFace> BRefFace;
 
-        PointerEncapsulator< HalfEdgeEdge> edgeRef;
-        PointerEncapsulator< HalfEdgeEdge> edgeInc;
-    };
+		PointerEncapsulator<HalfEdgeEdge> edgeRef;
+		PointerEncapsulator<HalfEdgeEdge> edgeInc;
+	};
 
 
-}
+} // namespace rythe::physics

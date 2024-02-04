@@ -6,98 +6,95 @@ using namespace physx;
 
 namespace rythe::physics
 {
-    physx::PxPhysics* getSDK()
-    {
-        return PhysXPhysicsSystem::getSDK();
-    }
+	physx::PxPhysics* getSDK()
+	{
+		return PhysXPhysicsSystem::getSDK();
+	}
 
-    static inline void toPhysxTransform(physx::PxTransform& pxTransform, const rsl::math::float3& pos, const rsl::math::quat& rot)
-    {
-        pxTransform.p = { pos.x,pos.y,pos.z };
-        pxTransform.q = { rot.x,rot.y,rot.z,rot.w };
-    }
+	static inline void toPhysxTransform(physx::PxTransform& pxTransform, const rsl::math::float3& pos, const rsl::math::quat& rot)
+	{
+		pxTransform.p = {pos.x, pos.y, pos.z};
+		pxTransform.q = {rot.x, rot.y, rot.z, rot.w};
+	}
 
-    void calculateLocalColliderTransform(physx::PxTransform& outLocalTransform, const ColliderData& collider)
-    {
-        const rsl::math::float3& localOffset = collider.getOffset();
-        const rsl::math::quat& localRot = collider.getRotationOffset();
+	void calculateLocalColliderTransform(physx::PxTransform& outLocalTransform, const ColliderData& collider)
+	{
+		const rsl::math::float3& localOffset = collider.getOffset();
+		const rsl::math::quat& localRot = collider.getRotationOffset();
 
-        toPhysxTransform(outLocalTransform, localOffset, localRot);
-    }
+		toPhysxTransform(outLocalTransform, localOffset, localRot);
+	}
 
-    void calculateGlobalAndLocalTransforms(physx::PxTransform& outLocalTransform, physx::PxTransform& outGlobalTransform, const ColliderData& collider, ecs::entity ent)
-    {
-        transform trans = ent.get_component<transform>();
-        const math::float4x4& globalTransform = trans.to_world_matrix();
+	void calculateGlobalAndLocalTransforms(physx::PxTransform& outLocalTransform, physx::PxTransform& outGlobalTransform, const ColliderData& collider, ecs::entity ent)
+	{
+		transform trans = ent.get_component<transform>();
+		const math::float4x4& globalTransform = trans.to_world_matrix();
 
-        rsl::math::float3 pos; rsl::math::quat rot; rsl::math::float3 tempScale;
-        math::decompose(globalTransform, tempScale, rot, pos);
-       
-        calculateLocalColliderTransform(outLocalTransform, collider);
-        toPhysxTransform(outGlobalTransform, pos, rot);
-    }
+		rsl::math::float3 pos;
+		rsl::math::quat rot;
+		rsl::math::float3 tempScale;
+		math::decompose(globalTransform, tempScale, rot, pos);
 
-    template<class PxGeometry, class ...GeometryArgs>
-    void instantiateStaticActorWith(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper,
-        const physx::PxTransform& globalTransform, const physx::PxTransform& localTransform, const PhysxEnviromentInfo& sceneInfo, ecs::entity ent, GeometryArgs&&... geometryArgs)
-    {
-        PxRigidStatic* staticCollider = PxCreateStatic(*getSDK(), globalTransform, 
-            PxGeometry(std::forward<GeometryArgs>(geometryArgs)...), *sceneInfo.defaultMaterial, localTransform);
-        staticCollider->userData = ent.data;
+		calculateLocalColliderTransform(outLocalTransform, collider);
+		toPhysxTransform(outGlobalTransform, pos, rot);
+	}
 
-        wrapper.physicsActor = staticCollider;
-        sceneInfo.scene->addActor(*staticCollider);
-    }
+	template <class PxGeometry, class... GeometryArgs>
+	void instantiateStaticActorWith(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper, const physx::PxTransform& globalTransform, const physx::PxTransform& localTransform, const PhysxEnviromentInfo& sceneInfo, ecs::entity ent, GeometryArgs&&... geometryArgs)
+	{
+		PxRigidStatic* staticCollider = PxCreateStatic(*getSDK(), globalTransform, PxGeometry(std::forward<GeometryArgs>(geometryArgs)...), *sceneInfo.defaultMaterial, localTransform);
+		staticCollider->userData = ent.data;
 
-    template<class PxGeometry, class ...GeometryArgs>
-    void instantiateDynamicActorWith(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper,
-        const physx::PxTransform& globalTransform, const physx::PxTransform& localTransform, const PhysxEnviromentInfo& sceneInfo, ecs::entity ent, GeometryArgs&&... geometryArgs)
-    {
-        PxRigidDynamic* dynamic = PxCreateDynamic(*getSDK(), globalTransform,
-            PxGeometry(std::forward<GeometryArgs>(geometryArgs)...), *sceneInfo.defaultMaterial, sceneInfo.defaultRigidbodyDensity, localTransform);
-        dynamic->userData = ent.data;
-        auto& rbData = ( * ent.get_component<rigidbody>() ).data;
+		wrapper.physicsActor = staticCollider;
+		sceneInfo.scene->addActor(*staticCollider);
+	}
 
-        rbData.setDensityDirect(sceneInfo.defaultRigidbodyDensity);
+	template <class PxGeometry, class... GeometryArgs>
+	void instantiateDynamicActorWith(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper, const physx::PxTransform& globalTransform, const physx::PxTransform& localTransform, const PhysxEnviromentInfo& sceneInfo, ecs::entity ent, GeometryArgs&&... geometryArgs)
+	{
+		PxRigidDynamic* dynamic = PxCreateDynamic(*getSDK(), globalTransform, PxGeometry(std::forward<GeometryArgs>(geometryArgs)...), *sceneInfo.defaultMaterial, sceneInfo.defaultRigidbodyDensity, localTransform);
+		dynamic->userData = ent.data;
+		auto& rbData = (*ent.get_component<rigidbody>()).data;
 
-        if (! rbData.getGeneratedModifyEvents().test(rigidbody_flag::rb_mass))
-        {
-            rbData.setMassDirect(dynamic->getMass());
-        }
-       
-        wrapper.physicsActor = dynamic;
-        sceneInfo.scene->addActor(*dynamic);
-    }
+		rbData.setDensityDirect(sceneInfo.defaultRigidbodyDensity);
+
+		if (!rbData.getGeneratedModifyEvents().test(rigidbody_flag::rb_mass))
+		{
+			rbData.setMassDirect(dynamic->getMass());
+		}
+
+		wrapper.physicsActor = dynamic;
+		sceneInfo.scene->addActor(*dynamic);
+	}
 
 
-    template<class PxGeometry, class ...GeometryArgs>
-    void instantiateNextCollider(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper, const physx::PxTransform& localTransform,
-        const PhysxEnviromentInfo& sceneInfo, GeometryArgs&& ...geometryArgs)
-    {
-        PxShape* shape = getSDK()->createShape(PxGeometry(std::forward<GeometryArgs>(geometryArgs)...), *sceneInfo.defaultMaterial, true);
+	template <class PxGeometry, class... GeometryArgs>
+	void instantiateNextCollider(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper, const physx::PxTransform& localTransform, const PhysxEnviromentInfo& sceneInfo, GeometryArgs&&... geometryArgs)
+	{
+		PxShape* shape = getSDK()->createShape(PxGeometry(std::forward<GeometryArgs>(geometryArgs)...), *sceneInfo.defaultMaterial, true);
 
-        PxRigidActor* rigid = static_cast<PxRigidActor*>(wrapper.physicsActor);
+		PxRigidActor* rigid = static_cast<PxRigidActor*>(wrapper.physicsActor);
 
-        shape->setLocalPose(localTransform);
-        rigid->attachShape(*shape);
-        shape->release();
-    }
+		shape->setLocalPose(localTransform);
+		rigid->attachShape(*shape);
+		shape->release();
+	}
 
-#define DECLARE_STATIC_COLLIDER_TEMPLATE_INSTANTIATION(PxGeometry,...)  template void instantiateStaticActorWith<PxGeometry, __VA_ARGS__>(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper, const physx::PxTransform& outGlobalTransform, const physx::PxTransform& outLocalTransform, const PhysxEnviromentInfo& sceneInfo, ecs::entity ent, __VA_ARGS__);
+#define DECLARE_STATIC_COLLIDER_TEMPLATE_INSTANTIATION(PxGeometry, ...) template void instantiateStaticActorWith<PxGeometry, __VA_ARGS__>(physx::PxPhysics * sdk, PhysxInternalWrapper & wrapper, const physx::PxTransform& outGlobalTransform, const physx::PxTransform& outLocalTransform, const PhysxEnviromentInfo& sceneInfo, ecs::entity ent, __VA_ARGS__);
 
-    DECLARE_STATIC_COLLIDER_TEMPLATE_INSTANTIATION(PxSphereGeometry, float&);
-    DECLARE_STATIC_COLLIDER_TEMPLATE_INSTANTIATION(PxBoxGeometry, const PxVec3&);
-    DECLARE_STATIC_COLLIDER_TEMPLATE_INSTANTIATION(PxConvexMeshGeometry, PxConvexMesh*&);
+	DECLARE_STATIC_COLLIDER_TEMPLATE_INSTANTIATION(PxSphereGeometry, float&);
+	DECLARE_STATIC_COLLIDER_TEMPLATE_INSTANTIATION(PxBoxGeometry, const PxVec3&);
+	DECLARE_STATIC_COLLIDER_TEMPLATE_INSTANTIATION(PxConvexMeshGeometry, PxConvexMesh*&);
 
-#define DECLARE_DYNAMIC_COLLIDER_TEMPLATE_INSTANTIATION(PxGeometry,...) template void instantiateDynamicActorWith<PxGeometry, __VA_ARGS__>(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper,const physx::PxTransform& outGlobalTransform, const physx::PxTransform& outLocalTransform, const PhysxEnviromentInfo& sceneInfo, ecs::entity ent, __VA_ARGS__);
+#define DECLARE_DYNAMIC_COLLIDER_TEMPLATE_INSTANTIATION(PxGeometry, ...) template void instantiateDynamicActorWith<PxGeometry, __VA_ARGS__>(physx::PxPhysics * sdk, PhysxInternalWrapper & wrapper, const physx::PxTransform& outGlobalTransform, const physx::PxTransform& outLocalTransform, const PhysxEnviromentInfo& sceneInfo, ecs::entity ent, __VA_ARGS__);
 
-    DECLARE_DYNAMIC_COLLIDER_TEMPLATE_INSTANTIATION(PxSphereGeometry, float&);
-    DECLARE_DYNAMIC_COLLIDER_TEMPLATE_INSTANTIATION(PxBoxGeometry, const PxVec3&);
-    DECLARE_DYNAMIC_COLLIDER_TEMPLATE_INSTANTIATION(PxConvexMeshGeometry, PxConvexMesh*&);
+	DECLARE_DYNAMIC_COLLIDER_TEMPLATE_INSTANTIATION(PxSphereGeometry, float&);
+	DECLARE_DYNAMIC_COLLIDER_TEMPLATE_INSTANTIATION(PxBoxGeometry, const PxVec3&);
+	DECLARE_DYNAMIC_COLLIDER_TEMPLATE_INSTANTIATION(PxConvexMeshGeometry, PxConvexMesh*&);
 
-#define DECLARE_NEXT_COLLIDER_TEMPLATE_INSTANTIATION(PxGeometry,...) template void instantiateNextCollider<PxGeometry, __VA_ARGS__>(physx::PxPhysics* sdk, PhysxInternalWrapper& wrapper, const physx::PxTransform& outLocalTransform, const PhysxEnviromentInfo& sceneInfo, __VA_ARGS__);
+#define DECLARE_NEXT_COLLIDER_TEMPLATE_INSTANTIATION(PxGeometry, ...) template void instantiateNextCollider<PxGeometry, __VA_ARGS__>(physx::PxPhysics * sdk, PhysxInternalWrapper & wrapper, const physx::PxTransform& outLocalTransform, const PhysxEnviromentInfo& sceneInfo, __VA_ARGS__);
 
-    DECLARE_NEXT_COLLIDER_TEMPLATE_INSTANTIATION(PxSphereGeometry, float&);
-    DECLARE_NEXT_COLLIDER_TEMPLATE_INSTANTIATION(PxBoxGeometry, const PxVec3&);
-    DECLARE_NEXT_COLLIDER_TEMPLATE_INSTANTIATION(PxConvexMeshGeometry, PxConvexMesh*&);
-}
+	DECLARE_NEXT_COLLIDER_TEMPLATE_INSTANTIATION(PxSphereGeometry, float&);
+	DECLARE_NEXT_COLLIDER_TEMPLATE_INSTANTIATION(PxBoxGeometry, const PxVec3&);
+	DECLARE_NEXT_COLLIDER_TEMPLATE_INSTANTIATION(PxConvexMeshGeometry, PxConvexMesh*&);
+} // namespace rythe::physics

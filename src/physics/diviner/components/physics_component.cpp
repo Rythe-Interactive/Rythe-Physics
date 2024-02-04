@@ -1,54 +1,53 @@
-#include <physics/diviner/components/physics_component.hpp>
 #include <physics/diviner/colliders/convexcollider.hpp>
+#include <physics/diviner/components/physics_component.hpp>
 #include <physics/diviner/physics_statics.hpp>
 
 namespace rythe::physics::diviner
 {
-    void physics_component::calculateNewLocalCenterOfMass()
-    {
-        localCenterOfMass = rsl::math::float3::zero;
+	void physics_component::calculateNewLocalCenterOfMass()
+	{
+		localCenterOfMass = rsl::math::float3::zero;
 
-        for (auto collider : colliders)
-        {
-            localCenterOfMass += collider->GetLocalCentroid();
-        }
+		for (auto collider : colliders)
+		{
+			localCenterOfMass += collider->GetLocalCentroid();
+		}
 
-        localCenterOfMass /= static_cast<float>(colliders.size());
-    }
+		localCenterOfMass /= static_cast<float>(colliders.size());
+	}
 
-    std::shared_ptr<ConvexCollider> physics_component::constructConvexHullFromVertices(const std::vector<rsl::math::float3>& vertices)
-    {
-        auto collider = PhysicsStatics::generateConvexHull(vertices);
+	std::shared_ptr<ConvexCollider> physics_component::constructConvexHullFromVertices(const std::vector<rsl::math::float3>& vertices)
+	{
+		auto collider = PhysicsStatics::generateConvexHull(vertices);
 
-        if (collider)
-        {
-            colliders.push_back(collider);
-            calculateNewLocalCenterOfMass();
-        }
+		if (collider)
+		{
+			colliders.push_back(collider);
+			calculateNewLocalCenterOfMass();
+		}
 
-        return collider;
-    }
+		return collider;
+	}
 
-    void physics_component::ConstructBox()
-    {
+	void physics_component::ConstructBox()
+	{
 
-        calculateNewLocalCenterOfMass();
-    }
+		calculateNewLocalCenterOfMass();
+	}
 
-    void physics_component::AddBox(const cube_collider_params& cubeParams)
-    {
-        auto cuboidCollider = std::make_shared<ConvexCollider>();
+	void physics_component::AddBox(const cube_collider_params& cubeParams)
+	{
+		auto cuboidCollider = std::make_shared<ConvexCollider>();
 
-        cuboidCollider->CreateBox(cubeParams);
+		cuboidCollider->CreateBox(cubeParams);
 
-        colliders.push_back(cuboidCollider);
+		colliders.push_back(cuboidCollider);
 
-        calculateNewLocalCenterOfMass();
-    }
+		calculateNewLocalCenterOfMass();
+	}
 
-    void physics_component::AddSphere()
-    {
-        calculateNewLocalCenterOfMass();
-    }
-}
-
+	void physics_component::AddSphere()
+	{
+		calculateNewLocalCenterOfMass();
+	}
+} // namespace rythe::physics::diviner

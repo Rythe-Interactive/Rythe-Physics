@@ -3,9 +3,9 @@
 
 namespace rythe::physics
 {
-    struct identifier
-    {
-        std::string id = "";
-    };
+	struct identifier
+	{
+		std::string id = "";
+	};
 
-}
+} // namespace rythe::physics

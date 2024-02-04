@@ -1,357 +1,349 @@
 #pragma once
 
-#include <physics/diviner/components/rigidbody.hpp>
 #include <core/core.hpp>
-#include <physics/diviner/data/identifier.hpp>
+#include <physics/diviner/components/rigidbody.hpp>
 #include <physics/diviner/data/edge_label.hpp>
+#include <physics/diviner/data/identifier.hpp>
 
 
 
 namespace rythe::physics
 {
-    class PhysicsCollider;
+	class PhysicsCollider;
 
-    struct physics_contact
-    {
-        PhysicsCollider* refCollider;
+	struct physics_contact
+	{
+		PhysicsCollider* refCollider;
 
-        EdgeLabel label;
+		EdgeLabel label;
 
-        diviner::rigidbody* rbRef;
-        diviner::rigidbody* rbInc;
+		diviner::rigidbody* rbRef;
+		diviner::rigidbody* rbInc;
 
-        rsl::math::float3 RefWorldContact;
-        rsl::math::float3 IncWorldContact;
+		rsl::math::float3 RefWorldContact;
+		rsl::math::float3 IncWorldContact;
 
-        rsl::math::float3 refRBCentroid;
-        rsl::math::float3 incRBCentroid;
+		rsl::math::float3 refRBCentroid;
+		rsl::math::float3 incRBCentroid;
 
-        math::float4x4 refTransform;
-        math::float4x4 incTransform;
+		math::float4x4 refTransform;
+		math::float4x4 incTransform;
 
-        rsl::math::float3 collisionNormal;
-        rsl::math::float3 tangentNormal1;
-        rsl::math::float3 tangentNormal2;
+		rsl::math::float3 collisionNormal;
+		rsl::math::float3 tangentNormal1;
+		rsl::math::float3 tangentNormal2;
 
-        float totalLambda = 0.0f;
-        float tangent1Lambda = 0.0f;
-        float tangent2Lambda = 0.0f;
+		float totalLambda = 0.0f;
+		float tangent1Lambda = 0.0f;
+		float tangent2Lambda = 0.0f;
 
-        float effectiveMass = 0.0f;
+		float effectiveMass = 0.0f;
 
-        float tangent1EffectiveMass = 0.0f;
-        float tangent2EffectiveMass = 0.0f;
+		float tangent1EffectiveMass = 0.0f;
+		float tangent2EffectiveMass = 0.0f;
 
-        int contactCount = 0;
+		int contactCount = 0;
 
-        void ApplyWarmStarting()
-        {
-            rsl::math::float3 Ra = RefWorldContact - refRBCentroid;
-            rsl::math::float3 Rb = IncWorldContact - incRBCentroid;
+		void ApplyWarmStarting()
+		{
+			rsl::math::float3 Ra = RefWorldContact - refRBCentroid;
+			rsl::math::float3 Rb = IncWorldContact - incRBCentroid;
 
-            ApplyImpulse(collisionNormal, totalLambda, Ra, Rb);
-            ApplyImpulse(tangentNormal1, tangent1Lambda, Ra, Rb);
-            ApplyImpulse(tangentNormal2, tangent2Lambda, Ra, Rb);
-        }
-        
-        /* @brief Calculate a certain linear and angular impulse that will resolve the collision
-        */
-        void resolveContactConstraint(float dt, int i)
-        {
-            //the idea behind this collision resolution strategy (Sequential Impulses) 
-            //is we resolve the collision by giving an impulse towards both 
-            //rigidbodies so that the collision would resolve itself in the next time step.
+			ApplyImpulse(collisionNormal, totalLambda, Ra, Rb);
+			ApplyImpulse(tangentNormal1, tangent1Lambda, Ra, Rb);
+			ApplyImpulse(tangentNormal2, tangent2Lambda, Ra, Rb);
+		}
 
-            //We calculate this value by first getting the position constraint
+		/* @brief Calculate a certain linear and angular impulse that will resolve the collision
+		 */
+		void resolveContactConstraint(float dt, int i)
+		{
+			// the idea behind this collision resolution strategy (Sequential Impulses)
+			// is we resolve the collision by giving an impulse towards both
+			// rigidbodies so that the collision would resolve itself in the next time step.
 
-            // C : (Pa - Pb).n = 0
+			// We calculate this value by first getting the position constraint
 
-            //Pa is the vector from the centroid of diviner::rigidbodyA to the contact point of diviner::rigidbodyA
-            //and Pb is the vector from the centroid of diviner::rigidbodyB to the contact point of diviner::rigidbodyB
-            //and n is the collision normal
+			// C : (Pa - Pb).n = 0
 
-            //Next, in order to apply the aformentioned impulse.We must get the velocity constraint. In order to do so,
-            //we must find the time deriavative of our position constraint using the product rule of differentiation.
+			// Pa is the vector from the centroid of diviner::rigidbodyA to the contact point of diviner::rigidbodyA
+			// and Pb is the vector from the centroid of diviner::rigidbodyB to the contact point of diviner::rigidbodyB
+			// and n is the collision normal
 
-            //Cdot: [(Vb + Wb x Rb - (Va + Wa x Ra))] .n + (Pb - Pa) .[Na x Wa]
+			// Next, in order to apply the aformentioned impulse.We must get the velocity constraint. In order to do so,
+			// we must find the time deriavative of our position constraint using the product rule of differentiation.
 
-            //where Ra is the vector from the center of diviner::rigidbodyA towards Pa and Rb 
-            //is the vector from the center of diviner::rigidbodyB towards Pb. Where every 'V' stands for velocity and every
-            //'W' stands for angular velocity
+			// Cdot: [(Vb + Wb x Rb - (Va + Wa x Ra))] .n + (Pb - Pa) .[Na x Wa]
 
-            //the position part of this constraint can be ignored so we get:
-            //Cdot: [(Vb + Wb x Rb - (Va + Wa x Ra))] .n
+			// where Ra is the vector from the center of diviner::rigidbodyA towards Pa and Rb
+			// is the vector from the center of diviner::rigidbodyB towards Pb. Where every 'V' stands for velocity and every
+			//'W' stands for angular velocity
 
-            //Using the triple product identity, we can isolate the angular and linear velocities so we get
+			// the position part of this constraint can be ignored so we get:
+			// Cdot: [(Vb + Wb x Rb - (Va + Wa x Ra))] .n
 
-            //Cdot: J.V
+			// Using the triple product identity, we can isolate the angular and linear velocities so we get
 
-            //where J is a 1x12 matrix [ -n     (-Ra x n)   n   (Rb x n) ] 
-            //and V is a 12x1 matrix  ([ -Va    (-Wa)       Vb  (Wb)     ])^T
+			// Cdot: J.V
 
-            //By changing the form of the constraint we now see that J dictates the rate of change of V 
-            //(similar to how the function of a line is y = mx + b)
-            //In other words, J is the jacobian matrix of V. This means that if we are looking for a certain delta-V
-            //that would resolve the collision it would be equal to:
+			// where J is a 1x12 matrix [ -n     (-Ra x n)   n   (Rb x n) ]
+			// and V is a 12x1 matrix  ([ -Va    (-Wa)       Vb  (Wb)     ])^T
 
-            // delta-V :  (J^T) * lambda
+			// By changing the form of the constraint we now see that J dictates the rate of change of V
+			//(similar to how the function of a line is y = mx + b)
+			// In other words, J is the jacobian matrix of V. This means that if we are looking for a certain delta-V
+			// that would resolve the collision it would be equal to:
 
-            //Where lambda is a single value that represents the scalar value of the linear and angular impulse
+			// delta-V :  (J^T) * lambda
 
-            //However, in order to keep this 'shift' in velocity physically based, we must keep in mind the
-            //mass and inertia of the rigidbodies involved, therefore we must multiply delta-V with the matrix M^-1
+			// Where lambda is a single value that represents the scalar value of the linear and angular impulse
 
-            // delta-V :  M^-1 * (J^T) * lambda
+			// However, in order to keep this 'shift' in velocity physically based, we must keep in mind the
+			// mass and inertia of the rigidbodies involved, therefore we must multiply delta-V with the matrix M^-1
 
-            //where M is the 12x12 matrix
-            //[ ma  0   0   0]
-            //[ 0   Ia  0   0]
-            //[ 0   0   mb  0]
-            //[ 0   0   0  Ib]
+			// delta-V :  M^-1 * (J^T) * lambda
 
-            //where ma is a 3x3 identity matrix scaled by the mass of the diviner::rigidbodyA,
-            //mb is a 3x3 identity matrix scaled by the mass of the diviner::rigidbodyB,
-            //where Ia is the 3x3 matrix inertia tensor of the diviner::rigidbodyA,
-            //where Ib is the 3x3 matrix inertia tensor of the diviner::rigidbodyB,
+			// where M is the 12x12 matrix
+			//[ ma  0   0   0]
+			//[ 0   Ia  0   0]
+			//[ 0   0   mb  0]
+			//[ 0   0   0  Ib]
 
-            //calculate J.V + b
-            rsl::math::float3 Ra, Rb, minRaCrossN, RbCrossN;
-            calculateJacobianComponents(collisionNormal, Ra, minRaCrossN, Rb, RbCrossN);
+			// where ma is a 3x3 identity matrix scaled by the mass of the diviner::rigidbodyA,
+			// mb is a 3x3 identity matrix scaled by the mass of the diviner::rigidbodyB,
+			// where Ia is the 3x3 matrix inertia tensor of the diviner::rigidbodyA,
+			// where Ib is the 3x3 matrix inertia tensor of the diviner::rigidbodyB,
 
-            rsl::math::float3 va, wa, vb, wb;
+			// calculate J.V + b
+			rsl::math::float3 Ra, Rb, minRaCrossN, RbCrossN;
+			calculateJacobianComponents(collisionNormal, Ra, minRaCrossN, Rb, RbCrossN);
 
-            va = rbRef ? rbRef->velocity : rsl::math::float3::zero;
-            wa = rbRef ? rbRef->angularVelocity : rsl::math::float3::zero;
-            vb = rbInc ? rbInc->velocity : rsl::math::float3::zero;
-            wb = rbInc ? rbInc->angularVelocity : rsl::math::float3::zero;
+			rsl::math::float3 va, wa, vb, wb;
 
-            float JVx = math::dot(-collisionNormal, va);
-            float JVy = math::dot(minRaCrossN, wa);
-            float JVz = math::dot(collisionNormal, vb);
-            float JVw = math::dot(RbCrossN, wb);
+			va = rbRef ? rbRef->velocity : rsl::math::float3::zero;
+			wa = rbRef ? rbRef->angularVelocity : rsl::math::float3::zero;
+			vb = rbInc ? rbInc->velocity : rsl::math::float3::zero;
+			wb = rbInc ? rbInc->angularVelocity : rsl::math::float3::zero;
 
-            float minJV = -(JVx + JVy + JVz + JVw);
+			float JVx = math::dot(-collisionNormal, va);
+			float JVy = math::dot(minRaCrossN, wa);
+			float JVz = math::dot(collisionNormal, vb);
+			float JVw = math::dot(RbCrossN, wb);
 
+			float minJV = -(JVx + JVy + JVz + JVw);
 
-            //log::debug("CALCULATE");
 
-            //-------------------------- Positional Constraint ----------------------------------//
+			// log::debug("CALCULATE");
 
-            //resolve the position violation by adding it into the lambda
-            float penetration = math::dot(RefWorldContact - IncWorldContact, -collisionNormal);
+			//-------------------------- Positional Constraint ----------------------------------//
 
-            //but allow some penetration for the sake of stability
-            penetration = math::min(penetration + physics::constants::baumgarteSlop, 0.0f);
+			// resolve the position violation by adding it into the lambda
+			float penetration = math::dot(RefWorldContact - IncWorldContact, -collisionNormal);
 
-            float baumgarteConstraint = -penetration * physics::constants::baumgarteCoefficient * 1 / dt;
+			// but allow some penetration for the sake of stability
+			penetration = math::min(penetration + physics::constants::baumgarteSlop, 0.0f);
 
-            //-------------------------- Restitution Constraint ----------------------------------//
+			float baumgarteConstraint = -penetration * physics::constants::baumgarteCoefficient * 1 / dt;
 
-            //calculate restitution between the 2 bodies
-            float restCoeff = diviner::rigidbody::calculateRestitution(rbRef? rbRef->restitution : 0.3f, rbInc? rbInc->restitution : 0.3f);
+			//-------------------------- Restitution Constraint ----------------------------------//
 
-            rsl::math::float3 minWaCrossRa = math::cross(-wa, Ra);
-            rsl::math::float3 WbCrossRb = math::cross(wb, Rb);
+			// calculate restitution between the 2 bodies
+			float restCoeff = diviner::rigidbody::calculateRestitution(rbRef ? rbRef->restitution : 0.3f, rbInc ? rbInc->restitution : 0.3f);
 
-            //restitution is based on the relative velocities of the 2 rigidbodies
-            float dotResult = math::dot((-va + minWaCrossRa + vb + WbCrossRb), collisionNormal);
+			rsl::math::float3 minWaCrossRa = math::cross(-wa, Ra);
+			rsl::math::float3 WbCrossRb = math::cross(wb, Rb);
 
-            float restitutionConstraint = dotResult * restCoeff;
+			// restitution is based on the relative velocities of the 2 rigidbodies
+			float dotResult = math::dot((-va + minWaCrossRa + vb + WbCrossRb), collisionNormal);
 
-            restitutionConstraint = math::max(restitutionConstraint - physics::constants::restitutionSlop, 0.0f);
+			float restitutionConstraint = dotResult * restCoeff;
 
-            //-------------------------- Velocity Constraint ----------------------------------//
+			restitutionConstraint = math::max(restitutionConstraint - physics::constants::restitutionSlop, 0.0f);
 
+			//-------------------------- Velocity Constraint ----------------------------------//
 
 
-            float biasFactor = baumgarteConstraint + restitutionConstraint;
 
-            float foundLambda = (minJV + biasFactor) / effectiveMass;
+			float biasFactor = baumgarteConstraint + restitutionConstraint;
 
-            float oldTotalLambda = totalLambda;
-            totalLambda += foundLambda;
+			float foundLambda = (minJV + biasFactor) / effectiveMass;
 
-            totalLambda = math::clamp(totalLambda, 0.0f, std::numeric_limits<float>::max());
+			float oldTotalLambda = totalLambda;
+			totalLambda += foundLambda;
 
-            float lambdaApplied = totalLambda - oldTotalLambda;
+			totalLambda = math::clamp(totalLambda, 0.0f, std::numeric_limits<float>::max());
 
-            ApplyImpulse(collisionNormal, lambdaApplied,
-                Ra, Rb);
+			float lambdaApplied = totalLambda - oldTotalLambda;
 
-        }
+			ApplyImpulse(collisionNormal, lambdaApplied, Ra, Rb);
+		}
 
-        void resolveFrictionConstraint()
-        {
-            float frictionCoeff = diviner::rigidbody::calculateFriction(rbRef ? rbRef->friction : 0.3f, rbInc ? rbInc->friction : 0.3f);
-            float frictionConstraint = totalLambda * frictionCoeff;
+		void resolveFrictionConstraint()
+		{
+			float frictionCoeff = diviner::rigidbody::calculateFriction(rbRef ? rbRef->friction : 0.3f, rbInc ? rbInc->friction : 0.3f);
+			float frictionConstraint = totalLambda * frictionCoeff;
 
-            rsl::math::float3 Ra = RefWorldContact - refRBCentroid;
-            rsl::math::float3 Rb = IncWorldContact - incRBCentroid;
+			rsl::math::float3 Ra = RefWorldContact - refRBCentroid;
+			rsl::math::float3 Rb = IncWorldContact - incRBCentroid;
 
-            //calculate friction constraint for tangent1
-            {
-                float tangent1MinJV = calculateJVConstraint(tangentNormal1);
+			// calculate friction constraint for tangent1
+			{
+				float tangent1MinJV = calculateJVConstraint(tangentNormal1);
 
-                float foundLambda = tangent1MinJV / tangent1EffectiveMass;
+				float foundLambda = tangent1MinJV / tangent1EffectiveMass;
 
-                float oldTotalLambda = tangent1Lambda;
-                tangent1Lambda += foundLambda;
+				float oldTotalLambda = tangent1Lambda;
+				tangent1Lambda += foundLambda;
 
-                tangent1Lambda = math::clamp(tangent1Lambda, -frictionConstraint, frictionConstraint);
+				tangent1Lambda = math::clamp(tangent1Lambda, -frictionConstraint, frictionConstraint);
 
-                float lambdaApplied = tangent1Lambda - oldTotalLambda;
+				float lambdaApplied = tangent1Lambda - oldTotalLambda;
 
-                ApplyImpulse(tangentNormal1, lambdaApplied,
-                    Ra, Rb);
+				ApplyImpulse(tangentNormal1, lambdaApplied, Ra, Rb);
+			}
 
-            }
+			// calculate friction constraint for tangent1
+			{
+				float tangent2MinJV = calculateJVConstraint(tangentNormal2);
 
-            //calculate friction constraint for tangent1
-            {
-                float tangent2MinJV = calculateJVConstraint(tangentNormal2);
+				float foundLambda = tangent2MinJV / tangent2EffectiveMass;
 
-                float foundLambda = tangent2MinJV / tangent2EffectiveMass;
+				float oldTotalLambda = tangent2Lambda;
+				tangent2Lambda += foundLambda;
 
-                float oldTotalLambda = tangent2Lambda;
-                tangent2Lambda += foundLambda;
+				tangent2Lambda = math::clamp(tangent2Lambda, -frictionConstraint, frictionConstraint);
 
-                tangent2Lambda = math::clamp(tangent2Lambda, -frictionConstraint, frictionConstraint);
+				float lambdaApplied = tangent2Lambda - oldTotalLambda;
 
-                float lambdaApplied = tangent2Lambda - oldTotalLambda;
+				ApplyImpulse(tangentNormal2, lambdaApplied, Ra, Rb);
+			}
+		}
 
-                ApplyImpulse(tangentNormal2, lambdaApplied,
-                    Ra, Rb);
-            }
-        }
+		/* @brief Given the equation to calculate lambda -(J.V)/(J * M^-1 * J^T),
+		 * precalculates (J * M^-1 * J^T).
+		 */
+		void preCalculateEffectiveMass()
+		{
+			// calculate tangent vectors
 
-        /* @brief Given the equation to calculate lambda -(J.V)/(J * M^-1 * J^T),
-        * precalculates (J * M^-1 * J^T).
-        */
-        void preCalculateEffectiveMass()
-        {
-            //calculate tangent vectors
+			//--------------------------- pre calculate contact constraint effective mass -----------------------------------//
 
-            //--------------------------- pre calculate contact constraint effective mass -----------------------------------//
+			tangentNormal1 = math::cross(collisionNormal, rsl::math::float3(1, 0, 0));
 
-            tangentNormal1 = math::cross(collisionNormal, rsl::math::float3(1, 0, 0));
+			if (math::epsilonEqual(math::length(tangentNormal1), 0.0f, 0.01f))
+			{
+				tangentNormal1 = math::cross(collisionNormal, rsl::math::float3(0, 1, 0));
+			}
 
-            if (math::epsilonEqual(math::length(tangentNormal1), 0.0f, 0.01f))
-            {
-                tangentNormal1 = math::cross(collisionNormal, rsl::math::float3(0, 1, 0));
-            }
+			tangentNormal1 = math::normalize(tangentNormal1);
 
-            tangentNormal1 = math::normalize(tangentNormal1);
+			tangentNormal2 = math::normalize(math::cross(collisionNormal, tangentNormal1));
 
-            tangentNormal2 = math::normalize(math::cross(collisionNormal, tangentNormal1));
+			effectiveMass = calculateEffectiveMassOnNormal(collisionNormal);
+			tangent1EffectiveMass = calculateEffectiveMassOnNormal(tangentNormal1);
+			tangent2EffectiveMass = calculateEffectiveMassOnNormal(tangentNormal2);
+		}
 
-            effectiveMass = calculateEffectiveMassOnNormal(collisionNormal);
-            tangent1EffectiveMass = calculateEffectiveMassOnNormal(tangentNormal1);
-            tangent2EffectiveMass = calculateEffectiveMassOnNormal(tangentNormal2);
-        }
+		float calculateJVConstraint(const rsl::math::float3& normal)
+		{
+			rsl::math::float3 Ra, Rb, minRaCrossN, RbCrossN;
+			calculateJacobianComponents(normal, Ra, minRaCrossN, Rb, RbCrossN);
 
-        float calculateJVConstraint(const rsl::math::float3& normal)
-        {
-            rsl::math::float3 Ra, Rb, minRaCrossN, RbCrossN;
-            calculateJacobianComponents(normal, Ra, minRaCrossN, Rb, RbCrossN);
+			rsl::math::float3 va, wa, vb, wb;
 
-            rsl::math::float3 va, wa, vb, wb;
+			va = rbRef ? rbRef->velocity : rsl::math::float3::zero;
+			wa = rbRef ? rbRef->angularVelocity : rsl::math::float3::zero;
+			vb = rbInc ? rbInc->velocity : rsl::math::float3::zero;
+			wb = rbInc ? rbInc->angularVelocity : rsl::math::float3::zero;
 
-            va = rbRef ? rbRef->velocity : rsl::math::float3::zero;
-            wa = rbRef ? rbRef->angularVelocity : rsl::math::float3::zero;
-            vb = rbInc ? rbInc->velocity : rsl::math::float3::zero;
-            wb = rbInc ? rbInc->angularVelocity : rsl::math::float3::zero;
+			float JVx = math::dot(-normal, va);
+			float JVy = math::dot(minRaCrossN, wa);
+			float JVz = math::dot(normal, vb);
+			float JVw = math::dot(RbCrossN, wb);
 
-            float JVx = math::dot(-normal, va);
-            float JVy = math::dot(minRaCrossN, wa);
-            float JVz = math::dot(normal, vb);
-            float JVw = math::dot(RbCrossN, wb);
+			return -(JVx + JVy + JVz + JVw);
+		}
 
-            return -(JVx + JVy + JVz + JVw);
-        }
+		float calculateEffectiveMassOnNormal(rsl::math::float3& normal)
+		{
+			rsl::math::float3 Ra, Rb, minRaCrossN, RbCrossN;
+			calculateJacobianComponents(normal, Ra, minRaCrossN, Rb, RbCrossN);
 
-        float calculateEffectiveMassOnNormal(rsl::math::float3& normal)
-        {
-            rsl::math::float3 Ra, Rb, minRaCrossN, RbCrossN;
-            calculateJacobianComponents(normal, Ra, minRaCrossN, Rb, RbCrossN);
+			float maUnit = rbRef ? rbRef->inverseMass : 0.0f;
+			float mbUnit = rbInc ? rbInc->inverseMass : 0.0f;
 
-            float maUnit = rbRef ? rbRef->inverseMass : 0.0f;
-            float mbUnit = rbInc ? rbInc->inverseMass : 0.0f;
+			// calculate M-1
+			math::float3x3 ma = math::float3x3(maUnit);
+			math::float3x3 Ia = rbRef ? rbRef->globalInverseInertiaTensor : math::float3x3(0.0f);
+			math::float3x3 mb = math::float3x3(mbUnit);
+			math::float3x3 Ib = rbInc ? rbInc->globalInverseInertiaTensor : math::float3x3(0.0f);
 
-            //calculate M-1
-            math::float3x3 ma = math::float3x3(maUnit);
-            math::float3x3 Ia = rbRef ? rbRef->globalInverseInertiaTensor : math::float3x3(0.0f);
-            math::float3x3 mb = math::float3x3(mbUnit);                                
-            math::float3x3 Ib = rbInc ? rbInc->globalInverseInertiaTensor : math::float3x3(0.0f);
+			// calculate M^-1 J^T
+			rsl::math::float3 jx = ma * -normal;
+			rsl::math::float3 jy = Ia * minRaCrossN;
+			rsl::math::float3 jz = mb * normal;
+			rsl::math::float3 jw = Ib * RbCrossN;
 
-            //calculate M^-1 J^T
-            rsl::math::float3 jx = ma * -normal;
-            rsl::math::float3 jy = Ia * minRaCrossN;
-            rsl::math::float3 jz = mb * normal;
-            rsl::math::float3 jw = Ib * RbCrossN;
+			// calculate effective mass
+			float efMx = math::dot(-normal, jx);
+			float efMy = math::dot(minRaCrossN, jy);
+			float efMz = math::dot(normal, jz);
+			float efMw = math::dot(RbCrossN, jw);
 
-            //calculate effective mass
-            float efMx = math::dot(-normal, jx);
-            float efMy = math::dot(minRaCrossN, jy);
-            float efMz = math::dot(normal, jz);
-            float efMw = math::dot(RbCrossN, jw);
+			return efMx + efMy + efMz + efMw;
+		}
 
-            return efMx + efMy + efMz + efMw;
+		/* @brief Given a normal indicating the impulse direction, the vectors ra and rb that indicate the contact vectors,
+		 * and a lambda that indicates the scalar value of the impulse, applies impulses to the colliding rigidbodies
+		 */
+		void ApplyImpulse(const rsl::math::float3& normal, const float lambda, const rsl::math::float3& ra, const rsl::math::float3& rb)
+		{
 
-        }
+			rsl::math::float3 linearImpulse = normal * lambda;
 
-        /* @brief Given a normal indicating the impulse direction, the vectors ra and rb that indicate the contact vectors,
-        * and a lambda that indicates the scalar value of the impulse, applies impulses to the colliding rigidbodies
-        */
-        void ApplyImpulse(const rsl::math::float3& normal, const float lambda,
-            const rsl::math::float3& ra, const rsl::math::float3& rb)
-        {
+			rsl::math::float3 torqueDirectionA = math::cross(-ra, normal);
+			rsl::math::float3 torqueDirectionB = math::cross(rb, normal);
 
-            rsl::math::float3 linearImpulse = normal * lambda;
+			rsl::math::float3 angularImpulseA = torqueDirectionA * lambda;
+			rsl::math::float3 angularImpulseB = torqueDirectionB * lambda;
 
-            rsl::math::float3 torqueDirectionA = math::cross(-ra, normal);
-            rsl::math::float3 torqueDirectionB = math::cross(rb, normal);
+			if (rbRef)
+			{
+				rbRef->velocity += -linearImpulse * rbRef->inverseMass;
+				rbRef->angularVelocity += rbRef->globalInverseInertiaTensor * angularImpulseA;
+			}
 
-            rsl::math::float3 angularImpulseA = torqueDirectionA * lambda;      
-            rsl::math::float3 angularImpulseB = torqueDirectionB * lambda;
+			if (rbInc)
+			{
+				rbInc->velocity += linearImpulse * rbInc->inverseMass;
+				auto addedAngular = rbInc->globalInverseInertiaTensor * angularImpulseB;
+				rbInc->angularVelocity += addedAngular;
+			}
+		}
 
-            if (rbRef)
-            {
-                rbRef->velocity += -linearImpulse * rbRef->inverseMass;
-                rbRef->angularVelocity += rbRef->globalInverseInertiaTensor * angularImpulseA;
-            }
+		void calculateJacobianComponents(const rsl::math::float3 normal, rsl::math::float3& Ra, rsl::math::float3& minRaCrossN, rsl::math::float3& Rb, rsl::math::float3& RbCrossN)
+		{
+			Ra = RefWorldContact - refRBCentroid;
+			Rb = IncWorldContact - incRBCentroid;
 
-            if (rbInc)
-            {
-                rbInc->velocity += linearImpulse * rbInc->inverseMass;
-                auto addedAngular = rbInc->globalInverseInertiaTensor * angularImpulseB;
-                rbInc->angularVelocity += addedAngular;
-            }
-        }
+			minRaCrossN = math::cross(-Ra, normal);
+			RbCrossN = math::cross(Rb, normal);
+		}
 
-        void calculateJacobianComponents(const rsl::math::float3 normal,
-            rsl::math::float3& Ra, rsl::math::float3& minRaCrossN, rsl::math::float3& Rb, rsl::math::float3& RbCrossN)
-        {
-            Ra = RefWorldContact - refRBCentroid;
-            Rb = IncWorldContact - incRBCentroid;
 
-            minRaCrossN = math::cross(-Ra, normal);
-            RbCrossN = math::cross(Rb, normal);
-        }
 
+		void logRigidbodyState()
+		{
+			log::debug("//--------logRigidbodyState----------//");
+			log::debug("rbInc->velocity {} ", math::to_string(rbInc->velocity));
+			log::debug("rbInc->angularVelocity {} ", math::to_string(rbInc->angularVelocity));
 
+			log::debug("collisionNormal {} ", math::to_string(collisionNormal));
+			log::debug("lambda {} ", totalLambda);
+			log::debug("////////////////////////////");
+		}
+	};
 
-        void logRigidbodyState()
-        {
-            log::debug("//--------logRigidbodyState----------//");
-            log::debug("rbInc->velocity {} ", math::to_string(rbInc->velocity));
-            log::debug("rbInc->angularVelocity {} ", math::to_string(rbInc->angularVelocity));
 
-            log::debug("collisionNormal {} ", math::to_string(collisionNormal));
-            log::debug("lambda {} ", totalLambda);
-            log::debug("////////////////////////////");
-        }
-    };
 
-
-
-}
+} // namespace rythe::physics

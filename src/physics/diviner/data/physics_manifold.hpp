@@ -1,77 +1,74 @@
 #pragma once
 
+#include <core/core.hpp>
 #include <physics/diviner/colliders/physicscollider.hpp>
-#include <core/core.hpp>
-#include <physics/diviner/physics_contact.hpp>
-#include <core/core.hpp>
 #include <physics/diviner/components/physics_component.hpp>
 #include <physics/diviner/data/penetrationquery.hpp>
+#include <physics/diviner/physics_contact.hpp>
 
 namespace rythe::physics
 {
-    class PhysicsCollider;
+	class PhysicsCollider;
 
-    /** @struct physics_manifold
-    * @brief contains the necessary information to detect and resolve a collision.
-    * Only exist within one physics timestep.
-    */
-    struct physics_manifold
-    {
-        std::vector<physics_contact> contacts;
+	/** @struct physics_manifold
+	 * @brief contains the necessary information to detect and resolve a collision.
+	 * Only exist within one physics timestep.
+	 */
+	struct physics_manifold
+	{
+		std::vector<physics_contact> contacts;
 
-        math::float4x4 transformA;
-        math::float4x4 transformB;
+		math::float4x4 transformA;
+		math::float4x4 transformB;
 
-        PhysicsCollider* colliderA = nullptr;
-        PhysicsCollider* colliderB = nullptr;
+		PhysicsCollider* colliderA = nullptr;
+		PhysicsCollider* colliderB = nullptr;
 
-        ecs::entity entityA;
-        ecs::entity entityB;
+		ecs::entity entityA;
+		ecs::entity entityB;
 
-        physics::diviner::physics_component* physicsCompA = nullptr;
-        physics::diviner::physics_component* physicsCompB = nullptr;
+		physics::diviner::physics_component* physicsCompA = nullptr;
+		physics::diviner::physics_component* physicsCompB = nullptr;
 
-        physics::diviner::rigidbody* rigidbodyA = nullptr;
-        physics::diviner::rigidbody* rigidbodyB = nullptr;
+		physics::diviner::rigidbody* rigidbodyA = nullptr;
+		physics::diviner::rigidbody* rigidbodyB = nullptr;
 
-        std::unique_ptr<PenetrationQuery> penetrationInformation;
+		std::unique_ptr<PenetrationQuery> penetrationInformation;
 
-        bool isColliding;
+		bool isColliding;
 
-        bool DEBUG_checkID(std::string firstID, std::string secondID) const
-        {
-            std::string str1, str2;
-            GetPairID(str1, str2);
+		bool DEBUG_checkID(std::string firstID, std::string secondID) const
+		{
+			std::string str1, str2;
+			GetPairID(str1, str2);
 
-            if ((str1 == firstID && str2 == secondID)
-                || (str2 == firstID && str1 == secondID))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+			if ((str1 == firstID && str2 == secondID) || (str2 == firstID && str1 == secondID))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 
-        void GetPairID(std::string& str1, std::string& str2) const
-        {
-            auto idHA = entityA.get_component<identifier>();
-            auto idHB = entityB.get_component<identifier>();
+		void GetPairID(std::string& str1, std::string& str2) const
+		{
+			auto idHA = entityA.get_component<identifier>();
+			auto idHB = entityB.get_component<identifier>();
 
-            str1 = "" ;
-            str2 = "" ;
+			str1 = "";
+			str2 = "";
 
-            if (idHA)
-            {
-                str1 = idHA->id;
-            }
+			if (idHA)
+			{
+				str1 = idHA->id;
+			}
 
-            if (idHB)
-            {
-                str2 = idHB->id;
-            }
-
-        }
-    };
-}
+			if (idHB)
+			{
+				str2 = idHB->id;
+			}
+		}
+	};
+} // namespace rythe::physics

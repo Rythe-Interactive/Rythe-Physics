@@ -2,121 +2,122 @@
 
 #include <core/core.hpp>
 #include <memory>
-#include <physics/diviner/halfedgeface.hpp>
 #include <physics/diviner/data/convergence_identifier.hpp>
+#include <physics/diviner/halfedgeface.hpp>
 #include <physics/diviner/physics_contact.hpp>
 
 namespace rythe::physics
 {
-    struct physics_manifold;
-    class ConvexCollider;
+	struct physics_manifold;
+	class ConvexCollider;
 
 
-    class PhysicsCollider
-    {
-    public:
-        bool shouldBeDrawn = true;
-        std::vector<std::unique_ptr<ConvergenceIdentifier>> convergenceIdentifiers;
+	class PhysicsCollider
+	{
+	public:
+		bool shouldBeDrawn = true;
+		std::vector<std::unique_ptr<ConvergenceIdentifier>> convergenceIdentifiers;
 
-        PhysicsCollider()
-        {
-            static int colliderID = 0;
-            id = colliderID++;
-        }
+		PhysicsCollider()
+		{
+			static int colliderID = 0;
+			id = colliderID++;
+		}
 
-        virtual void AddConvergenceIdentifier(const  physics_contact& contact) = 0;
+		virtual void AddConvergenceIdentifier(const physics_contact& contact) = 0;
 
-        void AttemptFindAndCopyConvergenceID(physics_contact& contact)
-        {
-            if (!constants::applyWarmStarting) { return; }
+		void AttemptFindAndCopyConvergenceID(physics_contact& contact)
+		{
+			if (!constants::applyWarmStarting)
+			{
+				return;
+			}
 
-            for (auto& convergenceId : convergenceIdentifiers)
-            {
-                if (convergenceId->refColliderID == contact.refCollider->GetColliderID())
-                {
-                    if (convergenceId->IsEqual(contact))
-                    {
-                        convergenceId->CopyLambdasToContact(contact);
-                        return;
-                    }
-                }
-            }
-        }
-            
-        /** @brief given a PhysicsCollider, CheckCollision calls "CheckCollisionWith". Both colliders are then passed through
-        * to the correct "CheckCollisionWith" function with double dispatch.
-        * @param physicsCollider The collider we would like to check collision against
-        * @param [in/out] manifold A physics_manifold that holds information about the collision
-        */
-        virtual void CheckCollision(
-            PhysicsCollider* physicsCollider, physics_manifold& manifold) {};
+			for (auto& convergenceId : convergenceIdentifiers)
+			{
+				if (convergenceId->refColliderID == contact.refCollider->GetColliderID())
+				{
+					if (convergenceId->IsEqual(contact))
+					{
+						convergenceId->CopyLambdasToContact(contact);
+						return;
+					}
+				}
+			}
+		}
 
-        /** @brief given a convexCollider checks if this collider collides the convexCollider. The information
-        * the information is then passed to the manifold.
-        */
-        virtual void CheckCollisionWith(ConvexCollider* convexCollider, physics_manifold& manifold) {};
+		/** @brief given a PhysicsCollider, CheckCollision calls "CheckCollisionWith". Both colliders are then passed through
+		 * to the correct "CheckCollisionWith" function with double dispatch.
+		 * @param physicsCollider The collider we would like to check collision against
+		 * @param [in/out] manifold A physics_manifold that holds information about the collision
+		 */
+		virtual void CheckCollision(
+			PhysicsCollider* physicsCollider, physics_manifold& manifold
+		) {};
 
-        /** @brief Gets the unique id of this collider
-        */
-        int GetColliderID() const
-        {
-            return id;
-        }
+		/** @brief given a convexCollider checks if this collider collides the convexCollider. The information
+		 * the information is then passed to the manifold.
+		 */
+		virtual void CheckCollisionWith(ConvexCollider* convexCollider, physics_manifold& manifold) {};
 
-        /** @brief given a PhysicsCollider, PopulateContactPoints calls PopulateContactPointsWith. Both colliders are then passed through
-        * to the corrent FillManifoldWith function with double dispatch.
-        */
-        virtual void PopulateContactPoints(
-            PhysicsCollider* physicsCollider, physics_manifold& manifold) {};
+		/** @brief Gets the unique id of this collider
+		 */
+		int GetColliderID() const
+		{
+			return id;
+		}
 
-        /** @brief Creates the contact points between this physics collider and the given ConvexCollider and
-        * stores them in the manifold
-        */
-        virtual void PopulateContactPointsWith(
-            ConvexCollider* convexCollider, physics_manifold& manifold) {};
+		/** @brief given a PhysicsCollider, PopulateContactPoints calls PopulateContactPointsWith. Both colliders are then passed through
+		 * to the corrent FillManifoldWith function with double dispatch.
+		 */
+		virtual void PopulateContactPoints(
+			PhysicsCollider* physicsCollider, physics_manifold& manifold
+		) {};
 
-        /** @brief Given the transform of the entity that the collider is attached to, draws a visual representation
-        * of the collider.
-        * @note This is called internally by PhysicsSysten
-        */
-        virtual void DrawColliderRepresentation(const math::float4x4& transform, math::color usedColor, float width, float time, bool ignoreDepth = false) {};
+		/** @brief Creates the contact points between this physics collider and the given ConvexCollider and
+		 * stores them in the manifold
+		 */
+		virtual void PopulateContactPointsWith(
+			ConvexCollider* convexCollider, physics_manifold& manifold
+		) {};
 
-        virtual void UpdateTransformedTightBoundingVolume(const math::float4x4& transform) {};
+		/** @brief Given the transform of the entity that the collider is attached to, draws a visual representation
+		 * of the collider.
+		 * @note This is called internally by PhysicsSysten
+		 */
+		virtual void DrawColliderRepresentation(const math::float4x4& transform, math::color usedColor, float width, float time, bool ignoreDepth = false) {};
 
-        inline virtual std::vector<HalfEdgeFace*>& GetHalfEdgeFaces()
-        {
-            return dummyHalfEdges;
-        }
+		virtual void UpdateTransformedTightBoundingVolume(const math::float4x4& transform) {};
 
-        [[nodiscard]] rsl::math::float3 GetLocalCentroid() const noexcept
-        {
-            return localColliderCentroid;
-        }
+		inline virtual std::vector<HalfEdgeFace*>& GetHalfEdgeFaces()
+		{
+			return dummyHalfEdges;
+		}
 
-        //
-        std::pair<rsl::math::float3, rsl::math::float3> GetMinMaxLocalAABB() const
-        {
-            return minMaxLocalAABB;
-        }
+		[[nodiscard]] rsl::math::float3 GetLocalCentroid() const noexcept
+		{
+			return localColliderCentroid;
+		}
 
-        std::pair<rsl::math::float3, rsl::math::float3> GetMinMaxWorldAABB() const
-        {
-            return minMaxWorldAABB;
-        }
+		//
+		std::pair<rsl::math::float3, rsl::math::float3> GetMinMaxLocalAABB() const
+		{
+			return minMaxLocalAABB;
+		}
 
-    protected:
+		std::pair<rsl::math::float3, rsl::math::float3> GetMinMaxWorldAABB() const
+		{
+			return minMaxWorldAABB;
+		}
 
-        rsl::math::float3 localColliderCentroid = rsl::math::float3(0, 0, 0);
-        std::pair<rsl::math::float3, rsl::math::float3> minMaxLocalAABB;
-        std::pair<rsl::math::float3, rsl::math::float3> minMaxWorldAABB;
-    private:
+	protected:
+		rsl::math::float3 localColliderCentroid = rsl::math::float3(0, 0, 0);
+		std::pair<rsl::math::float3, rsl::math::float3> minMaxLocalAABB;
+		std::pair<rsl::math::float3, rsl::math::float3> minMaxWorldAABB;
 
-        int id = -1;
-       //this is not used, its mostly for debug reasons
-        std::vector<HalfEdgeFace*> dummyHalfEdges;
-
-    };
-}
-
-
-
+	private:
+		int id = -1;
+		// this is not used, its mostly for debug reasons
+		std::vector<HalfEdgeFace*> dummyHalfEdges;
+	};
+} // namespace rythe::physics

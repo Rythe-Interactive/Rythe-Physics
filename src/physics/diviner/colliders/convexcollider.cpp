@@ -1,210 +1,210 @@
 #include <physics/diviner/colliders/convexcollider.hpp>
-#include <physics/diviner/physics_statics.hpp>
-#include <physics/diviner/data/identifier.hpp>
 #include <physics/diviner/data/convexconvexpenetrationquery.hpp>
 #include <physics/diviner/data/edgepenetrationquery.hpp>
+#include <physics/diviner/data/identifier.hpp>
 #include <physics/diviner/data/pointer_encapsulator.hpp>
+#include <physics/diviner/physics_statics.hpp>
 #include <physics/diviner/systems/physicssystem.hpp>
 #include <rendering/debugrendering.hpp>
 
 namespace rythe::physics
 {
-    void ConvexCollider::AddConvergenceIdentifier(const physics_contact& contact)
-    {
-        if (contact.label.IsSet())
-        {
-            convergenceIdentifiers.push_back(
-                std::make_unique<ConvexConvergenceIdentifier>(contact.label, contact.totalLambda,
-                    contact.tangent1Lambda, contact.tangent2Lambda, GetColliderID()));
-        }
-    }
+	void ConvexCollider::AddConvergenceIdentifier(const physics_contact& contact)
+	{
+		if (contact.label.IsSet())
+		{
+			convergenceIdentifiers.push_back(
+				std::make_unique<ConvexConvergenceIdentifier>(contact.label, contact.totalLambda, contact.tangent1Lambda, contact.tangent2Lambda, GetColliderID())
+			);
+		}
+	}
 
-    void ConvexCollider::CheckCollisionWith(ConvexCollider* convexCollider, physics_manifold& manifold)
-    {
-        // Middle-phase collision detection
-        // Do AABB collision to check whether collision is possible
-        auto aabbThis = this->GetMinMaxWorldAABB();
-        auto aabbOther = convexCollider->GetMinMaxWorldAABB();
-        auto& [low0, high0] = aabbThis;
-        auto& [low1, high1] = aabbOther;
-       
-        if (!physics::PhysicsStatics::CollideAABB(low0, high0, low1, high1))
-        {
-            manifold.isColliding = false;
-            return;
-        }
+	void ConvexCollider::CheckCollisionWith(ConvexCollider* convexCollider, physics_manifold& manifold)
+	{
+		// Middle-phase collision detection
+		// Do AABB collision to check whether collision is possible
+		auto aabbThis = this->GetMinMaxWorldAABB();
+		auto aabbOther = convexCollider->GetMinMaxWorldAABB();
+		auto& [low0, high0] = aabbThis;
+		auto& [low1, high1] = aabbOther;
 
-        //--------------------- Check for a collision by going through the edges and faces of both polyhedrons  --------------//
-        //'this' is colliderB and 'convexCollider' is colliderA
-        
-        PointerEncapsulator < HalfEdgeFace> ARefFace;
+		if (!physics::PhysicsStatics::CollideAABB(low0, high0, low1, high1))
+		{
+			manifold.isColliding = false;
+			return;
+		}
 
-        float ARefSeperation;
-        if (PhysicsStatics::FindSeperatingAxisByExtremePointProjection(
-            this, convexCollider, manifold.transformB,manifold.transformA,  ARefFace, ARefSeperation) || !ARefFace.ptr)
-        {
-            manifold.isColliding = false;
-            return;
-        }
+		//--------------------- Check for a collision by going through the edges and faces of both polyhedrons  --------------//
+		//'this' is colliderB and 'convexCollider' is colliderA
 
-        PointerEncapsulator < HalfEdgeFace> BRefFace;
+		PointerEncapsulator<HalfEdgeFace> ARefFace;
 
-        float BRefSeperation;
-        if (PhysicsStatics::FindSeperatingAxisByExtremePointProjection(convexCollider,
-            this, manifold.transformA, manifold.transformB, BRefFace, BRefSeperation) || !BRefFace.ptr)
-        {
-            manifold.isColliding = false;
-            return;
-        }
+		float ARefSeperation;
+		if (PhysicsStatics::FindSeperatingAxisByExtremePointProjection(
+				this, convexCollider, manifold.transformB, manifold.transformA, ARefFace, ARefSeperation
+			) ||
+			!ARefFace.ptr)
+		{
+			manifold.isColliding = false;
+			return;
+		}
 
-        PointerEncapsulator< HalfEdgeEdge> edgeRef;
-        PointerEncapsulator< HalfEdgeEdge> edgeInc;
+		PointerEncapsulator<HalfEdgeFace> BRefFace;
 
-        rsl::math::float3 edgeNormal;
-        float aToBEdgeSeperation;
+		float BRefSeperation;
+		if (PhysicsStatics::FindSeperatingAxisByExtremePointProjection(convexCollider, this, manifold.transformA, manifold.transformB, BRefFace, BRefSeperation) || !BRefFace.ptr)
+		{
+			manifold.isColliding = false;
+			return;
+		}
 
-        if (PhysicsStatics::FindSeperatingAxisByGaussMapEdgeCheck( this, convexCollider, manifold.transformB, manifold.transformA,
-            edgeRef, edgeInc, edgeNormal, aToBEdgeSeperation,true ) || !edgeRef.ptr )
-        {
-            manifold.isColliding = false;
-            return;
-        }
+		PointerEncapsulator<HalfEdgeEdge> edgeRef;
+		PointerEncapsulator<HalfEdgeEdge> edgeInc;
 
-        //--------------------- A Collision has been found, find the most shallow penetration  ------------------------------------//
+		rsl::math::float3 edgeNormal;
+		float aToBEdgeSeperation;
 
-        //TODO all penetration querys should supply a constructor that takes in a  ConvexConvexCollisionInfo
-        
-        rsl::math::float3 worldFaceCentroidA = manifold.transformA * math::float4(ARefFace.ptr->centroid, 1);
-        rsl::math::float3 worldFaceNormalA = manifold.transformA * math::float4(ARefFace.ptr->normal, 0);
-        
-        rsl::math::float3 worldFaceCentroidB = manifold.transformB * math::float4(BRefFace.ptr->centroid, 1);
-        rsl::math::float3 worldFaceNormalB = manifold.transformB * math::float4(BRefFace.ptr->normal, 0);
+		if (PhysicsStatics::FindSeperatingAxisByGaussMapEdgeCheck(this, convexCollider, manifold.transformB, manifold.transformA, edgeRef, edgeInc, edgeNormal, aToBEdgeSeperation, true) || !edgeRef.ptr)
+		{
+			manifold.isColliding = false;
+			return;
+		}
 
-        rsl::math::float3 worldEdgeAPosition = edgeRef.ptr? manifold.transformB * math::float4(edgeRef.ptr->edgePosition, 1) : rsl::math::float3();
-        rsl::math::float3 worldEdgeNormal = edgeNormal;
+		//--------------------- A Collision has been found, find the most shallow penetration  ------------------------------------//
 
-        auto abPenetrationQuery =
-            std::make_unique< ConvexConvexPenetrationQuery>(ARefFace.ptr
-                , BRefFace.ptr, worldFaceCentroidA,worldFaceNormalA, ARefSeperation,true);
+		// TODO all penetration querys should supply a constructor that takes in a  ConvexConvexCollisionInfo
 
-        auto baPenetrationQuery =
-            std::make_unique < ConvexConvexPenetrationQuery>(BRefFace.ptr, ARefFace.ptr,
-                worldFaceCentroidB, worldFaceNormalB, BRefSeperation, false);
+		rsl::math::float3 worldFaceCentroidA = manifold.transformA * math::float4(ARefFace.ptr->centroid, 1);
+		rsl::math::float3 worldFaceNormalA = manifold.transformA * math::float4(ARefFace.ptr->normal, 0);
 
-        auto abEdgePenetrationQuery = 
-            std::make_unique < EdgePenetrationQuery>(edgeRef.ptr, edgeInc.ptr,worldEdgeAPosition,worldEdgeNormal,
-                aToBEdgeSeperation, false);
+		rsl::math::float3 worldFaceCentroidB = manifold.transformB * math::float4(BRefFace.ptr->centroid, 1);
+		rsl::math::float3 worldFaceNormalB = manifold.transformB * math::float4(BRefFace.ptr->normal, 0);
 
-        //-------------------------------------- Choose which PenetrationQuery to use for contact population --------------------------------------------------//
+		rsl::math::float3 worldEdgeAPosition = edgeRef.ptr ? manifold.transformB * math::float4(edgeRef.ptr->edgePosition, 1) : rsl::math::float3();
+		rsl::math::float3 worldEdgeNormal = edgeNormal;
 
-        if (abPenetrationQuery->penetration + physics::constants::faceToFacePenetrationBias >
-            baPenetrationQuery->penetration)
-        {
-            manifold.penetrationInformation = std::move(abPenetrationQuery);
-        }
-        else
-        {
-            manifold.penetrationInformation = std::move(baPenetrationQuery);
-        }
+		auto abPenetrationQuery =
+			std::make_unique<ConvexConvexPenetrationQuery>(ARefFace.ptr, BRefFace.ptr, worldFaceCentroidA, worldFaceNormalA, ARefSeperation, true);
+
+		auto baPenetrationQuery =
+			std::make_unique<ConvexConvexPenetrationQuery>(BRefFace.ptr, ARefFace.ptr, worldFaceCentroidB, worldFaceNormalB, BRefSeperation, false);
+
+		auto abEdgePenetrationQuery =
+			std::make_unique<EdgePenetrationQuery>(edgeRef.ptr, edgeInc.ptr, worldEdgeAPosition, worldEdgeNormal, aToBEdgeSeperation, false);
+
+		//-------------------------------------- Choose which PenetrationQuery to use for contact population --------------------------------------------------//
+
+		if (abPenetrationQuery->penetration + physics::constants::faceToFacePenetrationBias >
+			baPenetrationQuery->penetration)
+		{
+			manifold.penetrationInformation = std::move(abPenetrationQuery);
+		}
+		else
+		{
+			manifold.penetrationInformation = std::move(baPenetrationQuery);
+		}
 
 
-        if (abEdgePenetrationQuery->penetration >
-            manifold.penetrationInformation->penetration + physics::constants::faceToEdgePenetrationBias)
-        {
-            manifold.penetrationInformation = std::move(abEdgePenetrationQuery);
-        }
+		if (abEdgePenetrationQuery->penetration >
+			manifold.penetrationInformation->penetration + physics::constants::faceToEdgePenetrationBias)
+		{
+			manifold.penetrationInformation = std::move(abEdgePenetrationQuery);
+		}
 
-        manifold.isColliding = true;
-    }
+		manifold.isColliding = true;
+	}
 
-    void ConvexCollider::PopulateContactPointsWith(ConvexCollider* convexCollider, physics_manifold& manifold)
-    {
-        math::float4x4& refTransform = manifold.penetrationInformation->isARef ? manifold.transformA : manifold.transformB;
-        math::float4x4& incTransform = manifold.penetrationInformation->isARef ? manifold.transformB : manifold.transformA;
+	void ConvexCollider::PopulateContactPointsWith(ConvexCollider* convexCollider, physics_manifold& manifold)
+	{
+		math::float4x4& refTransform = manifold.penetrationInformation->isARef ? manifold.transformA : manifold.transformB;
+		math::float4x4& incTransform = manifold.penetrationInformation->isARef ? manifold.transformB : manifold.transformA;
 
-        diviner::physics_component* refPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompA : manifold.physicsCompB;
-        diviner::physics_component* incPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompB : manifold.physicsCompA;
+		diviner::physics_component* refPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompA : manifold.physicsCompB;
+		diviner::physics_component* incPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompB : manifold.physicsCompA;
 
-        PhysicsCollider* refCollider = manifold.penetrationInformation->isARef ? manifold.colliderA : manifold.colliderB;
-        PhysicsCollider* incCollider = manifold.penetrationInformation->isARef ? manifold.colliderB : manifold.colliderA;
+		PhysicsCollider* refCollider = manifold.penetrationInformation->isARef ? manifold.colliderA : manifold.colliderB;
+		PhysicsCollider* incCollider = manifold.penetrationInformation->isARef ? manifold.colliderB : manifold.colliderA;
 
-        manifold.penetrationInformation->populateContactList(manifold, refTransform, incTransform, refCollider);
+		manifold.penetrationInformation->populateContactList(manifold, refTransform, incTransform, refCollider);
 
-        diviner::rigidbody* refRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyA : manifold.rigidbodyB;
-        diviner::rigidbody* incRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyB : manifold.rigidbodyA;
+		diviner::rigidbody* refRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyA : manifold.rigidbodyB;
+		diviner::rigidbody* incRB = manifold.penetrationInformation->isARef ? manifold.rigidbodyB : manifold.rigidbodyA;
 
-        rsl::math::float3 refWorldCentroid = refTransform * math::float4(refPhysicsComp->localCenterOfMass,1);
-        rsl::math::float3 incWorldCentroid = incTransform * math::float4(incPhysicsComp->localCenterOfMass,1);
+		rsl::math::float3 refWorldCentroid = refTransform * math::float4(refPhysicsComp->localCenterOfMass, 1);
+		rsl::math::float3 incWorldCentroid = incTransform * math::float4(incPhysicsComp->localCenterOfMass, 1);
 
-        for ( auto& contact : manifold.contacts)
-        {
-            contact.incTransform = incTransform;
-            contact.refTransform = refTransform;
+		for (auto& contact : manifold.contacts)
+		{
+			contact.incTransform = incTransform;
+			contact.refTransform = refTransform;
 
-            contact.rbInc = incRB;
-            contact.rbRef = refRB;
-           
-            contact.collisionNormal = manifold.penetrationInformation->normal;
+			contact.rbInc = incRB;
+			contact.rbRef = refRB;
 
-            contact.refRBCentroid = refWorldCentroid;
-            contact.incRBCentroid = incWorldCentroid;
+			contact.collisionNormal = manifold.penetrationInformation->normal;
 
-        }
-    }
+			contact.refRBCentroid = refWorldCentroid;
+			contact.incRBCentroid = incWorldCentroid;
+		}
+	}
 
-    void ConvexCollider::UpdateTightAABB(const math::float4x4& transform)
-    {
-        minMaxWorldAABB = PhysicsStatics::ConstructAABBFromTransformedVertices
-        (vertices, transform);
-    }
+	void ConvexCollider::UpdateTightAABB(const math::float4x4& transform)
+	{
+		minMaxWorldAABB = PhysicsStatics::ConstructAABBFromTransformedVertices(vertices, transform);
+	}
 
-    void ConvexCollider::DrawColliderRepresentation(const math::float4x4& transform,math::color usedColor, float width, float time,bool ignoreDepth)
-    {
-        if (!shouldBeDrawn) { return; }
+	void ConvexCollider::DrawColliderRepresentation(const math::float4x4& transform, math::color usedColor, float width, float time, bool ignoreDepth)
+	{
+		if (!shouldBeDrawn)
+		{
+			return;
+		}
 
-        for (auto face : GetHalfEdgeFaces())
-        {
-            physics::HalfEdgeEdge* initialEdge = face->startEdge;
-            physics::HalfEdgeEdge* currentEdge = face->startEdge;
+		for (auto face : GetHalfEdgeFaces())
+		{
+			physics::HalfEdgeEdge* initialEdge = face->startEdge;
+			physics::HalfEdgeEdge* currentEdge = face->startEdge;
 
-            rsl::math::float3 faceStart = transform * math::float4(face->centroid, 1);
-            rsl::math::float3 faceEnd = faceStart + rsl::math::float3((transform * math::float4(face->normal, 0))) * 0.5f;
+			rsl::math::float3 faceStart = transform * math::float4(face->centroid, 1);
+			rsl::math::float3 faceEnd = faceStart + rsl::math::float3((transform * math::float4(face->normal, 0))) * 0.5f;
 
-            debug::user_projectDrawLine(faceStart, faceEnd, math::colors::green, 2.0f);
+			debug::user_projectDrawLine(faceStart, faceEnd, math::colors::green, 2.0f);
 
-            if (!currentEdge) { return; }
+			if (!currentEdge)
+			{
+				return;
+			}
 
-            do
-            {
-                physics::HalfEdgeEdge* edgeToExecuteOn = currentEdge;
-                currentEdge = currentEdge->nextEdge;
+			do
+			{
+				physics::HalfEdgeEdge* edgeToExecuteOn = currentEdge;
+				currentEdge = currentEdge->nextEdge;
 
-                rsl::math::float3 worldStart = transform * math::float4(edgeToExecuteOn->edgePosition, 1);
-                rsl::math::float3 worldEnd = transform * math::float4(edgeToExecuteOn->nextEdge->edgePosition, 1);
+				rsl::math::float3 worldStart = transform * math::float4(edgeToExecuteOn->edgePosition, 1);
+				rsl::math::float3 worldEnd = transform * math::float4(edgeToExecuteOn->nextEdge->edgePosition, 1);
 
-                debug::user_projectDrawLine(worldStart, worldEnd, usedColor, width, time,ignoreDepth);
+				debug::user_projectDrawLine(worldStart, worldEnd, usedColor, width, time, ignoreDepth);
 
-            } while (initialEdge != currentEdge && currentEdge != nullptr);
-        }
-    }
+			} while (initialEdge != currentEdge && currentEdge != nullptr);
+		}
+	}
 
-    void ConvexCollider::populateVertexListWithHalfEdges()
-    {
-        auto& verticesVec = vertices;
+	void ConvexCollider::populateVertexListWithHalfEdges()
+	{
+		auto& verticesVec = vertices;
 
-        const size_t reserveSize = halfEdgeFaces.size() * 3;
-        verticesVec.reserve(reserveSize);
+		const size_t reserveSize = halfEdgeFaces.size() * 3;
+		verticesVec.reserve(reserveSize);
 
-        auto collectVertices = [&verticesVec](HalfEdgeEdge* edge)
-        {
-            edge->calculateRobustEdgeDirection();
-            verticesVec.push_back(edge->edgePosition -= PhysicsStatics::PointDistanceToPlane(edge->face->normal, edge->face->centroid, edge->edgePosition));
-        };
+		auto collectVertices = [&verticesVec](HalfEdgeEdge* edge)
+		{
+			edge->calculateRobustEdgeDirection();
+			verticesVec.push_back(edge->edgePosition -= PhysicsStatics::PointDistanceToPlane(edge->face->normal, edge->face->centroid, edge->edgePosition));
+		};
 
-        for (auto face : halfEdgeFaces)
-        {
-            face->forEachEdge(collectVertices);
-        }
-    }
-}
-
+		for (auto face : halfEdgeFaces)
+		{
+			face->forEachEdge(collectVertices);
+		}
+	}
+} // namespace rythe::physics
