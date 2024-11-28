@@ -11,7 +11,8 @@ namespace rythe::physics
 	class PhysicsHelpers
 	{
 	public:
-		static void createPhysicsMaterial(float dynamicFriction, float staticFriction, float restitution, const char* name);
+		static void
+		createPhysicsMaterial(float dynamicFriction, float staticFriction, float restitution, const char* name);
 
 		static physics_material_hash retrievePhysicsMaterialHash(const char* name);
 

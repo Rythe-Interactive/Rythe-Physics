@@ -49,8 +49,7 @@ namespace rythe::physics
 
 	bool HalfEdgeEdge::isVertexVisible(const rsl::math::float3& vert, float epsilon)
 	{
-		float distanceToPlane =
-			math::pointToPlane(vert, face->centroid, face->normal);
+		float distanceToPlane = math::pointToPlane(vert, face->centroid, face->normal);
 
 		return distanceToPlane > epsilon;
 	}
@@ -60,7 +59,9 @@ namespace rythe::physics
 		return isVertexVisible(vert, epsilon) && !pairingEdge->isVertexVisible(vert, epsilon);
 	}
 
-	void HalfEdgeEdge::DEBUG_drawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width)
+	void HalfEdgeEdge::DEBUG_drawEdge(
+		const math::float4x4& transform, const math::color& debugColor, float time, float width
+	)
 	{
 		rsl::math::float3 worldStart = transform * math::float4(edgePosition, 1);
 		rsl::math::float3 worldEnd = transform * math::float4(nextEdge->edgePosition, 1);
@@ -68,7 +69,9 @@ namespace rythe::physics
 		debug::drawLine(worldStart, worldEnd, debugColor, width, time, true);
 	}
 
-	void HalfEdgeEdge::DEBUG_drawInsetEdge(const rsl::math::float3 spacing, const math::color& debugColor, float time, float width)
+	void HalfEdgeEdge::DEBUG_drawInsetEdge(
+		const rsl::math::float3 spacing, const math::color& debugColor, float time, float width
+	)
 	{
 		rsl::math::float3 worldCentroid = face->centroid + spacing;
 
@@ -81,7 +84,9 @@ namespace rythe::physics
 		debug::drawLine(worldStart + startDifference, worldEnd + endDifference, debugColor, width, time, true);
 	}
 
-	void HalfEdgeEdge::DEBUG_directionDrawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width)
+	void HalfEdgeEdge::DEBUG_directionDrawEdge(
+		const math::float4x4& transform, const math::color& debugColor, float time, float width
+	)
 	{
 		rsl::math::float3 worldStart = transform * math::float4(edgePosition, 1);
 		rsl::math::float3 worldEnd = transform * math::float4(nextEdge->edgePosition, 1);
@@ -99,12 +104,14 @@ namespace rythe::physics
 		debug::drawLine(pointStart + diff * 0.75f, worldCentroid, math::colors::red, width, time, true);
 	}
 
-	void HalfEdgeEdge::suicidalMergeWithPairing(std::vector<rsl::math::float3>& unmergedVertices, rsl::math::float3& normal, float scalingEpsilon)
+	void HalfEdgeEdge::suicidalMergeWithPairing(
+		std::vector<rsl::math::float3>& unmergedVertices, rsl::math::float3& normal, float scalingEpsilon
+	)
 	{
 		//[1] identify connecting edges of this face and merge face and connect them together
-		//[2] Handle possible issue where merging this face and merge faces causes the new face to have 2 edges with the same neighbors
-		//[3] re-Initialize to account for new edges
-		//[4] delete pairing and 'this' edge. These edges are no longer part of this face
+		//[2] Handle possible issue where merging this face and merge faces causes the new face to have 2 edges with the
+		// same neighbors [3] re-Initialize to account for new edges [4] delete pairing and 'this' edge. These edges are
+		// no longer part of this face
 
 
 		auto releaseFaceToVert = [&unmergedVertices](HalfEdgeFace* face)
@@ -149,7 +156,8 @@ namespace rythe::physics
 		mergeFace->startEdge = nullptr;
 		delete mergeFace;
 
-		//[2] Handle possible issue where merging this face and merge faces causes the new face to have 2 edges that neighbor the same face
+		//[2] Handle possible issue where merging this face and merge faces causes the new face to have 2 edges that
+		// neighbor the same face
 
 		//----------------------------------------------------------------------//
 		//                        [invariantMergeFace]                          //
@@ -171,7 +179,8 @@ namespace rythe::physics
 		//                                                                      //
 		//----------------------------------------------------------------------//
 
-		auto handleDoubleAdjacentMergeResult = [this, releaseFaceToVert](HalfEdgeEdge* prevFromCurrent, HalfEdgeEdge* prevFromCurrentConnection)
+		auto handleDoubleAdjacentMergeResult =
+			[this, releaseFaceToVert](HalfEdgeEdge* prevFromCurrent, HalfEdgeEdge* prevFromCurrentConnection)
 		{
 			HalfEdgeFace* invariantMergeFace = prevFromCurrent->pairingEdge->face;
 			releaseFaceToVert(invariantMergeFace);
@@ -205,15 +214,16 @@ namespace rythe::physics
 		};
 
 		HalfEdgeFace* currentFace = face;
-		auto setEdgeFace = [&currentFace](HalfEdgeEdge* edge)
-		{ edge->face = currentFace; };
+		auto setEdgeFace = [&currentFace](HalfEdgeEdge* edge) { edge->face = currentFace; };
 
 		if (prevFromCurrent->pairingEdge->face == prevFromCurrentConnection->pairingEdge->face)
 		{
 			face->forEachEdge(setEdgeFace);
 
 			rsl::math::float3 norm;
-			if (PhysicsStatics::isNewellFacesCoplanar(face, prevFromCurrent->pairingEdge->face, prevFromCurrent, scalingEpsilon, norm, 2))
+			if (PhysicsStatics::isNewellFacesCoplanar(
+					face, prevFromCurrent->pairingEdge->face, prevFromCurrent, scalingEpsilon, norm, 2
+				))
 			{
 				handleDoubleAdjacentMergeResult(prevFromCurrent, prevFromCurrentConnection);
 			}
@@ -224,7 +234,9 @@ namespace rythe::physics
 			face->forEachEdge(setEdgeFace);
 
 			rsl::math::float3 norm;
-			if (PhysicsStatics::isNewellFacesCoplanar(face, nextFromCurrent->pairingEdge->face, nextFromCurrentConnection, scalingEpsilon, norm, 2))
+			if (PhysicsStatics::isNewellFacesCoplanar(
+					face, nextFromCurrent->pairingEdge->face, nextFromCurrentConnection, scalingEpsilon, norm, 2
+				))
 			{
 				handleDoubleAdjacentMergeResult(nextFromCurrentConnection, nextFromCurrent);
 			}

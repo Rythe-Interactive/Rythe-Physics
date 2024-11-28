@@ -24,22 +24,13 @@ namespace rythe::physics
 			m_onObstacleHit = obstacleHitDelegate;
 		}
 
-		virtual void onShapeHit(const PxControllerShapeHit& hit) override
-		{
-			m_onShapeHit.invoke(hit);
-		}
+		virtual void onShapeHit(const PxControllerShapeHit& hit) override { m_onShapeHit.invoke(hit); }
 
 		// brief Called when current controller hits another controller.
-		virtual void onControllerHit(const PxControllersHit& hit) override
-		{
-			m_onControllerHit.invoke(hit);
-		}
+		virtual void onControllerHit(const PxControllersHit& hit) override { m_onControllerHit.invoke(hit); }
 
 		// Called when current controller hits a user-defined obstacle.
-		virtual void onObstacleHit(const PxControllerObstacleHit& hit) override
-		{
-			m_onObstacleHit.invoke(hit);
-		}
+		virtual void onObstacleHit(const PxControllerObstacleHit& hit) override { m_onObstacleHit.invoke(hit); }
 
 	private:
 		rsl::delegate<void(const PxControllerShapeHit&)> m_onShapeHit;

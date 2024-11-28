@@ -29,20 +29,14 @@ namespace rythe::physics
 
 		[[nodiscard]] std::pair<ecs::entity, ecs::entity> participants() const
 		{
-			return std::make_pair(
-				manifold->entityA,
-				manifold->entityB
-			);
+			return std::make_pair(manifold->entityA, manifold->entityB);
 		}
 
 		/** @brief gets the centers of the colliders in local space
 		 */
 		[[nodiscard]] std::pair<rsl::math::float3, rsl::math::float3> centers() const noexcept
 		{
-			return std::make_pair(
-				manifold->colliderA->GetLocalCentroid(),
-				manifold->colliderB->GetLocalCentroid()
-			);
+			return std::make_pair(manifold->colliderA->GetLocalCentroid(), manifold->colliderB->GetLocalCentroid());
 		}
 
 		/** @brief gets the colliders themselves
@@ -82,7 +76,9 @@ namespace rythe::physics
 		float newRestitution;
 		rsl::size_type newMaterialHash;
 
-		request_create_physics_material(float dynamicFriction, float staticFriction, float restitution, rsl::size_type materialHash)
+		request_create_physics_material(
+			float dynamicFriction, float staticFriction, float restitution, rsl::size_type materialHash
+		)
 			: newDynamicFriction(dynamicFriction),
 			  newStaticFriction(staticFriction),
 			  newRestitution(restitution),

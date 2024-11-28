@@ -23,7 +23,8 @@ namespace rythe::physics
 
 		rythe_always_inline void resetModificationFlags() { m_modificationFlags.reset(); }
 
-		rythe_always_inline const std::bitset<physics_enviroment_flag::pe_max>& getGeneratedModifyEvents() const noexcept
+		rythe_always_inline const std::bitset<physics_enviroment_flag::pe_max>&
+		getGeneratedModifyEvents() const noexcept
 		{
 			return m_modificationFlags;
 		};

@@ -76,7 +76,8 @@ namespace rythe::physics
 			// Cdot: [(Vb + Wb x Rb - (Va + Wa x Ra))] .n + (Pb - Pa) .[Na x Wa]
 
 			// where Ra is the vector from the center of diviner::rigidbodyA towards Pa and Rb
-			// is the vector from the center of diviner::rigidbodyB towards Pb. Where every 'V' stands for velocity and every
+			// is the vector from the center of diviner::rigidbodyB towards Pb. Where every 'V' stands for velocity and
+			// every
 			//'W' stands for angular velocity
 
 			// the position part of this constraint can be ignored so we get:
@@ -148,7 +149,9 @@ namespace rythe::physics
 			//-------------------------- Restitution Constraint ----------------------------------//
 
 			// calculate restitution between the 2 bodies
-			float restCoeff = diviner::rigidbody::calculateRestitution(rbRef ? rbRef->restitution : 0.3f, rbInc ? rbInc->restitution : 0.3f);
+			float restCoeff = diviner::rigidbody::calculateRestitution(
+				rbRef ? rbRef->restitution : 0.3f, rbInc ? rbInc->restitution : 0.3f
+			);
 
 			rsl::math::float3 minWaCrossRa = math::cross(-wa, Ra);
 			rsl::math::float3 WbCrossRb = math::cross(wb, Rb);
@@ -180,7 +183,8 @@ namespace rythe::physics
 
 		void resolveFrictionConstraint()
 		{
-			float frictionCoeff = diviner::rigidbody::calculateFriction(rbRef ? rbRef->friction : 0.3f, rbInc ? rbInc->friction : 0.3f);
+			float frictionCoeff =
+				diviner::rigidbody::calculateFriction(rbRef ? rbRef->friction : 0.3f, rbInc ? rbInc->friction : 0.3f);
 			float frictionConstraint = totalLambda * frictionCoeff;
 
 			rsl::math::float3 Ra = RefWorldContact - refRBCentroid;
@@ -226,7 +230,8 @@ namespace rythe::physics
 		{
 			// calculate tangent vectors
 
-			//--------------------------- pre calculate contact constraint effective mass -----------------------------------//
+			//--------------------------- pre calculate contact constraint effective mass
+			//-----------------------------------//
 
 			tangentNormal1 = math::cross(collisionNormal, rsl::math::float3(1, 0, 0));
 
@@ -293,10 +298,14 @@ namespace rythe::physics
 			return efMx + efMy + efMz + efMw;
 		}
 
-		/* @brief Given a normal indicating the impulse direction, the vectors ra and rb that indicate the contact vectors,
-		 * and a lambda that indicates the scalar value of the impulse, applies impulses to the colliding rigidbodies
+		/* @brief Given a normal indicating the impulse direction, the vectors ra and rb that indicate the contact
+		 * vectors, and a lambda that indicates the scalar value of the impulse, applies impulses to the colliding
+		 * rigidbodies
 		 */
-		void ApplyImpulse(const rsl::math::float3& normal, const float lambda, const rsl::math::float3& ra, const rsl::math::float3& rb)
+		void ApplyImpulse(
+			const rsl::math::float3& normal, const float lambda, const rsl::math::float3& ra,
+			const rsl::math::float3& rb
+		)
 		{
 
 			rsl::math::float3 linearImpulse = normal * lambda;
@@ -321,7 +330,10 @@ namespace rythe::physics
 			}
 		}
 
-		void calculateJacobianComponents(const rsl::math::float3 normal, rsl::math::float3& Ra, rsl::math::float3& minRaCrossN, rsl::math::float3& Rb, rsl::math::float3& RbCrossN)
+		void calculateJacobianComponents(
+			const rsl::math::float3 normal, rsl::math::float3& Ra, rsl::math::float3& minRaCrossN,
+			rsl::math::float3& Rb, rsl::math::float3& RbCrossN
+		)
 		{
 			Ra = RefWorldContact - refRBCentroid;
 			Rb = IncWorldContact - incRBCentroid;

@@ -17,7 +17,10 @@ namespace rythe::physics
 
 		physics_manifold_precursor() = default;
 
-		physics_manifold_precursor(math::float4x4 pWorldTransform, diviner::physics_component* pPhysicsComp, id_type precursorID, ecs::entity entity)
+		physics_manifold_precursor(
+			math::float4x4 pWorldTransform, diviner::physics_component* pPhysicsComp, id_type precursorID,
+			ecs::entity entity
+		)
 			: worldTransform(pWorldTransform),
 			  physicsComp(pPhysicsComp),
 			  id(precursorID),
@@ -25,10 +28,7 @@ namespace rythe::physics
 		{
 		}
 
-		bool operator==(const physics_manifold_precursor& rhs)
-		{
-			return entity == rhs.entity;
-		}
+		bool operator==(const physics_manifold_precursor& rhs) { return entity == rhs.entity; }
 	};
 
 } // namespace rythe::physics

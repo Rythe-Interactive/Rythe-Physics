@@ -50,11 +50,17 @@ namespace rythe::physics
 
 		rythe_always_inline float getHeight() const noexcept { return m_height; }
 
-		rythe_always_inline const rsl::math::float3& getCurrentDisplacement() const noexcept { return m_currentDisplacement; }
+		rythe_always_inline const rsl::math::float3& getCurrentDisplacement() const noexcept
+		{
+			return m_currentDisplacement;
+		}
 
 		rythe_always_inline void resetDisplacement() { m_currentDisplacement = rsl::math::float3(0); }
 
-		rythe_always_inline const std::bitset<capsule_character_flag::cc_max>& getModificationFlags() const noexcept { return m_modificationFlags; }
+		rythe_always_inline const std::bitset<capsule_character_flag::cc_max>& getModificationFlags() const noexcept
+		{
+			return m_modificationFlags;
+		}
 
 		rythe_always_inline void resetModificationFlags() { m_modificationFlags.reset(); }
 
@@ -110,12 +116,19 @@ namespace rythe::physics
 			controller_preset newPreset;
 			newPreset.hash = searchHash;
 
-			static_assert(std::is_same<gravity_preset, preset>::value || std::is_same<rigidbody_force_feedback, preset>::value, "The template parameter used to call CapsuleControllerData::addPreset is not a recognized preset");
+			static_assert(
+				std::is_same<gravity_preset, preset>::value || std::is_same<rigidbody_force_feedback, preset>::value,
+				"The template parameter used to call CapsuleControllerData::addPreset is not a recognized preset"
+			);
 
 			if constexpr (std::is_same<gravity_preset, preset>::value)
+			{
 				newPreset.specifics.gravityPreset = presetSpecifics;
+			}
 			else
+			{
 				newPreset.specifics.forcePreset = presetSpecifics;
+			}
 
 			m_presets.push_back(newPreset);
 
@@ -125,7 +138,10 @@ namespace rythe::physics
 
 		rythe_always_inline std::vector<controller_preset>& getControllerPresets() noexcept { return m_presets; }
 
-		rythe_always_inline const std::vector<controller_preset>& getControllerPresets() const noexcept { return m_presets; }
+		rythe_always_inline const std::vector<controller_preset>& getControllerPresets() const noexcept
+		{
+			return m_presets;
+		}
 
 	private:
 		rsl::math::float3 m_currentDisplacement;

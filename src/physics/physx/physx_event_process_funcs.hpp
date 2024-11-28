@@ -16,49 +16,97 @@ namespace rythe::physics
 	class rigidbody;
 	struct controller_preset;
 
-	//----------------------------------------------------------- Rigidbody -------------------------------------------------------------------------//
+	//----------------------------------------------------------- Rigidbody
+	//-------------------------------------------------------------------------//
 
-	void processAngularDragModification(rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAngularDragModification(
+		rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity
+	);
 
-	void processLinearDragModification(rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processLinearDragModification(
+		rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity
+	);
 
-	void processVelocityModification(rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processVelocityModification(
+		rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity
+	);
 
-	void processAngularVelocityModification(rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAngularVelocityModification(
+		rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity
+	);
 
-	void processMassModification(rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processMassModification(
+		rigidbody& rigidbody, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity
+	);
 
-	//----------------------------------------------------------- Physics Component -------------------------------------------------------------------------//
+	//----------------------------------------------------------- Physics Component
+	//-------------------------------------------------------------------------//
 
-	void processAddFirstBox(physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAddFirstBox(
+		physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper,
+		ecs::entity entity
+	);
 
-	void processAddNextBox(physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAddNextBox(
+		physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper,
+		ecs::entity entity
+	);
 
-	void processAddFirstSphere(physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAddFirstSphere(
+		physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper,
+		ecs::entity entity
+	);
 
-	void processAddNextSphere(physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAddNextSphere(
+		physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper,
+		ecs::entity entity
+	);
 
-	void processAddFirstConvex(physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAddFirstConvex(
+		physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper,
+		ecs::entity entity
+	);
 
-	void processAddNextConvex(physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAddNextConvex(
+		physics_component& physicsComponent, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper,
+		ecs::entity entity
+	);
 
-	//----------------------------------------------------------- Physics Collider -------------------------------------------------------------------------//
+	//----------------------------------------------------------- Physics Collider
+	//-------------------------------------------------------------------------//
 
-	void processSetPhysicsMaterial(const ColliderData& collider, const collider_modification_data& modData, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper);
+	void processSetPhysicsMaterial(
+		const ColliderData& collider, const collider_modification_data& modData, const PhysxEnviromentInfo& sceneInfo,
+		PhysxInternalWrapper& wrapper
+	);
 
-	void processSetBoxSize(const ColliderData& collider, const collider_modification_data& modData, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper);
+	void processSetBoxSize(
+		const ColliderData& collider, const collider_modification_data& modData, const PhysxEnviromentInfo& sceneInfo,
+		PhysxInternalWrapper& wrapper
+	);
 
-	void processSetSphereSize(const ColliderData& collider, const collider_modification_data& modData, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper);
+	void processSetSphereSize(
+		const ColliderData& collider, const collider_modification_data& modData, const PhysxEnviromentInfo& sceneInfo,
+		PhysxInternalWrapper& wrapper
+	);
 
-	//----------------------------------------------------------- Physics Enviroment -------------------------------------------------------------------------//
+	//----------------------------------------------------------- Physics Enviroment
+	//-------------------------------------------------------------------------//
 
-	void processAddInfinitePlane(physics_enviroment& physicsEnviroment, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper, ecs::entity entity);
+	void processAddInfinitePlane(
+		physics_enviroment& physicsEnviroment, const PhysxEnviromentInfo& sceneInfo, PhysxInternalWrapper& wrapper,
+		ecs::entity entity
+	);
 
-	//----------------------------------------------------------- Capsule Controller -------------------------------------------------------------------------//
+	//----------------------------------------------------------- Capsule Controller
+	//-------------------------------------------------------------------------//
 
 	void processCapsuleMoveTo(PhysxCharacterWrapper& characterWrapper, capsule_controller& capsule);
 
-	//----------------------------------------------------------- Controller Preset -------------------------------------------------------------------------//
+	//----------------------------------------------------------- Controller Preset
+	//-------------------------------------------------------------------------//
 
-	void processGravityPreset(controller_preset& contPreset, PhysxCharacterWrapper& character, const PhysxEnviromentInfo& sceneInfo);
+	void processGravityPreset(
+		controller_preset& contPreset, PhysxCharacterWrapper& character, const PhysxEnviromentInfo& sceneInfo
+	);
 } // namespace rythe::physics

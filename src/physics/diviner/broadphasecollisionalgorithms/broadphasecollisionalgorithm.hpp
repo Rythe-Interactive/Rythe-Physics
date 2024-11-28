@@ -12,17 +12,16 @@ namespace rythe::physics
 	class BroadPhaseCollisionAlgorithm
 	{
 	public:
-		/**@brief Collects collider pairs that have a chance of colliding and should be checked in narrow-phase collision detection
+		/**@brief Collects collider pairs that have a chance of colliding and should be checked in narrow-phase
+		 * collision detection
 		 * @param manifoldPrecursors all the physics components
-		 * @param manifoldPrecursorGrouping a list-list of colliders that have a chance of colliding and should be checked
+		 * @param manifoldPrecursorGrouping a list-list of colliders that have a chance of colliding and should be
+		 * checked
 		 */
-		virtual const std::vector<std::vector<physics_manifold_precursor>>& collectPairs(
-			std::vector<physics_manifold_precursor>&& manifoldPrecursors
-		) = 0;
+		virtual const std::vector<std::vector<physics_manifold_precursor>>&
+		collectPairs(std::vector<physics_manifold_precursor>&& manifoldPrecursors) = 0;
 
-		virtual void debugDraw()
-		{
-		}
+		virtual void debugDraw() {}
 
 	protected:
 		std::vector<std::vector<physics_manifold_precursor>> m_groupings;

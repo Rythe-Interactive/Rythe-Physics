@@ -12,12 +12,13 @@ namespace rythe::physics
 		void Log() const
 		{
 			log::debug("- This EdgeLabel has ");
-			log::debug("firstEdge {},{} and secondEdge {},{}", firstEdge.first, firstEdge.second, nextEdge.first, nextEdge.second);
+			log::debug(
+				"firstEdge {},{} and secondEdge {},{}", firstEdge.first, firstEdge.second, nextEdge.first,
+				nextEdge.second
+			);
 		}
 
-		EdgeLabel()
-		{
-		}
+		EdgeLabel() {}
 
 		EdgeLabel(std::pair<int, int> pFirstEdge, std::pair<int, int> pNextEdge)
 		{
@@ -31,14 +32,13 @@ namespace rythe::physics
 			nextEdge = rhs.nextEdge;
 		}
 
-		bool operator==(const EdgeLabel& rhs)
-		{
-			return firstEdge == rhs.firstEdge && nextEdge == rhs.nextEdge;
-		}
+		bool operator==(const EdgeLabel& rhs) { return firstEdge == rhs.firstEdge && nextEdge == rhs.nextEdge; }
 
 		bool IsSet() const
 		{
-			return ((firstEdge.first != -1 && firstEdge.second != -1) && (nextEdge.first != -1 && nextEdge.second != -1));
+			return (
+				(firstEdge.first != -1 && firstEdge.second != -1) && (nextEdge.first != -1 && nextEdge.second != -1)
+			);
 		}
 	};
 } // namespace rythe::physics

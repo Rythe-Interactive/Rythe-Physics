@@ -10,7 +10,10 @@ namespace rythe::physics
 	class ConvergenceIdentifier
 	{
 	public:
-		ConvergenceIdentifier(const EdgeLabel& plabel, float pTotalLambda, float pTangent1Lambda, float pTangent2Lambda, int pRefColliderId)
+		ConvergenceIdentifier(
+			const EdgeLabel& plabel, float pTotalLambda, float pTangent1Lambda, float pTangent2Lambda,
+			int pRefColliderId
+		)
 			: totalLambda(pTotalLambda),
 			  tangent1Lambda(pTangent1Lambda),
 			  tangent2Lambda(pTangent2Lambda),

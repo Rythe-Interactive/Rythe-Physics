@@ -6,7 +6,10 @@
 
 namespace rythe::physics
 {
-	EdgePenetrationQuery::EdgePenetrationQuery(HalfEdgeEdge* pRefEdge, HalfEdgeEdge* pIncEdge, rsl::math::float3& pFaceCentroid, rsl::math::float3& pNormal, float& pPenetration, bool pIsARef)
+	EdgePenetrationQuery::EdgePenetrationQuery(
+		HalfEdgeEdge* pRefEdge, HalfEdgeEdge* pIncEdge, rsl::math::float3& pFaceCentroid, rsl::math::float3& pNormal,
+		float& pPenetration, bool pIsARef
+	)
 		: PenetrationQuery(pFaceCentroid, pNormal, pPenetration, pIsARef),
 		  refEdge(pRefEdge),
 		  incEdge(pIncEdge)
@@ -15,9 +18,13 @@ namespace rythe::physics
 	}
 
 
-	void EdgePenetrationQuery::populateContactList(physics_manifold& manifold, math::float4x4& refTransform, math::float4x4 incTransform, PhysicsCollider* refCollider)
+	void EdgePenetrationQuery::populateContactList(
+		physics_manifold& manifold, math::float4x4& refTransform, math::float4x4 incTransform,
+		PhysicsCollider* refCollider
+	)
 	{
-		//------------------- The contact points between 2 edges are the closest points between the 2 edges --------------------//
+		//------------------- The contact points between 2 edges are the closest points between the 2 edges
+		//--------------------//
 		// log::debug("EdgePenetrationQuery::populateContactList");
 
 		rsl::math::float3 p1 = refTransform * math::float4(refEdge->edgePosition, 1);
@@ -40,7 +47,10 @@ namespace rythe::physics
 		auto refLabel = refEdge->label;
 		auto incLabel = incEdge->label;
 
-		contact.label = EdgeLabel(std::make_pair(refLabel.firstEdge.first, refLabel.firstEdge.second), std::make_pair(incLabel.nextEdge.first, incLabel.nextEdge.second));
+		contact.label = EdgeLabel(
+			std::make_pair(refLabel.firstEdge.first, refLabel.firstEdge.second),
+			std::make_pair(incLabel.nextEdge.first, incLabel.nextEdge.second)
+		);
 
 		contact.refCollider = refCollider;
 		contact.IncWorldContact = incContactPoint;

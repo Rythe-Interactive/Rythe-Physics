@@ -29,7 +29,10 @@ namespace rythe::physics
 		friend class PhysicsComponentData;
 
 	public:
-		ColliderData(rsl::size_type colliderIndex, pointer<std::vector<collider_modification_data>> modificationsRequests, collider_type colliderType, const rsl::math::float3& offset, const rsl::math::quat& rotation) noexcept;
+		ColliderData(
+			rsl::size_type colliderIndex, pointer<std::vector<collider_modification_data>> modificationsRequests,
+			collider_type colliderType, const rsl::math::float3& offset, const rsl::math::quat& rotation
+		) noexcept;
 
 		rythe_always_inline void setRegistered(bool registeredState) noexcept { m_isRegistered = registeredState; }
 		rythe_always_inline bool isRegistered() const noexcept { return m_isRegistered; }
@@ -66,7 +69,8 @@ namespace rythe::physics
 		{
 			if (m_colliderType != collider_type::sphere)
 			{
-				log::warn("ColliderData::getSphereRadius called on a collider that is not of type collider_type::sphere");
+				log::warn("ColliderData::getSphereRadius called on a collider that is not of type collider_type::sphere"
+				);
 				return {nullptr};
 			}
 
@@ -79,7 +83,8 @@ namespace rythe::physics
 		{
 			if (m_colliderType != collider_type::quickhull_convex)
 			{
-				log::warn("ColliderData::getConvexCollider called on a collider that is not of type collider_type::quickhull_convex");
+				log::warn("ColliderData::getConvexCollider called on a collider that is not of type "
+						  "collider_type::quickhull_convex");
 				return {nullptr};
 			}
 
@@ -89,7 +94,8 @@ namespace rythe::physics
 		rythe_always_inline rsl::size_type getColliderIndex() const noexcept { return m_colliderIndex; }
 
 	private:
-		rythe_always_inline void setModificationRequestVector(pointer<std::vector<collider_modification_data>> modificationsRequests) noexcept
+		rythe_always_inline void
+		setModificationRequestVector(pointer<std::vector<collider_modification_data>> modificationsRequests) noexcept
 		{
 			m_modificationsRequests = modificationsRequests;
 		}

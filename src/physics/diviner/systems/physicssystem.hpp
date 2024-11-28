@@ -37,7 +37,9 @@ namespace rythe::physics
 				rigidbodies.resize(manifoldPrecursorQuery.size(), std::ref(emptyRigidbody));
 				hasRigidBodies.resize(manifoldPrecursorQuery.size());
 
-				queueJobs(manifoldPrecursorQuery.size(), [&]()
+				queueJobs(
+					manifoldPrecursorQuery.size(),
+					[&]()
 				{
 					id_type index = async::this_job::get_id();
 					auto entity = manifoldPrecursorQuery[index];
@@ -47,8 +49,11 @@ namespace rythe::physics
 						rigidbodies[index] = entity.get_component<diviner::rigidbody>();
 					}
 					else
+					{
 						hasRigidBodies[index] = false;
-				}).wait();
+					}
+				}
+				).wait();
 			}
 
 			auto& physComps = manifoldPrecursorQuery.get<diviner::physics_component>();
@@ -60,7 +65,9 @@ namespace rythe::physics
 			{
 				integrateRigidbodies(hasRigidBodies, rigidbodies, m_timeStep);
 				runPhysicsPipeline(hasRigidBodies, rigidbodies, physComps, positions, rotations, scales, m_timeStep);
-				integrateRigidbodyQueryPositionAndRotation(hasRigidBodies, positions, rotations, rigidbodies, m_timeStep);
+				integrateRigidbodyQueryPositionAndRotation(
+					hasRigidBodies, positions, rotations, rigidbodies, m_timeStep
+				);
 			}
 
 			if (oneTimeRunActive)
@@ -69,32 +76,38 @@ namespace rythe::physics
 
 				integrateRigidbodies(hasRigidBodies, rigidbodies, m_timeStep);
 				runPhysicsPipeline(hasRigidBodies, rigidbodies, physComps, positions, rotations, scales, m_timeStep);
-				integrateRigidbodyQueryPositionAndRotation(hasRigidBodies, positions, rotations, rigidbodies, m_timeStep);
+				integrateRigidbodyQueryPositionAndRotation(
+					hasRigidBodies, positions, rotations, rigidbodies, m_timeStep
+				);
 			}
 		}
 
 		void bulkRetrievePreManifoldData(
 			ecs::component_container<diviner::physics_component>& physComps,
-			ecs::component_container<position>& positions,
-			ecs::component_container<rotation>& rotations,
-			ecs::component_container<scale>& scales,
-			std::vector<physics_manifold_precursor>& manifoldPrecursors
+			ecs::component_container<position>& positions, ecs::component_container<rotation>& rotations,
+			ecs::component_container<scale>& scales, std::vector<physics_manifold_precursor>& manifoldPrecursors
 		)
 		{
 			manifoldPrecursors.resize(physComps.size());
 
-			queueJobs(physComps.size(), [&]()
+			queueJobs(
+				physComps.size(),
+				[&]()
 			{
 				id_type index = async::this_job::get_id();
-				math::float4x4 transf = math::compose(scales[index].get(), rotations[index].get(), positions[index].get());
+				math::float4x4 transf =
+					math::compose(scales[index].get(), rotations[index].get(), positions[index].get());
 
 				diviner::physics_component& individualPhysicsComponent = physComps[index].get();
 
 				for (auto& collider : individualPhysicsComponent.colliders)
+				{
 					collider->UpdateTransformedTightBoundingVolume(transf);
+				}
 
 				manifoldPrecursors[index] = {transf, &individualPhysicsComponent, index, manifoldPrecursorQuery[index]};
-			}).wait();
+			}
+			).wait();
 		}
 
 		/**@brief Sets the broad phase collision detection method
@@ -103,14 +116,14 @@ namespace rythe::physics
 		template <typename BroadPhaseType, typename... Args>
 		static void setBroadPhaseCollisionDetection(Args&&... args)
 		{
-			static_assert(std::is_base_of_v<BroadPhaseCollisionAlgorithm, BroadPhaseType>, "Broadphase type did not inherit from BroadPhaseCollisionAlgorithm");
+			static_assert(
+				std::is_base_of_v<BroadPhaseCollisionAlgorithm, BroadPhaseType>,
+				"Broadphase type did not inherit from BroadPhaseCollisionAlgorithm"
+			);
 			m_broadPhase = std::make_unique<BroadPhaseType>(std::forward<Args>(args)...);
 		}
 
-		static void drawBroadPhase()
-		{
-			m_broadPhase->debugDraw();
-		}
+		static void drawBroadPhase() { m_broadPhase->debugDraw(); }
 
 	private:
 		static std::unique_ptr<BroadPhaseCollisionAlgorithm> m_broadPhase;
@@ -122,26 +135,30 @@ namespace rythe::physics
 		 * Broadphase Collision Detection, Narrowphase Collision Detection, and the Collision Resolution)
 		 */
 		void runPhysicsPipeline(
-			std::vector<rsl::byte>& hasRigidBodies,
-			ecs::component_container<diviner::rigidbody>& rigidbodies,
+			std::vector<rsl::byte>& hasRigidBodies, ecs::component_container<diviner::rigidbody>& rigidbodies,
 			ecs::component_container<diviner::physics_component>& physComps,
-			ecs::component_container<position>& positions,
-			ecs::component_container<rotation>& rotations,
-			ecs::component_container<scale>& scales,
-			float deltaTime
+			ecs::component_container<position>& positions, ecs::component_container<rotation>& rotations,
+			ecs::component_container<scale>& scales, float deltaTime
 		);
 
-		/**@brief given 2 physics_manifold_precursors precursorA and precursorB, create a manifold for each collider in precursorA
-		 * with every other collider in precursorB. The manifolds that involve rigidbodies are then pushed into the given manifold list
+		/**@brief given 2 physics_manifold_precursors precursorA and precursorB, create a manifold for each collider in
+		 * precursorA with every other collider in precursorB. The manifolds that involve rigidbodies are then pushed
+		 * into the given manifold list
 		 * @param manifoldsToSolve [out] a std::vector of physics_manifold that will store the manifolds created
 		 * @param isRigidbodyInvolved A bool that indicates whether a diviner::rigidbody is involved in this manifold
-		 * @param isTriggerInvolved A bool that indicates whether a diviner::physics_component with a diviner::physics_component::isTrigger set to true is involved in this manifold
+		 * @param isTriggerInvolved A bool that indicates whether a diviner::physics_component with a
+		 * diviner::physics_component::isTrigger set to true is involved in this manifold
 		 */
-		void constructManifoldsWithPrecursors(ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<rsl::byte>& hasRigidBodies, physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB, std::vector<physics_manifold>& manifoldsToSolve, bool isRigidbodyInvolved, bool isTriggerInvolved);
+		void constructManifoldsWithPrecursors(
+			ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<rsl::byte>& hasRigidBodies,
+			physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB,
+			std::vector<physics_manifold>& manifoldsToSolve, bool isRigidbodyInvolved, bool isTriggerInvolved
+		);
 
 		void constructManifoldWithCollider(
 			ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<rsl::byte>& hasRigidBodies,
-			PhysicsCollider* colliderA, PhysicsCollider* colliderB, physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB, physics_manifold& manifold
+			PhysicsCollider* colliderA, PhysicsCollider* colliderB, physics_manifold_precursor& precursorA,
+			physics_manifold_precursor& precursorB, physics_manifold& manifold
 		)
 		{
 			manifold.colliderA = colliderA;
@@ -151,10 +168,14 @@ namespace rythe::physics
 			manifold.entityB = precursorB.entity;
 
 			if (hasRigidBodies[precursorA.id])
+			{
 				manifold.rigidbodyA = &rigidbodies[precursorA.id].get();
+			}
 
 			if (hasRigidBodies[precursorB.id])
+			{
 				manifold.rigidbodyB = &rigidbodies[precursorB.id].get();
+			}
 
 			manifold.physicsCompA = precursorA.physicsComp;
 			manifold.physicsCompB = precursorB.physicsComp;
@@ -167,12 +188,19 @@ namespace rythe::physics
 
 		/** @brief gets all the entities with a diviner::rigidbody component and calls the integrate function on them
 		 */
-		void integrateRigidbodies(std::vector<rsl::byte>& hasRigidBodies, ecs::component_container<diviner::rigidbody>& rigidbodies, float deltaTime)
+		void integrateRigidbodies(
+			std::vector<rsl::byte>& hasRigidBodies, ecs::component_container<diviner::rigidbody>& rigidbodies,
+			float deltaTime
+		)
 		{
-			queueJobs(manifoldPrecursorQuery.size(), [&]()
+			queueJobs(
+				manifoldPrecursorQuery.size(),
+				[&]()
 			{
 				if (!hasRigidBodies[async::this_job::get_id()])
+				{
 					return;
+				}
 
 				diviner::rigidbody& rb = rigidbodies[async::this_job::get_id()];
 
@@ -185,22 +213,25 @@ namespace rythe::physics
 				rb.angularVelocity += (angularAcc)*deltaTime;
 
 				rb.resetAccumulators();
-			}).wait();
+			}
+			).wait();
 		}
 
 		void integrateRigidbodyQueryPositionAndRotation(
-			std::vector<rsl::byte>& hasRigidBodies,
-			ecs::component_container<position>& positions,
-			ecs::component_container<rotation>& rotations,
-			ecs::component_container<diviner::rigidbody>& rigidbodies,
+			std::vector<rsl::byte>& hasRigidBodies, ecs::component_container<position>& positions,
+			ecs::component_container<rotation>& rotations, ecs::component_container<diviner::rigidbody>& rigidbodies,
 			float deltaTime
 		)
 		{
-			queueJobs(manifoldPrecursorQuery.size(), [&]()
+			queueJobs(
+				manifoldPrecursorQuery.size(),
+				[&]()
 			{
 				id_type index = async::this_job::get_id();
 				if (!hasRigidBodies[index])
+				{
 					return;
+				}
 
 				diviner::rigidbody& rb = rigidbodies[index].get();
 				position& pos = positions[index].get();
@@ -226,10 +257,12 @@ namespace rythe::physics
 				rb.globalCentreOfMass = pos;
 
 				rb.UpdateInertiaTensor(rot);
-			}).wait();
+			}
+			).wait();
 		}
 
-		void initializeManifolds(std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity)
+		void
+		initializeManifolds(std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity)
 		{
 			for (int i = 0; i < manifoldsToSolve.size(); i++)
 			{
@@ -246,10 +279,12 @@ namespace rythe::physics
 			}
 		}
 
-		void resolveContactConstraint(std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity, float dt, int contactIter)
+		void resolveContactConstraint(
+			std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity, float dt,
+			int contactIter
+		)
 		{
-			for (int manifoldIter = 0;
-				 manifoldIter < manifoldsToSolve.size(); manifoldIter++)
+			for (int manifoldIter = 0; manifoldIter < manifoldsToSolve.size(); manifoldIter++)
 			{
 				if (manifoldValidity.at(manifoldIter))
 				{
@@ -263,10 +298,11 @@ namespace rythe::physics
 			}
 		}
 
-		void resolveFrictionConstraint(std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity)
+		void resolveFrictionConstraint(
+			std::vector<physics_manifold>& manifoldsToSolve, std::vector<rsl::byte>& manifoldValidity
+		)
 		{
-			for (int manifoldIter = 0;
-				 manifoldIter < manifoldsToSolve.size(); manifoldIter++)
+			for (int manifoldIter = 0; manifoldIter < manifoldsToSolve.size(); manifoldIter++)
 			{
 				if (manifoldValidity.at(manifoldIter))
 				{

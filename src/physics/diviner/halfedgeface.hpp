@@ -29,8 +29,11 @@ namespace rythe::physics
 		/** @brief given a function that takes in a HalfEdgeEdge*,
 		 * executes the function on each edge connected to 'startEdge'
 		 */
-		void forEachEdge(rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute, rythe::core::rsl::delegate<HalfEdgeEdge*(HalfEdgeEdge*)> getNextEdge = [](HalfEdgeEdge* current)
-		{ return current->nextEdge; });
+		void forEachEdge(
+			rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute,
+			rythe::core::rsl::delegate<HalfEdgeEdge*(HalfEdgeEdge*)> getNextEdge = [](HalfEdgeEdge* current)
+		{ return current->nextEdge; }
+		);
 
 		void forEachEdgeReverse(rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute);
 
@@ -42,7 +45,8 @@ namespace rythe::physics
 
 		void DEBUG_DrawFace(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f);
 
-		void DEBUG_DirectionDrawFace(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f);
+		void
+		DEBUG_DirectionDrawFace(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f);
 
 		~HalfEdgeFace();
 	};

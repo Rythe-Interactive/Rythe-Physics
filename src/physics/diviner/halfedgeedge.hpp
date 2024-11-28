@@ -39,7 +39,8 @@ namespace rythe::physics
 		void setPrev(HalfEdgeEdge* newPrevEdge);
 
 		/**@brief Sets the pairingEdge to the passed in edge, and sets the edge.pairingEdge to this
-		 * if this edge or the passed edge already have pairing edge, the pairing edge of the pairing edge will be set to nullptr
+		 * if this edge or the passed edge already have pairing edge, the pairing edge of the pairing edge will be set
+		 * to nullptr
 		 */
 		void setPairingEdge(HalfEdgeEdge* edge);
 
@@ -62,15 +63,23 @@ namespace rythe::physics
 		 */
 		bool isEdgeHorizonFromVertex(const rsl::math::float3& vert, float epsilon = math::sqrt(math::epsilon<float>()));
 
-		/**@brief Merges this edges face with the face of this edge's pairing. The latter face, this edge, and its pairing edge
-		 * is destroyed in the process.
+		/**@brief Merges this edges face with the face of this edge's pairing. The latter face, this edge, and its
+		 * pairing edge is destroyed in the process.
 		 */
-		void suicidalMergeWithPairing(std::vector<rsl::math::float3>& unmergedVertices, rsl::math::float3& normal, float scalingEpsilon);
+		void suicidalMergeWithPairing(
+			std::vector<rsl::math::float3>& unmergedVertices, rsl::math::float3& normal, float scalingEpsilon
+		);
 
-		void DEBUG_drawEdge(const math::float4x4& transform, const math::color& debugColor, float time = 20.0f, float width = 5.0f);
+		void DEBUG_drawEdge(
+			const math::float4x4& transform, const math::color& debugColor, float time = 20.0f, float width = 5.0f
+		);
 
-		void DEBUG_drawInsetEdge(const rsl::math::float3 spacing, const math::color& debugColor, float time = 20.0f, float width = 5.0f);
+		void DEBUG_drawInsetEdge(
+			const rsl::math::float3 spacing, const math::color& debugColor, float time = 20.0f, float width = 5.0f
+		);
 
-		void DEBUG_directionDrawEdge(const math::float4x4& transform, const math::color& debugColor, float time, float width);
+		void DEBUG_directionDrawEdge(
+			const math::float4x4& transform, const math::color& debugColor, float time, float width
+		);
 	};
 } // namespace rythe::physics

@@ -3,7 +3,7 @@
 
 namespace rythe::physics
 {
-	namespace detail
+	namespace internal
 	{
 		static inline bool greater_penetration(const physics_contact& contact1, const physics_contact& contact2)
 		{
@@ -11,7 +11,7 @@ namespace rythe::physics
 			auto dot2 = math::dot(contact2.RefWorldContact - contact2.IncWorldContact, -contact2.collisionNormal);
 			return dot1 < dot2;
 		}
-	} // namespace detail
+	} // namespace internal
 
 	std::unique_ptr<BroadPhaseCollisionAlgorithm> PhysicsSystem::m_broadPhase = nullptr;
 
@@ -25,16 +25,13 @@ namespace rythe::physics
 	}
 
 	void PhysicsSystem::runPhysicsPipeline(
-		std::vector<rsl::byte>& hasRigidBodies,
-		ecs::component_container<diviner::rigidbody>& rigidbodies,
-		ecs::component_container<diviner::physics_component>& physComps,
-		ecs::component_container<position>& positions,
-		ecs::component_container<rotation>& rotations,
-		ecs::component_container<scale>& scales,
-		float deltaTime
+		std::vector<rsl::byte>& hasRigidBodies, ecs::component_container<diviner::rigidbody>& rigidbodies,
+		ecs::component_container<diviner::physics_component>& physComps, ecs::component_container<position>& positions,
+		ecs::component_container<rotation>& rotations, ecs::component_container<scale>& scales, float deltaTime
 	)
 	{
-		//-------------------------------------------------Broadphase Optimization-----------------------------------------------//
+		//-------------------------------------------------Broadphase
+		// Optimization-----------------------------------------------//
 
 		// get all physics components from the world
 		std::vector<physics_manifold_precursor> manifoldPrecursors;
@@ -44,7 +41,8 @@ namespace rythe::physics
 		// m_optimizeBroadPhase(manifoldPrecursors, manifoldPrecursorGrouping);
 		manifoldPrecursorGrouping = m_broadPhase->collectPairs(std::move(manifoldPrecursors));
 
-		//------------------------------------------------------ Narrowphase -----------------------------------------------------//
+		//------------------------------------------------------ Narrowphase
+		//-----------------------------------------------------//
 		std::vector<physics_manifold> manifoldsToSolve;
 
 		{
@@ -54,7 +52,9 @@ namespace rythe::physics
 			for (auto& manifoldPrecursor : manifoldPrecursorGrouping)
 			{
 				if (manifoldPrecursor.size() == 0)
+				{
 					continue;
+				}
 				for (int i = 0; i < manifoldPrecursor.size() - 1; i++)
 				{
 					for (int j = i + 1; j < manifoldPrecursor.size(); j++)
@@ -88,21 +88,28 @@ namespace rythe::physics
 
 						// only construct a manifold if at least one of these requirement are fulfilled
 						// 1. One of the diviner::physics_components is a trigger and the other one is not
-						// 2. One of the diviner::physics_component's entity has a diviner::rigidbody and the other one is not a trigger
+						// 2. One of the diviner::physics_component's entity has a diviner::rigidbody and the other one
+						// is not a trigger
 						// 3. Both have a diviner::rigidbody
 
 						bool isBetweenTriggerAndNonTrigger =
-							(precursorPhyCompA.isTrigger && !precursorPhyCompB.isTrigger) || (!precursorPhyCompA.isTrigger && precursorPhyCompB.isTrigger);
+							(precursorPhyCompA.isTrigger && !precursorPhyCompB.isTrigger) ||
+							(!precursorPhyCompA.isTrigger && precursorPhyCompB.isTrigger);
 
 						bool isBetweenRigidbodyAndNonTrigger =
-							(hasRigidBodies[precursorA.id] && !precursorPhyCompB.isTrigger) || (hasRigidBodies[precursorB.id] && !precursorPhyCompA.isTrigger);
+							(hasRigidBodies[precursorA.id] && !precursorPhyCompB.isTrigger) ||
+							(hasRigidBodies[precursorB.id] && !precursorPhyCompA.isTrigger);
 
 						bool isBetween2Rigidbodies = (hasRigidBodies[precursorA.id] && hasRigidBodies[precursorB.id]);
 
 
 						if (isBetweenTriggerAndNonTrigger || isBetweenRigidbodyAndNonTrigger || isBetween2Rigidbodies)
 						{
-							constructManifoldsWithPrecursors(rigidbodies, hasRigidBodies, precursorA, precursorB, manifoldsToSolve, hasRigidBodies[precursorA.id] || hasRigidBodies[precursorB.id], precursorPhyCompA.isTrigger || precursorPhyCompB.isTrigger);
+							constructManifoldsWithPrecursors(
+								rigidbodies, hasRigidBodies, precursorA, precursorB, manifoldsToSolve,
+								hasRigidBodies[precursorA.id] || hasRigidBodies[precursorB.id],
+								precursorPhyCompA.isTrigger || precursorPhyCompB.isTrigger
+							);
 						}
 					}
 				}
@@ -113,27 +120,29 @@ namespace rythe::physics
 
 		std::vector<rsl::byte> manifoldValidity(manifoldsToSolve.size(), true);
 
-		//-------------------------------------------------- Collision Solver ---------------------------------------------------//
+		//-------------------------------------------------- Collision Solver
+		//---------------------------------------------------//
 		// for both contact and friction resolution, an iterative algorithm is used.
-		// Everytime physics_contact::resolveContactConstraint is called, the rigidbodies in question get closer to the actual
-		//"correct" linear and angular velocity (Projected Gauss Seidel). For the sake of simplicity, an arbitrary number is set for the
+		// Everytime physics_contact::resolveContactConstraint is called, the rigidbodies in question get closer to the
+		// actual
+		//"correct" linear and angular velocity (Projected Gauss Seidel). For the sake of simplicity, an arbitrary
+		// number is set for the
 		// iteration count.
 
-		// the effective mass remains the same for every iteration of the solver. This means that we can precalculate it before
-		// we start the solver
+		// the effective mass remains the same for every iteration of the solver. This means that we can precalculate it
+		// before we start the solver
 
 		{
 			initializeManifolds(manifoldsToSolve, manifoldValidity);
 
 			for (auto& manifold : manifoldsToSolve)
 			{
-				std::sort(manifold.contacts.begin(), manifold.contacts.end(), &detail::greater_penetration);
+				std::sort(manifold.contacts.begin(), manifold.contacts.end(), &internal::greater_penetration);
 			}
 
 			{
 				// resolve contact constraint
-				for (size_t contactIter = 0;
-					 contactIter < constants::contactSolverIterationCount; contactIter++)
+				for (size_t contactIter = 0; contactIter < constants::contactSolverIterationCount; contactIter++)
 				{
 					resolveContactConstraint(manifoldsToSolve, manifoldValidity, deltaTime, contactIter);
 				}
@@ -141,8 +150,7 @@ namespace rythe::physics
 
 			{
 				// resolve friction constraint
-				for (size_t frictionIter = 0;
-					 frictionIter < constants::frictionSolverIterationCount; frictionIter++)
+				for (size_t frictionIter = 0; frictionIter < constants::frictionSolverIterationCount; frictionIter++)
 				{
 					resolveFrictionConstraint(manifoldsToSolve, manifoldValidity);
 				}
@@ -168,10 +176,16 @@ namespace rythe::physics
 		}
 	}
 
-	void PhysicsSystem::constructManifoldsWithPrecursors(ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<rsl::byte>& hasRigidBodies, physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB, std::vector<physics_manifold>& manifoldsToSolve, bool isRigidbodyInvolved, bool isTriggerInvolved)
+	void PhysicsSystem::constructManifoldsWithPrecursors(
+		ecs::component_container<diviner::rigidbody>& rigidbodies, std::vector<rsl::byte>& hasRigidBodies,
+		physics_manifold_precursor& precursorA, physics_manifold_precursor& precursorB,
+		std::vector<physics_manifold>& manifoldsToSolve, bool isRigidbodyInvolved, bool isTriggerInvolved
+	)
 	{
 		if (!precursorA.physicsComp || !precursorB.physicsComp)
+		{
 			return;
+		}
 		auto& physicsComponentA = *precursorA.physicsComp;
 		auto& physicsComponentB = *precursorB.physicsComp;
 
@@ -180,7 +194,9 @@ namespace rythe::physics
 			for (auto colliderB : physicsComponentB.colliders)
 			{
 				physics::physics_manifold m;
-				constructManifoldWithCollider(rigidbodies, hasRigidBodies, colliderA.get(), colliderB.get(), precursorA, precursorB, m);
+				constructManifoldWithCollider(
+					rigidbodies, hasRigidBodies, colliderA.get(), colliderB.get(), precursorA, precursorB, m
+				);
 
 				if (!m.isColliding)
 				{

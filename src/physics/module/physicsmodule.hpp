@@ -30,9 +30,6 @@ namespace rythe::physics
 			registerComponentType<capsule_controller>();
 		}
 
-		virtual rsl::priority_type priority() override
-		{
-			return 20;
-		}
+		virtual rsl::priority_type priority() override { return 20; }
 	};
 } // namespace rythe::physics

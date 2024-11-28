@@ -27,7 +27,10 @@ namespace rythe::physics
 		/** @brief given the necessary information to create contact points between 2 colliding colliders
 		 * calculates the contact points of the colliders and pushes them into the physics_manifold
 		 */
-		virtual void populateContactList(physics_manifold& manifold, math::float4x4& refTransform, math::float4x4 incTransform, PhysicsCollider* refCollider)
+		virtual void populateContactList(
+			physics_manifold& manifold, math::float4x4& refTransform, math::float4x4 incTransform,
+			PhysicsCollider* refCollider
+		)
 		{
 		}
 	};

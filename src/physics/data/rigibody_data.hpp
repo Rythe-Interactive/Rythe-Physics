@@ -66,7 +66,8 @@ namespace rythe::physics
 
 		rythe_always_inline void resetModificationFlags() { m_modificationFlags.reset(); }
 
-		//-------------------------------------------- internal use functions ------------------------------------------------//
+		//-------------------------------------------- internal use functions
+		//------------------------------------------------//
 
 		/** @brief Internal use only. Sets the mass of the rigidbody without updating its bitset*/
 		rythe_always_inline void setMassDirect(float newMass) noexcept { m_mass = newMass; }
@@ -77,11 +78,17 @@ namespace rythe::physics
 
 		/** @brief Internal use only. Sets the density of the rigidbody without updating its bitset.
 		 * The currently active active physics engine should be responsible for setting this value */
-		rythe_always_inline void setLinearVelocityDirect(const rsl::math::float3& linearVelocity) noexcept { m_velocity = linearVelocity; }
+		rythe_always_inline void setLinearVelocityDirect(const rsl::math::float3& linearVelocity) noexcept
+		{
+			m_velocity = linearVelocity;
+		}
 
 		/** @brief Internal use only. Sets the density of the rigidbody without updating its bitset.
 		 * The currently active active physics engine should be responsible for setting this value */
-		rythe_always_inline void setAngularVelocityDirect(const rsl::math::float3& angularVelocity) noexcept { m_velocity = angularVelocity; }
+		rythe_always_inline void setAngularVelocityDirect(const rsl::math::float3& angularVelocity) noexcept
+		{
+			m_velocity = angularVelocity;
+		}
 
 	private:
 		rsl::math::float3 m_velocity = rsl::math::float3(0.0);

@@ -4,14 +4,14 @@
 
 namespace rythe::physics
 {
-	const std::vector<std::vector<physics_manifold_precursor>>& BroadphaseUniformGrid::collectPairs(
-		std::vector<physics_manifold_precursor>&& manifoldPrecursors
-	)
+	const std::vector<std::vector<physics_manifold_precursor>>&
+	BroadphaseUniformGrid::collectPairs(std::vector<physics_manifold_precursor>&& manifoldPrecursors)
 	{
 		// Check if the amount of empty cells is higher than the threshhold. If it is, clear the cached data
 		if (m_emptyCellDestroyThreshold > 0 && m_emptyCells.size() > m_emptyCellDestroyThreshold)
 		{
-			// This function is called since it clears all data. A few cpu cycles are lost to settings the m_cellsize to itself.
+			// This function is called since it clears all data. A few cpu cycles are lost to settings the m_cellsize to
+			// itself.
 			setCellSize(m_cellSize);
 		}
 
@@ -47,7 +47,9 @@ namespace rythe::physics
 			std::vector<rythe::physics::PhysicsColliderPtr>& colliders = precursor.physicsComp->colliders;
 			// If the entity has no colliders, we can skip it
 			if (colliders.size() == 0)
+			{
 				continue;
+			}
 
 			// Get the biggest AABB collider of this physics component
 			// If it has one collider we can simply retrieve it
@@ -58,7 +60,8 @@ namespace rythe::physics
 				aabb = PhysicsStatics::CombineAABB(colliders.at(i)->GetMinMaxWorldAABB(), aabb);
 			}
 
-			// We get the start and end cell indices for this entity. This way we know which groupings/cells should contain this entity
+			// We get the start and end cell indices for this entity. This way we know which groupings/cells should
+			// contain this entity
 			math::int3 startCellIndex = calculateCellIndex(aabb.first);
 			math::int3 endCellIndex = calculateCellIndex(aabb.second);
 
@@ -79,7 +82,9 @@ namespace rythe::physics
 
 							// If the entity already occupies this cell, skip it
 							if (m_entityOccupiedCells.at(id).count(currentCellIndex))
+							{
 								continue;
+							}
 
 							// Add this cell to the cells of the entity
 							m_entityOccupiedCells.at(id).insert(currentCellIndex);
@@ -91,7 +96,8 @@ namespace rythe::physics
 								// Cell already exist, push this object into it
 								m_groupings.at(cellIndices.at(currentCellIndex)).push_back(precursor);
 
-								// We do not need to check if the object was already in the set, since the set will do nothing if it wasn't there to be removed
+								// We do not need to check if the object was already in the set, since the set will do
+								// nothing if it wasn't there to be removed
 								m_emptyCells.erase(currentCellIndex);
 							}
 							else
@@ -119,8 +125,7 @@ namespace rythe::physics
 						m_groupings.at(index).erase(
 							std::remove(
 								m_groupings.at(cellIndices.at(cellIndex)).begin(),
-								m_groupings.at(cellIndices.at(cellIndex)).end(),
-								precursor
+								m_groupings.at(cellIndices.at(cellIndex)).end(), precursor
 							),
 							m_groupings.at(cellIndices.at(cellIndex)).end()
 						);
@@ -144,9 +149,8 @@ namespace rythe::physics
 		return m_groupings;
 	}
 
-	const std::vector<std::vector<physics_manifold_precursor>>& BroadphaseUniformGrid::reConstruct(
-		std::vector<physics_manifold_precursor>&& manifoldPrecursors
-	)
+	const std::vector<std::vector<physics_manifold_precursor>>&
+	BroadphaseUniformGrid::reConstruct(std::vector<physics_manifold_precursor>&& manifoldPrecursors)
 	{
 		std::vector<std::vector<physics_manifold_precursor>> groupings;
 		std::unordered_map<math::ivec3, int> cellIndices;
@@ -155,7 +159,9 @@ namespace rythe::physics
 		{
 			std::vector<rythe::physics::PhysicsColliderPtr>& colliders = precursor.physicsComp->colliders;
 			if (colliders.size() == 0)
+			{
 				continue;
+			}
 
 			// Get the biggest AABB collider of this physics component
 			// If it has one collider we can simply retrieve it
@@ -199,13 +205,20 @@ namespace rythe::physics
 		// A point below 0 needs an extra 'push' since -0.5 will be cast to int as 0
 		rsl::math::float3 temp = point;
 		if (temp.x < 0)
+		{
 			temp.x -= m_cellSize.x;
+		}
 		if (temp.y < 0)
+		{
 			temp.y -= m_cellSize.y;
+		}
 		if (temp.z < 0)
+		{
 			temp.z -= m_cellSize.z;
+		}
 
-		math::int3 cellIndex = math::int3(temp.x / (float)m_cellSize.x, temp.y / (float)m_cellSize.y, temp.z / (float)m_cellSize.z);
+		math::int3 cellIndex =
+			math::int3(temp.x / (float)m_cellSize.x, temp.y / (float)m_cellSize.y, temp.z / (float)m_cellSize.z);
 
 		return cellIndex;
 	}

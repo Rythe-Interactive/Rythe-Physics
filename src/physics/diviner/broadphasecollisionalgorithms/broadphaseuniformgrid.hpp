@@ -15,8 +15,9 @@ namespace rythe::physics
 		/**@brief Constructor of BroadPhaseUniformGrid
 		 * @param cellSize The size of the cells for the grid
 		 * @param emptyCellDestroyThreshold the empty cell count at which the entire uniform grid is reset and rebuild.
-		 * This can be usefull since every empty cell still takes up space in lists. when a new object is added to the list the list may have to be moved in memory,
-		 * which takes time. By keeping the lists small and removing empty cells lists require less moving.
+		 * This can be usefull since every empty cell still takes up space in lists. when a new object is added to the
+		 * list the list may have to be moved in memory, which takes time. By keeping the lists small and removing empty
+		 * cells lists require less moving.
 		 */
 		BroadphaseUniformGrid(math::ivec3 cellSize, rsl::size_type emptyCellDestroyThreshold = 0)
 			: m_cellSize(cellSize),
@@ -24,22 +25,22 @@ namespace rythe::physics
 		{
 		}
 
-		/**@brief Collects collider pairs that have a chance of colliding and should be checked in narrow-phase collision detection
+		/**@brief Collects collider pairs that have a chance of colliding and should be checked in narrow-phase
+		 * collision detection
 		 * @param manifoldPrecursors all the physics components
 		 * @return a list-list of colliders that have a chance of colliding and should be checked
 		 */
-		const std::vector<std::vector<physics_manifold_precursor>>& collectPairs(
-			std::vector<physics_manifold_precursor>&& manifoldPrecursors
-		) override;
+		const std::vector<std::vector<physics_manifold_precursor>>&
+		collectPairs(std::vector<physics_manifold_precursor>&& manifoldPrecursors) override;
 
-		/**@brief Collects collider pairs that have a chance of colliding and should be checked in narrow-phase collision detection.
-		 * Unlike collectPairs this function ignores all the cached data and reconstructs the grid every time
+		/**@brief Collects collider pairs that have a chance of colliding and should be checked in narrow-phase
+		 * collision detection. Unlike collectPairs this function ignores all the cached data and reconstructs the grid
+		 * every time
 		 * @param manifoldPrecursors all the physics components
 		 * @return a list-list of colliders that have a chance of colliding and should be checked
 		 */
-		const std::vector<std::vector<physics_manifold_precursor>>& reConstruct(
-			std::vector<physics_manifold_precursor>&& manifoldPrecursors
-		);
+		const std::vector<std::vector<physics_manifold_precursor>>&
+		reConstruct(std::vector<physics_manifold_precursor>&& manifoldPrecursors);
 
 		/**@brief Sets the cell size which will be used for the virtual grid
 		 */
@@ -62,7 +63,8 @@ namespace rythe::physics
 		math::int3 m_cellSize;
 		rsl::size_type m_emptyCellDestroyThreshold = 0;
 
-		/**@brief Calculates a cell index from a point. i.e. calculates in which cell in the uniform grid a point will be.
+		/**@brief Calculates a cell index from a point. i.e. calculates in which cell in the uniform grid a point will
+		 * be.
 		 */
 		math::int3 calculateCellIndex(const rsl::math::float3 point);
 
@@ -73,7 +75,8 @@ namespace rythe::physics
 		std::unordered_set<id_type> m_collectedEntities;
 		// Stores the old positions of the collected entities. This way we can check if an object moved.
 		std::unordered_map<id_type, rsl::math::float3> m_oldPositions;
-		// Stores all the cells that an entity occupies. An entity can be on the edge of mulitple cells and therefore be in multiple cells at once.
+		// Stores all the cells that an entity occupies. An entity can be on the edge of mulitple cells and therefore be
+		// in multiple cells at once.
 		std::unordered_map<id_type, std::unordered_set<math::ivec3>> m_entityOccupiedCells;
 
 		// All the empty cells. This list is used to check how many empty cells there are.

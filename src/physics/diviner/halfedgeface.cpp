@@ -53,8 +53,7 @@ namespace rythe::physics
 		std::vector<rsl::math::float3> vertices;
 		vertices.reserve(6);
 
-		auto collectVertices = [&vertices](HalfEdgeEdge* edge)
-		{ vertices.push_back(edge->edgePosition); };
+		auto collectVertices = [&vertices](HalfEdgeEdge* edge) { vertices.push_back(edge->edgePosition); };
 		forEachEdge(collectVertices);
 
 		// get tangents of normals
@@ -79,13 +78,18 @@ namespace rythe::physics
 		return (maxForwardLength + minForwardLength) + (maxRightLength + minRightLength);
 	}
 
-	void HalfEdgeFace::forEachEdge(rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute, rythe::core::rsl::delegate<HalfEdgeEdge*(HalfEdgeEdge*)> getNextEdge)
+	void HalfEdgeFace::forEachEdge(
+		rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute,
+		rythe::core::rsl::delegate<HalfEdgeEdge*(HalfEdgeEdge*)> getNextEdge
+	)
 	{
 		HalfEdgeEdge* initialEdge = startEdge;
 		HalfEdgeEdge* currentEdge = startEdge;
 
 		if (!currentEdge)
+		{
 			return;
+		}
 
 		// the HalfEdgeEdge* 'startEdge' creates a ring buffer.
 		// This means that initialEdge will eventually go back to "startEdge", ending the loop.
@@ -100,8 +104,7 @@ namespace rythe::physics
 
 	void HalfEdgeFace::forEachEdgeReverse(rythe::core::rsl::delegate<void(HalfEdgeEdge*)> functionToExecute)
 	{
-		auto getPrevEdges = [](HalfEdgeEdge* current)
-		{ return current->prevEdge; };
+		auto getPrevEdges = [](HalfEdgeEdge* current) { return current->prevEdge; };
 
 		forEachEdge(functionToExecute, getPrevEdges);
 	}
@@ -113,10 +116,7 @@ namespace rythe::physics
 		// collect edges into std::vector
 		std::vector<HalfEdgeEdge*> edges;
 
-		auto collectEdges = [&edges](HalfEdgeEdge* edge)
-		{
-			edges.push_back(edge);
-		};
+		auto collectEdges = [&edges](HalfEdgeEdge* edge) { edges.push_back(edge); };
 
 		forEachEdgeReverse(collectEdges);
 
@@ -137,9 +137,7 @@ namespace rythe::physics
 	void HalfEdgeFace::DEBUG_DrawFace(const math::float4x4& transform, const math::color& debugColor, float time)
 	{
 		auto drawFunc = [&transform, debugColor, time](HalfEdgeEdge* edge)
-		{
-			edge->DEBUG_drawEdge(transform, debugColor, time);
-		};
+		{ edge->DEBUG_drawEdge(transform, debugColor, time); };
 
 		rsl::math::float3 worldStart = transform * math::float4(centroid, 1);
 		rsl::math::float3 worldEnd = transform * math::float4(centroid + normal * 0.1f, 1);
@@ -147,12 +145,11 @@ namespace rythe::physics
 		forEachEdge(drawFunc);
 	}
 
-	void HalfEdgeFace::DEBUG_DirectionDrawFace(const math::float4x4& transform, const math::color& debugColor, float time)
+	void
+	HalfEdgeFace::DEBUG_DirectionDrawFace(const math::float4x4& transform, const math::color& debugColor, float time)
 	{
 		auto drawFunc = [&transform, debugColor, time](HalfEdgeEdge* edge)
-		{
-			edge->DEBUG_directionDrawEdge(transform, debugColor, time, 5.0f);
-		};
+		{ edge->DEBUG_directionDrawEdge(transform, debugColor, time, 5.0f); };
 
 		rsl::math::float3 worldStart = transform * math::float4(centroid, 1);
 		rsl::math::float3 worldEnd = transform * math::float4(centroid + normal * 0.1f, 1);

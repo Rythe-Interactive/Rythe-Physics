@@ -13,9 +13,9 @@ namespace rythe::physics
 	{
 		if (contact.label.IsSet())
 		{
-			convergenceIdentifiers.push_back(
-				std::make_unique<ConvexConvergenceIdentifier>(contact.label, contact.totalLambda, contact.tangent1Lambda, contact.tangent2Lambda, GetColliderID())
-			);
+			convergenceIdentifiers.push_back(std::make_unique<ConvexConvergenceIdentifier>(
+				contact.label, contact.totalLambda, contact.tangent1Lambda, contact.tangent2Lambda, GetColliderID()
+			));
 		}
 	}
 
@@ -34,8 +34,8 @@ namespace rythe::physics
 			return;
 		}
 
-		//--------------------- Check for a collision by going through the edges and faces of both polyhedrons  --------------//
-		//'this' is colliderB and 'convexCollider' is colliderA
+		//--------------------- Check for a collision by going through the edges and faces of both polyhedrons
+		//--------------// 'this' is colliderB and 'convexCollider' is colliderA
 
 		PointerEncapsulator<HalfEdgeFace> ARefFace;
 
@@ -52,7 +52,10 @@ namespace rythe::physics
 		PointerEncapsulator<HalfEdgeFace> BRefFace;
 
 		float BRefSeperation;
-		if (PhysicsStatics::FindSeperatingAxisByExtremePointProjection(convexCollider, this, manifold.transformA, manifold.transformB, BRefFace, BRefSeperation) || !BRefFace.ptr)
+		if (PhysicsStatics::FindSeperatingAxisByExtremePointProjection(
+				convexCollider, this, manifold.transformA, manifold.transformB, BRefFace, BRefSeperation
+			) ||
+			!BRefFace.ptr)
 		{
 			manifold.isColliding = false;
 			return;
@@ -64,13 +67,18 @@ namespace rythe::physics
 		rsl::math::float3 edgeNormal;
 		float aToBEdgeSeperation;
 
-		if (PhysicsStatics::FindSeperatingAxisByGaussMapEdgeCheck(this, convexCollider, manifold.transformB, manifold.transformA, edgeRef, edgeInc, edgeNormal, aToBEdgeSeperation, true) || !edgeRef.ptr)
+		if (PhysicsStatics::FindSeperatingAxisByGaussMapEdgeCheck(
+				this, convexCollider, manifold.transformB, manifold.transformA, edgeRef, edgeInc, edgeNormal,
+				aToBEdgeSeperation, true
+			) ||
+			!edgeRef.ptr)
 		{
 			manifold.isColliding = false;
 			return;
 		}
 
-		//--------------------- A Collision has been found, find the most shallow penetration  ------------------------------------//
+		//--------------------- A Collision has been found, find the most shallow penetration
+		//------------------------------------//
 
 		// TODO all penetration querys should supply a constructor that takes in a  ConvexConvexCollisionInfo
 
@@ -80,19 +88,24 @@ namespace rythe::physics
 		rsl::math::float3 worldFaceCentroidB = manifold.transformB * math::float4(BRefFace.ptr->centroid, 1);
 		rsl::math::float3 worldFaceNormalB = manifold.transformB * math::float4(BRefFace.ptr->normal, 0);
 
-		rsl::math::float3 worldEdgeAPosition = edgeRef.ptr ? manifold.transformB * math::float4(edgeRef.ptr->edgePosition, 1) : rsl::math::float3();
+		rsl::math::float3 worldEdgeAPosition =
+			edgeRef.ptr ? manifold.transformB * math::float4(edgeRef.ptr->edgePosition, 1) : rsl::math::float3();
 		rsl::math::float3 worldEdgeNormal = edgeNormal;
 
-		auto abPenetrationQuery =
-			std::make_unique<ConvexConvexPenetrationQuery>(ARefFace.ptr, BRefFace.ptr, worldFaceCentroidA, worldFaceNormalA, ARefSeperation, true);
+		auto abPenetrationQuery = std::make_unique<ConvexConvexPenetrationQuery>(
+			ARefFace.ptr, BRefFace.ptr, worldFaceCentroidA, worldFaceNormalA, ARefSeperation, true
+		);
 
-		auto baPenetrationQuery =
-			std::make_unique<ConvexConvexPenetrationQuery>(BRefFace.ptr, ARefFace.ptr, worldFaceCentroidB, worldFaceNormalB, BRefSeperation, false);
+		auto baPenetrationQuery = std::make_unique<ConvexConvexPenetrationQuery>(
+			BRefFace.ptr, ARefFace.ptr, worldFaceCentroidB, worldFaceNormalB, BRefSeperation, false
+		);
 
-		auto abEdgePenetrationQuery =
-			std::make_unique<EdgePenetrationQuery>(edgeRef.ptr, edgeInc.ptr, worldEdgeAPosition, worldEdgeNormal, aToBEdgeSeperation, false);
+		auto abEdgePenetrationQuery = std::make_unique<EdgePenetrationQuery>(
+			edgeRef.ptr, edgeInc.ptr, worldEdgeAPosition, worldEdgeNormal, aToBEdgeSeperation, false
+		);
 
-		//-------------------------------------- Choose which PenetrationQuery to use for contact population --------------------------------------------------//
+		//-------------------------------------- Choose which PenetrationQuery to use for contact population
+		//--------------------------------------------------//
 
 		if (abPenetrationQuery->penetration + physics::constants::faceToFacePenetrationBias >
 			baPenetrationQuery->penetration)
@@ -116,14 +129,20 @@ namespace rythe::physics
 
 	void ConvexCollider::PopulateContactPointsWith(ConvexCollider* convexCollider, physics_manifold& manifold)
 	{
-		math::float4x4& refTransform = manifold.penetrationInformation->isARef ? manifold.transformA : manifold.transformB;
-		math::float4x4& incTransform = manifold.penetrationInformation->isARef ? manifold.transformB : manifold.transformA;
+		math::float4x4& refTransform =
+			manifold.penetrationInformation->isARef ? manifold.transformA : manifold.transformB;
+		math::float4x4& incTransform =
+			manifold.penetrationInformation->isARef ? manifold.transformB : manifold.transformA;
 
-		diviner::physics_component* refPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompA : manifold.physicsCompB;
-		diviner::physics_component* incPhysicsComp = manifold.penetrationInformation->isARef ? manifold.physicsCompB : manifold.physicsCompA;
+		diviner::physics_component* refPhysicsComp =
+			manifold.penetrationInformation->isARef ? manifold.physicsCompA : manifold.physicsCompB;
+		diviner::physics_component* incPhysicsComp =
+			manifold.penetrationInformation->isARef ? manifold.physicsCompB : manifold.physicsCompA;
 
-		PhysicsCollider* refCollider = manifold.penetrationInformation->isARef ? manifold.colliderA : manifold.colliderB;
-		PhysicsCollider* incCollider = manifold.penetrationInformation->isARef ? manifold.colliderB : manifold.colliderA;
+		PhysicsCollider* refCollider =
+			manifold.penetrationInformation->isARef ? manifold.colliderA : manifold.colliderB;
+		PhysicsCollider* incCollider =
+			manifold.penetrationInformation->isARef ? manifold.colliderB : manifold.colliderA;
 
 		manifold.penetrationInformation->populateContactList(manifold, refTransform, incTransform, refCollider);
 
@@ -153,7 +172,9 @@ namespace rythe::physics
 		minMaxWorldAABB = PhysicsStatics::ConstructAABBFromTransformedVertices(vertices, transform);
 	}
 
-	void ConvexCollider::DrawColliderRepresentation(const math::float4x4& transform, math::color usedColor, float width, float time, bool ignoreDepth)
+	void ConvexCollider::DrawColliderRepresentation(
+		const math::float4x4& transform, math::color usedColor, float width, float time, bool ignoreDepth
+	)
 	{
 		if (!shouldBeDrawn)
 		{
@@ -166,7 +187,8 @@ namespace rythe::physics
 			physics::HalfEdgeEdge* currentEdge = face->startEdge;
 
 			rsl::math::float3 faceStart = transform * math::float4(face->centroid, 1);
-			rsl::math::float3 faceEnd = faceStart + rsl::math::float3((transform * math::float4(face->normal, 0))) * 0.5f;
+			rsl::math::float3 faceEnd =
+				faceStart + rsl::math::float3((transform * math::float4(face->normal, 0))) * 0.5f;
 
 			debug::user_projectDrawLine(faceStart, faceEnd, math::colors::green, 2.0f);
 
@@ -199,7 +221,10 @@ namespace rythe::physics
 		auto collectVertices = [&verticesVec](HalfEdgeEdge* edge)
 		{
 			edge->calculateRobustEdgeDirection();
-			verticesVec.push_back(edge->edgePosition -= PhysicsStatics::PointDistanceToPlane(edge->face->normal, edge->face->centroid, edge->edgePosition));
+			verticesVec.push_back(
+				edge->edgePosition -=
+				PhysicsStatics::PointDistanceToPlane(edge->face->normal, edge->face->centroid, edge->edgePosition)
+			);
 		};
 
 		for (auto face : halfEdgeFaces)

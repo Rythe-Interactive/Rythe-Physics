@@ -22,8 +22,7 @@ namespace rythe::physics
 
 		bool operator==(const ContactVertex& rhs)
 		{
-			return (label.firstEdge == rhs.label.firstEdge) &
-				   (label.nextEdge == rhs.label.nextEdge);
+			return (label.firstEdge == rhs.label.firstEdge) & (label.nextEdge == rhs.label.nextEdge);
 		}
 	};
 } // namespace rythe::physics

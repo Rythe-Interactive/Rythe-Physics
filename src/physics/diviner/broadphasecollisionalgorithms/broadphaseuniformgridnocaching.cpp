@@ -2,7 +2,10 @@
 
 namespace rythe::physics
 {
-	const std::vector<std::vector<physics_manifold_precursor>>& rythe::physics::BroadphaseUniformGridNoCaching::collectPairs(std::vector<physics_manifold_precursor>&& manifoldPrecursors)
+	const std::vector<std::vector<physics_manifold_precursor>>&
+	rythe::physics::BroadphaseUniformGridNoCaching::collectPairs(
+		std::vector<physics_manifold_precursor>&& manifoldPrecursors
+	)
 	{
 
 		manifoldPrecursorGrouping.clear();
@@ -13,7 +16,9 @@ namespace rythe::physics
 		{
 			std::vector<rythe::physics::PhysicsColliderPtr> colliders = precursor.physicsComp->colliders;
 			if (colliders.size() == 0)
+			{
 				continue;
+			}
 
 			// Get the biggest AABB collider of this physics component
 			// If it has one collider we can simply retrieve it
@@ -55,13 +60,20 @@ namespace rythe::physics
 		// A point below 0 needs an extra 'push' since -0.5 will be cast to int as 0
 		rsl::math::float3 temp = point;
 		if (temp.x < 0)
+		{
 			--temp.x;
+		}
 		if (temp.y < 0)
+		{
 			--temp.y;
+		}
 		if (temp.z < 0)
+		{
 			--temp.z;
+		}
 
-		math::int3 cellIndex = math::int3(temp.x / (float)m_cellSize.x, temp.y / (float)m_cellSize.y, temp.z / (float)m_cellSize.z);
+		math::int3 cellIndex =
+			math::int3(temp.x / (float)m_cellSize.x, temp.y / (float)m_cellSize.y, temp.z / (float)m_cellSize.z);
 
 		return cellIndex;
 	}

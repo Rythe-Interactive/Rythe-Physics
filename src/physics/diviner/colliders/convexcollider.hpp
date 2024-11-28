@@ -27,7 +27,8 @@ namespace rythe::physics
 			}
 		}
 
-		/** @brief Given a physics_contact that has been resolved, use its label and lambdas in order to create a ConvexConverganceIdentifier
+		/** @brief Given a physics_contact that has been resolved, use its label and lambdas in order to create a
+		 * ConvexConverganceIdentifier
 		 */
 		void AddConvergenceIdentifier(const physics_contact& contact) override;
 
@@ -36,8 +37,8 @@ namespace rythe::physics
 			physicsCollider->CheckCollisionWith(this, manifold);
 		}
 
-		/** @brief Given a ConvexCollider and a physics_manifold, uses the seperating axis test for each HalfEdgeFace and edge
-		 * of both ConvexColliders
+		/** @brief Given a ConvexCollider and a physics_manifold, uses the seperating axis test for each HalfEdgeFace
+		 * and edge of both ConvexColliders
 		 */
 		void CheckCollisionWith(ConvexCollider* convexCollider, physics_manifold& manifold) override;
 
@@ -57,7 +58,9 @@ namespace rythe::physics
 		 */
 		void UpdateTightAABB(const math::float4x4& transform);
 
-		virtual void DrawColliderRepresentation(const math::float4x4& transform, math::color usedColor, float width, float time, bool ignoreDepth = false) override;
+		virtual void DrawColliderRepresentation(
+			const math::float4x4& transform, math::color usedColor, float width, float time, bool ignoreDepth = false
+		) override;
 
 
 		/**@brief Does one step of the convex hull generation
@@ -70,7 +73,9 @@ namespace rythe::physics
 			++step;
 		}
 
-		void ConstructConvexHullWithVertices(std::vector<rsl::math::float3>& vertices, rsl::math::float3 spacingAmount = rsl::math::float3())
+		void ConstructConvexHullWithVertices(
+			std::vector<rsl::math::float3>& vertices, rsl::math::float3 spacingAmount = rsl::math::float3()
+		)
 		{
 			// many of the functions for convex hull are coupled to mesh,
 			// for now we create a mesh so that we can pass it into the function
@@ -83,13 +88,13 @@ namespace rythe::physics
 		// TODO(cont.) investigate unused variables! (projected)
 		// LIKE A LOT OF CLEANUP
 
-		void ConstructConvexHullWithMesh(mesh& mesh, rsl::math::float3 spacingAmount = rsl::math::float3(), bool shouldDebug = false);
+		void ConstructConvexHullWithMesh(
+			mesh& mesh, rsl::math::float3 spacingAmount = rsl::math::float3(), bool shouldDebug = false
+		);
 
 		/**@brief Constructs a box-shaped convex hull that encompasses the given mesh.
 		 */
-		void ConstructBoxWithMesh()
-		{
-		}
+		void ConstructBoxWithMesh() {}
 
 		void CalculateLocalColliderCentroid()
 		{
@@ -125,13 +130,15 @@ namespace rythe::physics
 			// c ----------- d       //g ----------- h
 
 			/*a*/ rsl::math::float3 minVertexPlusBreadth = rsl::math::float3(-halfWidth, -halfHeight, halfBreath);
-			/*b*/ rsl::math::float3 minVertexPlusWidthPlusBreadth = rsl::math::float3(halfWidth, -halfHeight, halfBreath);
+			/*b*/ rsl::math::float3 minVertexPlusWidthPlusBreadth =
+				rsl::math::float3(halfWidth, -halfHeight, halfBreath);
 			/*c*/ rsl::math::float3 minVertex = rsl::math::float3(-halfWidth, -halfHeight, -halfBreath);
 			/*d*/ rsl::math::float3 minVertexPlusWidth = rsl::math::float3(halfWidth, -halfHeight, -halfBreath);
 
 			/*e*/ rsl::math::float3 maxVertexMinusWidth = rsl::math::float3(-halfWidth, halfHeight, halfBreath);
 			/*f*/ rsl::math::float3 maxVertex = rsl::math::float3(halfWidth, halfHeight, halfBreath);
-			/*g*/ rsl::math::float3 maxVertexMinusWidthMinusBreadth = rsl::math::float3(-halfWidth, halfHeight, -halfBreath);
+			/*g*/ rsl::math::float3 maxVertexMinusWidthMinusBreadth =
+				rsl::math::float3(-halfWidth, halfHeight, -halfBreath);
 			/*h*/ rsl::math::float3 maxVertexMinusBreadth = rsl::math::float3(halfWidth, halfHeight, -halfBreath);
 
 			// the HalfEdgeEdge only needs a ptr to the vertex
@@ -163,7 +170,8 @@ namespace rythe::physics
 			// note: each edge carries adjacency information. (for example, an edge 'eg' must know its edge pair 'ge').
 			// This is why each edge must be declared explicitly.
 
-			// each face also has an id. It is mostly used for debugging reasons and will be removed when it is no longer needed.
+			// each face also has an id. It is mostly used for debugging reasons and will be removed when it is no
+			// longer needed.
 
 			//[1] create face eghf
 
@@ -297,8 +305,7 @@ namespace rythe::physics
 			// edge pairings have been set, we can calculate edge directions now
 			for (HalfEdgeFace* face : halfEdgeFaces)
 			{
-				auto calculateDirection = [](HalfEdgeEdge* edge)
-				{ edge->calculateRobustEdgeDirection(); };
+				auto calculateDirection = [](HalfEdgeEdge* edge) { edge->calculateRobustEdgeDirection(); };
 				face->forEachEdge(calculateDirection);
 			}
 
@@ -335,20 +342,15 @@ namespace rythe::physics
 			cg->id = "cg";
 			ca->id = "ca";
 
-			// check if halfEdge data structure was initialized correctly. this will be commented when I know it always works
+			// check if halfEdge data structure was initialized correctly. this will be commented when I know it always
+			// works
 			AssertEdgeValidity();
 			CalculateLocalColliderCentroid();
 		}
 
-		std::vector<HalfEdgeFace*>& GetHalfEdgeFaces() override
-		{
-			return halfEdgeFaces;
-		}
+		std::vector<HalfEdgeFace*>& GetHalfEdgeFaces() override { return halfEdgeFaces; }
 
-		std::vector<rsl::math::float3>& GetVertices()
-		{
-			return vertices;
-		}
+		std::vector<rsl::math::float3>& GetVertices() { return vertices; }
 
 		void AssertEdgeValidity()
 		{

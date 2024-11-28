@@ -4,7 +4,11 @@
 
 namespace rythe::physics
 {
-	bool PhysicsStatics::FindSeperatingAxisByExtremePointProjection(ConvexCollider* convexA, ConvexCollider* convexB, const math::float4x4& transformA, const math::float4x4& transformB, PointerEncapsulator<HalfEdgeFace>& refFace, float& maximumSeperation, bool shouldDebug)
+	bool PhysicsStatics::FindSeperatingAxisByExtremePointProjection(
+		ConvexCollider* convexA, ConvexCollider* convexB, const math::float4x4& transformA,
+		const math::float4x4& transformB, PointerEncapsulator<HalfEdgeFace>& refFace, float& maximumSeperation,
+		bool shouldDebug
+	)
 	{
 		float currentMaximumSeperation = std::numeric_limits<float>::lowest();
 
@@ -40,7 +44,9 @@ namespace rythe::physics
 		return false;
 	}
 
-	float PhysicsStatics::GetSupportPoint(const std::vector<rsl::math::float3>& vertices, const rsl::math::float3& direction, rsl::math::float3& outVec)
+	float PhysicsStatics::GetSupportPoint(
+		const std::vector<rsl::math::float3>& vertices, const rsl::math::float3& direction, rsl::math::float3& outVec
+	)
 	{
 		float currentMaximumSupportPoint = std::numeric_limits<float>::lowest();
 
@@ -58,7 +64,10 @@ namespace rythe::physics
 		return currentMaximumSupportPoint;
 	}
 
-	void PhysicsStatics::GetSupportPointNoTransform(rsl::math::float3 planePosition, rsl::math::float3 direction, ConvexCollider* collider, const math::float4x4& colliderTransform, rsl::math::float3& worldSupportPoint)
+	void PhysicsStatics::GetSupportPointNoTransform(
+		rsl::math::float3 planePosition, rsl::math::float3 direction, ConvexCollider* collider,
+		const math::float4x4& colliderTransform, rsl::math::float3& worldSupportPoint
+	)
 	{
 		float largestDistanceInDirection = std::numeric_limits<float>::lowest();
 		planePosition = math::inverse(colliderTransform) * math::float4(planePosition, 1);
@@ -82,7 +91,12 @@ namespace rythe::physics
 		worldSupportPoint = colliderTransform * math::float4(worldSupportPoint, 1);
 	}
 
-	bool PhysicsStatics::FindSeperatingAxisByGaussMapEdgeCheck(ConvexCollider* convexA, ConvexCollider* convexB, const math::float4x4& transformA, const math::float4x4& transformB, PointerEncapsulator<HalfEdgeEdge>& refEdge, PointerEncapsulator<HalfEdgeEdge>& incEdge, rsl::math::float3& seperatingAxisFound, float& maximumSeperation, bool shouldDebug)
+	bool PhysicsStatics::FindSeperatingAxisByGaussMapEdgeCheck(
+		ConvexCollider* convexA, ConvexCollider* convexB, const math::float4x4& transformA,
+		const math::float4x4& transformB, PointerEncapsulator<HalfEdgeEdge>& refEdge,
+		PointerEncapsulator<HalfEdgeEdge>& incEdge, rsl::math::float3& seperatingAxisFound, float& maximumSeperation,
+		bool shouldDebug
+	)
 	{
 		float currentMaximumSeperation = std::numeric_limits<float>::lowest();
 
@@ -94,10 +108,7 @@ namespace rythe::physics
 			//----------------- Get all edges of faceA ------------//
 			std::vector<HalfEdgeEdge*> convexAHalfEdges;
 
-			auto lambda = [&convexAHalfEdges](HalfEdgeEdge* edge)
-			{
-				convexAHalfEdges.push_back(edge);
-			};
+			auto lambda = [&convexAHalfEdges](HalfEdgeEdge* edge) { convexAHalfEdges.push_back(edge); };
 
 			faceA->forEachEdge(lambda);
 
@@ -106,10 +117,7 @@ namespace rythe::physics
 				//----------------- Get all edges of faceB ------------//
 				std::vector<HalfEdgeEdge*> convexBHalfEdges;
 
-				auto lambda = [&convexBHalfEdges](HalfEdgeEdge* edge)
-				{
-					convexBHalfEdges.push_back(edge);
-				};
+				auto lambda = [&convexBHalfEdges](HalfEdgeEdge* edge) { convexBHalfEdges.push_back(edge); };
 
 				faceB->forEachEdge(lambda);
 
@@ -121,8 +129,10 @@ namespace rythe::physics
 						if (attemptBuildMinkowskiFace(edgeA, edgeB, transformA, transformB))
 						{
 							// get world edge direction
-							rsl::math::float3 edgeADirection = transformA * math::float4(edgeA->getRobustEdgeDirection(), 0);
-							rsl::math::float3 edgeBDirection = transformB * math::float4(edgeB->getRobustEdgeDirection(), 0);
+							rsl::math::float3 edgeADirection =
+								transformA * math::float4(edgeA->getRobustEdgeDirection(), 0);
+							rsl::math::float3 edgeBDirection =
+								transformB * math::float4(edgeB->getRobustEdgeDirection(), 0);
 
 							edgeADirection = math::normalize(edgeADirection);
 							edgeBDirection = math::normalize(edgeBDirection);
@@ -134,11 +144,14 @@ namespace rythe::physics
 								continue;
 							}
 
-							rsl::math::float3 seperatingAxis = math::normalize(math::cross(edgeADirection, edgeBDirection));
+							rsl::math::float3 seperatingAxis =
+								math::normalize(math::cross(edgeADirection, edgeBDirection));
 
 							// get world edge position
-							rsl::math::float3 edgeAtransformedPosition = transformA * math::float4(edgeA->edgePosition, 1);
-							rsl::math::float3 edgeBtransformedPosition = transformB * math::float4(edgeB->edgePosition, 1);
+							rsl::math::float3 edgeAtransformedPosition =
+								transformA * math::float4(edgeA->edgePosition, 1);
+							rsl::math::float3 edgeBtransformedPosition =
+								transformB * math::float4(edgeB->edgePosition, 1);
 
 							// check if its pointing in the right direction
 							if (math::dot(seperatingAxis, edgeAtransformedPosition - positionA) < 0)
@@ -147,7 +160,8 @@ namespace rythe::physics
 							}
 
 							// check if given edges create a seperating axis
-							float distance = math::dot(seperatingAxis, edgeBtransformedPosition - edgeAtransformedPosition);
+							float distance =
+								math::dot(seperatingAxis, edgeBtransformedPosition - edgeAtransformedPosition);
 
 							if (distance > currentMaximumSeperation)
 							{
@@ -172,9 +186,13 @@ namespace rythe::physics
 		return false;
 	}
 
-	bool PhysicsStatics::DetectConvexSphereCollision(ConvexCollider* convexA, const math::float4x4& transformA, rsl::math::float3 sphereWorldPosition, float sphereRadius, float& maximumSeperation)
+	bool PhysicsStatics::DetectConvexSphereCollision(
+		ConvexCollider* convexA, const math::float4x4& transformA, rsl::math::float3 sphereWorldPosition,
+		float sphereRadius, float& maximumSeperation
+	)
 	{
-		//-----------------  check if the seperating axis is the line generated between the centroid of the hull and sphereWorldPosition ------------------//
+		//-----------------  check if the seperating axis is the line generated between the centroid of the hull and
+		// sphereWorldPosition ------------------//
 
 		rsl::math::float3 worldHullCentroid = transformA * math::float4(convexA->GetLocalCentroid(), 1);
 		rsl::math::float3 centroidSeperatingAxis = math::normalize(worldHullCentroid - sphereWorldPosition);
@@ -194,7 +212,8 @@ namespace rythe::physics
 
 		maximumSeperation = std::numeric_limits<float>::lowest();
 
-		//--------------------------------- check if the seperating axis one of the faces of the convex hull ----------------------------------------------//
+		//--------------------------------- check if the seperating axis one of the faces of the convex hull
+		//----------------------------------------------//
 
 		for (auto faceA : convexA->GetHalfEdgeFaces())
 		{
@@ -218,7 +237,9 @@ namespace rythe::physics
 		return true;
 	}
 
-	std::pair<rsl::math::float3, rsl::math::float3> PhysicsStatics::ConstructAABBFromTransformedVertices(const std::vector<rsl::math::float3>& vertices, const math::float4x4& transform)
+	std::pair<rsl::math::float3, rsl::math::float3> PhysicsStatics::ConstructAABBFromTransformedVertices(
+		const std::vector<rsl::math::float3>& vertices, const math::float4x4& transform
+	)
 	{
 		rsl::math::float3 min, max;
 		rsl::math::float3 worldPos = transform[3];
@@ -259,7 +280,10 @@ namespace rythe::physics
 		return std::make_pair(min, max);
 	}
 
-	std::pair<rsl::math::float3, rsl::math::float3> PhysicsStatics::CombineAABB(const std::pair<rsl::math::float3, rsl::math::float3>& first, const std::pair<rsl::math::float3, rsl::math::float3>& second)
+	std::pair<rsl::math::float3, rsl::math::float3> PhysicsStatics::CombineAABB(
+		const std::pair<rsl::math::float3, rsl::math::float3>& first,
+		const std::pair<rsl::math::float3, rsl::math::float3>& second
+	)
 	{
 		auto& firstLow = first.first;
 		auto& firstHigh = first.second;
@@ -268,27 +292,45 @@ namespace rythe::physics
 		rsl::math::float3 lowBounds = secondLow;
 		rsl::math::float3 highBounds = secondHigh;
 		if (firstLow.x < secondLow.x)
+		{
 			lowBounds.x = firstLow.x;
+		}
 		if (firstLow.y < secondLow.y)
+		{
 			lowBounds.y = firstLow.y;
+		}
 		if (firstLow.z < secondLow.z)
+		{
 			lowBounds.z = firstLow.z;
+		}
 		if (firstHigh.x > secondHigh.x)
+		{
 			highBounds.x = firstHigh.x;
+		}
 		if (firstHigh.y > secondHigh.y)
+		{
 			highBounds.y = firstHigh.y;
+		}
 		if (firstHigh.z > secondHigh.z)
+		{
 			highBounds.z = firstHigh.z;
+		}
 
 		return std::make_pair(lowBounds, highBounds);
 	}
 
-	float PhysicsStatics::FindClosestPointToLineInterpolant(const rsl::math::float3& startPoint, const rsl::math::float3& lineDirection, const rsl::math::float3& pointPosition)
+	float PhysicsStatics::FindClosestPointToLineInterpolant(
+		const rsl::math::float3& startPoint, const rsl::math::float3& lineDirection,
+		const rsl::math::float3& pointPosition
+	)
 	{
-		return (math::dot(lineDirection, pointPosition) - math::dot(lineDirection, startPoint)) / math::dot(lineDirection, lineDirection);
+		return (math::dot(lineDirection, pointPosition) - math::dot(lineDirection, startPoint)) /
+			   math::dot(lineDirection, lineDirection);
 	}
 
-	rsl::math::float3 PhysicsStatics::FindClosestPointToLineSegment(const rsl::math::float3& start, const rsl::math::float3& end, const rsl::math::float3& pointPosition)
+	rsl::math::float3 PhysicsStatics::FindClosestPointToLineSegment(
+		const rsl::math::float3& start, const rsl::math::float3& end, const rsl::math::float3& pointPosition
+	)
 	{
 		float interpolant = FindClosestPointToLineInterpolant(start, end - start, pointPosition);
 		interpolant = math::clamp(interpolant, 0.0f, 1.0f);
@@ -298,16 +340,17 @@ namespace rythe::physics
 
 	std::shared_ptr<ConvexCollider> PhysicsStatics::generateConvexHull(const std::vector<rsl::math::float3>& vertices)
 	{
-		//[1] Calculated a scaled epsilon based on the extents of the hull. This ensures that epsilon takes the size of the hull into account.
-		//[2] Calculate a visibility epsilon that determines if a vertex should be merged to the hull or not.
-		//[3] Calculate the support points in x,y,z axis of the given vertices in order to create the initial hull
-		//[4] Create the initial hull given the calculated support points
-		//[5] Given the vector of vertices called 'vertices', partition them to the initial hull
-		//[6] While there is still a face in the constructed hull with a vertex that is not merged, merge the vertex
-		//[7] Populate the new ConvexCollider's face vector with the faces generated from the previous step
-		//[8] Populate the new ConvexCollider's vertex vector with the vertices merged from the previous step
+		//[1] Calculated a scaled epsilon based on the extents of the hull. This ensures that epsilon takes the size of
+		// the hull into account. [2] Calculate a visibility epsilon that determines if a vertex should be merged to the
+		// hull or not. [3] Calculate the support points in x,y,z axis of the given vertices in order to create the
+		// initial hull [4] Create the initial hull given the calculated support points [5] Given the vector of vertices
+		// called 'vertices', partition them to the initial hull [6] While there is still a face in the constructed hull
+		// with a vertex that is not merged, merge the vertex [7] Populate the new ConvexCollider's face vector with the
+		// faces generated from the previous step [8] Populate the new ConvexCollider's vertex vector with the vertices
+		// merged from the previous step
 
-		//[1] Calculated a scaled epsilon based on the extents of the hull. This ensures that epsilon takes the size of the hull into account.
+		//[1] Calculated a scaled epsilon based on the extents of the hull. This ensures that epsilon takes the size of
+		// the hull into account.
 		const static float initialEpsilon = math::sqrt(math::epsilon<float>());
 
 		rsl::math::float3 maxInDimension(std::numeric_limits<float>::lowest());
@@ -340,7 +383,8 @@ namespace rythe::physics
 		std::vector<HalfEdgeFace*> faces;
 		faces.reserve(4);
 
-		//[3] Calculate the support points in x,y,z,-x,-y,-z axis of the given vertices in order to create the initial hull
+		//[3] Calculate the support points in x,y,z,-x,-y,-z axis of the given vertices in order to create the initial
+		// hull
 		std::array<rsl::math::float3, 6> supportVertices;
 
 		// Get support points in -x and x
@@ -409,7 +453,9 @@ namespace rythe::physics
 		return convexCollider;
 	}
 
-	void PhysicsStatics::calculateNewellPlane(const std::vector<rsl::math::float3>& v, rsl::math::float3& outPlaneNormal, float& distToCentroid)
+	void PhysicsStatics::calculateNewellPlane(
+		const std::vector<rsl::math::float3>& v, rsl::math::float3& outPlaneNormal, float& distToCentroid
+	)
 	{
 		rsl::math::float3 centroid{0, 0, 0};
 		outPlaneNormal = rsl::math::float3();
@@ -427,30 +473,38 @@ namespace rythe::physics
 		distToCentroid = math::dot(centroid, outPlaneNormal) / v.size(); // �centroid / n� is the true centroid point
 	}
 
-	bool PhysicsStatics::attemptBuildMinkowskiFace(HalfEdgeEdge* edgeA, HalfEdgeEdge* edgeB, const math::float4x4& transformA, const math::float4x4& transformB)
+	bool PhysicsStatics::attemptBuildMinkowskiFace(
+		HalfEdgeEdge* edgeA, HalfEdgeEdge* edgeB, const math::float4x4& transformA, const math::float4x4& transformB
+	)
 	{
-		const rsl::math::float3 transformedA1 = transformA *
-												math::float4(edgeA->getLocalNormal(), 0);
+		const rsl::math::float3 transformedA1 = transformA * math::float4(edgeA->getLocalNormal(), 0);
 
-		const rsl::math::float3 transformedA2 = transformA *
-												math::float4(edgeA->pairingEdge->getLocalNormal(), 0);
+		const rsl::math::float3 transformedA2 = transformA * math::float4(edgeA->pairingEdge->getLocalNormal(), 0);
 
-		const rsl::math::float3 transformedEdgeDirectionA = math::normalize(transformA * math::float4(edgeA->getRobustEdgeDirection(), 0));
+		const rsl::math::float3 transformedEdgeDirectionA =
+			math::normalize(transformA * math::float4(edgeA->getRobustEdgeDirection(), 0));
 
-		const rsl::math::float3 transformedB1 = transformB *
-												math::float4(edgeB->getLocalNormal(), 0);
+		const rsl::math::float3 transformedB1 = transformB * math::float4(edgeB->getLocalNormal(), 0);
 
-		const rsl::math::float3 transformedB2 = transformB *
-												math::float4(edgeB->pairingEdge->getLocalNormal(), 0);
+		const rsl::math::float3 transformedB2 = transformB * math::float4(edgeB->pairingEdge->getLocalNormal(), 0);
 
-		const rsl::math::float3 transformedEdgeDirectionB = math::normalize(transformB * math::float4(edgeB->getRobustEdgeDirection(), 0));
+		const rsl::math::float3 transformedEdgeDirectionB =
+			math::normalize(transformB * math::float4(edgeB->getRobustEdgeDirection(), 0));
 
-		return isMinkowskiFace(transformedA1, transformedA2, -transformedB1, -transformedB2, (transformedEdgeDirectionA), (transformedEdgeDirectionB));
+		return isMinkowskiFace(
+			transformedA1, transformedA2, -transformedB1, -transformedB2, (transformedEdgeDirectionA),
+			(transformedEdgeDirectionB)
+		);
 	}
 
-	bool PhysicsStatics::isMinkowskiFace(const rsl::math::float3& transformedA1, const rsl::math::float3& transformedA2, const rsl::math::float3& transformedB1, const rsl::math::float3& transformedB2, const rsl::math::float3& planeANormal, const rsl::math::float3& planeBNormal)
+	bool PhysicsStatics::isMinkowskiFace(
+		const rsl::math::float3& transformedA1, const rsl::math::float3& transformedA2,
+		const rsl::math::float3& transformedB1, const rsl::math::float3& transformedB2,
+		const rsl::math::float3& planeANormal, const rsl::math::float3& planeBNormal
+	)
 	{
-		//------------------------ Check if normals created by arcA seperate normals of B --------------------------------------//
+		//------------------------ Check if normals created by arcA seperate normals of B
+		//--------------------------------------//
 
 		float planeADotB1 = math::dot(planeANormal, transformedB1); // CBA
 		float planeADotB2 = math::dot(planeANormal, transformedB2); // DBA
@@ -462,7 +516,8 @@ namespace rythe::physics
 			return false;
 		}
 
-		//------------------------ Check if normals created by arcB seperate normals of A --------------------------------------//
+		//------------------------ Check if normals created by arcB seperate normals of A
+		//--------------------------------------//
 
 		float planeBDotA1 = math::dot(planeBNormal, transformedA1); // ADC
 		float planeBDotA2 = math::dot(planeBNormal, transformedA2); // BDC
@@ -474,7 +529,8 @@ namespace rythe::physics
 			return false;
 		}
 
-		//------------------------ Check if arcA and arcB are in the same hemisphere --------------------------------------------//
+		//------------------------ Check if arcA and arcB are in the same hemisphere
+		//--------------------------------------------//
 
 		rsl::math::float3 abNormal = math::cross(transformedA2, transformedB2);
 
@@ -491,7 +547,10 @@ namespace rythe::physics
 		return true;
 	}
 
-	bool PhysicsStatics::buildInitialHull(const std::vector<rsl::math::float3>& vertices, std::array<rsl::math::float3, 6>& supportVertices, std::vector<HalfEdgeFace*>& faces)
+	bool PhysicsStatics::buildInitialHull(
+		const std::vector<rsl::math::float3>& vertices, std::array<rsl::math::float3, 6>& supportVertices,
+		std::vector<HalfEdgeFace*>& faces
+	)
 	{
 		// Summary:
 		//[1] Find the 2 most distant vertices in 'support Vertices'
@@ -538,7 +597,8 @@ namespace rythe::physics
 		// Iterate through 'vertices' to find the vertex most distant from line
 		for (auto& vertex : vertices)
 		{
-			// Check if vertex and firstDistant create a line segment parralel to the line segment created by 'firstToSecond'
+			// Check if vertex and firstDistant create a line segment parralel to the line segment created by
+			// 'firstToSecond'
 			float dotResult = math::dot(math::normalize(vertex - firstDistant), firstToSecond);
 
 			if (math::close_enough(dotResult, 1.0f))
@@ -547,7 +607,8 @@ namespace rythe::physics
 			}
 
 			// Find closest point between vertex and line segment
-			rsl::math::float3 closestPoint = PhysicsStatics::FindClosestPointToLineSegment(firstDistant, secondDistant, vertex);
+			rsl::math::float3 closestPoint =
+				PhysicsStatics::FindClosestPointToLineSegment(firstDistant, secondDistant, vertex);
 
 			float currentDistance = math::distance2(closestPoint, vertex);
 
@@ -577,7 +638,9 @@ namespace rythe::physics
 		thirdEdge->setNextAndPrevEdge(secondEdge, firstEdge);
 
 		// Initialize Half Edge Faces
-		HalfEdgeFace* initialFace = new HalfEdgeFace(firstEdge, math::normalize(math::cross(secondDistant - firstDistant, *thirdDistant - secondDistant)));
+		HalfEdgeFace* initialFace = new HalfEdgeFace(
+			firstEdge, math::normalize(math::cross(secondDistant - firstDistant, *thirdDistant - secondDistant))
+		);
 
 		// Add to collider
 		faces.push_back(initialFace);
@@ -593,8 +656,7 @@ namespace rythe::physics
 
 		for (auto& vertex : vertices)
 		{
-			float currentDistance =
-				math::abs(PhysicsStatics::PointDistanceToPlane(planeNormal, planePosition, vertex));
+			float currentDistance = math::abs(PhysicsStatics::PointDistanceToPlane(planeNormal, planePosition, vertex));
 
 			if (currentDistance > mostDistant)
 			{
@@ -612,8 +674,7 @@ namespace rythe::physics
 
 		//[5] invert face if distant vertex is in front of face
 
-		float eyePointDistance =
-			PhysicsStatics::PointDistanceToPlane(planeNormal, planePosition, *firstEyePoint);
+		float eyePointDistance = PhysicsStatics::PointDistanceToPlane(planeNormal, planePosition, *firstEyePoint);
 		bool needInverse = eyePointDistance > 0.0f;
 
 		if (needInverse)
@@ -628,10 +689,7 @@ namespace rythe::physics
 
 		std::vector<HalfEdgeEdge*> reverseHalfEdgeList;
 
-		auto collectEdges = [&reverseHalfEdgeList](HalfEdgeEdge* current)
-		{
-			reverseHalfEdgeList.push_back(current);
-		};
+		auto collectEdges = [&reverseHalfEdgeList](HalfEdgeEdge* current) { reverseHalfEdgeList.push_back(current); };
 
 		initialFace->forEachEdgeReverse(collectEdges);
 
@@ -643,7 +701,10 @@ namespace rythe::physics
 		return true;
 	}
 
-	void PhysicsStatics::createHalfEdgeFaceFromEyePoint(const rsl::math::float3 eyePoint, const std::vector<HalfEdgeEdge*>& reversedEdges, std::vector<HalfEdgeFace*>& createdFaces)
+	void PhysicsStatics::createHalfEdgeFaceFromEyePoint(
+		const rsl::math::float3 eyePoint, const std::vector<HalfEdgeEdge*>& reversedEdges,
+		std::vector<HalfEdgeFace*>& createdFaces
+	)
 	{
 		HalfEdgeEdge* pairingToConnectTo = nullptr;
 		HalfEdgeEdge* initialPairing = nullptr;
@@ -668,7 +729,9 @@ namespace rythe::physics
 			pairing->setPairingEdge(edge);
 
 			// initialize new face
-			rsl::math::float3 faceNormal = math::normalize(math::cross(nextPairing->edgePosition - pairing->edgePosition, prevPairing->edgePosition - pairing->edgePosition));
+			rsl::math::float3 faceNormal = math::normalize(math::cross(
+				nextPairing->edgePosition - pairing->edgePosition, prevPairing->edgePosition - pairing->edgePosition
+			));
 
 			HalfEdgeFace* face = new HalfEdgeFace(pairing, faceNormal);
 
@@ -691,7 +754,9 @@ namespace rythe::physics
 		initialPairing->setPairingEdge(pairingToConnectTo);
 	}
 
-	bool PhysicsStatics::foundFaceWithOutsideVert(std::list<ColliderFaceToVert>& facesWithOutsideVerts, PointerEncapsulator<ColliderFaceToVert>& outChosenFace)
+	bool PhysicsStatics::foundFaceWithOutsideVert(
+		std::list<ColliderFaceToVert>& facesWithOutsideVerts, PointerEncapsulator<ColliderFaceToVert>& outChosenFace
+	)
 	{
 		for (auto& faceWithOutsideVert : facesWithOutsideVerts)
 		{
@@ -705,7 +770,9 @@ namespace rythe::physics
 		return false;
 	}
 
-	void PhysicsStatics::partitionVerticesToList(const std::vector<rsl::math::float3> vertices, std::list<ColliderFaceToVert>& outFacesWithOutsideVerts)
+	void PhysicsStatics::partitionVerticesToList(
+		const std::vector<rsl::math::float3> vertices, std::list<ColliderFaceToVert>& outFacesWithOutsideVerts
+	)
 	{
 		for (const rsl::math::float3& vertex : vertices)
 		{
@@ -732,7 +799,10 @@ namespace rythe::physics
 		}
 	}
 
-	void PhysicsStatics::findHorizonEdgesFromFaces(const rsl::math::float3& eyePoint, std::vector<HalfEdgeFace*>& faces, std::vector<HalfEdgeEdge*>& outHorizonEdges, float scalingEpsilon)
+	void PhysicsStatics::findHorizonEdgesFromFaces(
+		const rsl::math::float3& eyePoint, std::vector<HalfEdgeFace*>& faces,
+		std::vector<HalfEdgeEdge*>& outHorizonEdges, float scalingEpsilon
+	)
 	{
 		//[1] Find first horizon edge
 		HalfEdgeEdge* initialHorizon = nullptr;
@@ -785,7 +855,9 @@ namespace rythe::physics
 		} while (currentEdge != initialHorizon);
 	}
 
-	void PhysicsStatics::mergeVertexToHull(const rsl::math::float3& eyePoint, std::list<ColliderFaceToVert>& facesWithOutsideVerts, float scalingEpsilon)
+	void PhysicsStatics::mergeVertexToHull(
+		const rsl::math::float3& eyePoint, std::list<ColliderFaceToVert>& facesWithOutsideVerts, float scalingEpsilon
+	)
 	{
 		//[1] identify faces that can see the 'eyePoint' and remove them from list
 		//[2] Find the horizon edges. These are the edges that neighbor a face that can see the eyePoint
@@ -868,8 +940,7 @@ namespace rythe::physics
 				std::vector<HalfEdgeEdge*> faceEdges;
 				faceEdges.reserve(3);
 
-				auto edgeCollect = [&faceEdges](HalfEdgeEdge* edge)
-				{ faceEdges.push_back(edge); };
+				auto edgeCollect = [&faceEdges](HalfEdgeEdge* edge) { faceEdges.push_back(edge); };
 
 				listIter->face->forEachEdge(edgeCollect);
 
@@ -880,7 +951,8 @@ namespace rythe::physics
 
 					rsl::math::float3 newNormal;
 
-					if (isNewellFacesCoplanar(currentFace, pairingEdge->face, edge, scalingEpsilon, newNormal, 1) || isFacesConcave(edge->face, pairingEdge->face))
+					if (isNewellFacesCoplanar(currentFace, pairingEdge->face, edge, scalingEpsilon, newNormal, 1) ||
+						isFacesConcave(edge->face, pairingEdge->face))
 					{
 						edge->suicidalMergeWithPairing(unmergedVertices, newNormal, scalingEpsilon);
 
@@ -892,8 +964,8 @@ namespace rythe::physics
 						HalfEdgeEdge* pairing = edge->pairingEdge;
 						HalfEdgeEdge* nextPairing = edge->nextEdge->pairingEdge;
 
-						// if this face a pair of adjacent edges that connect with the same face but they are not coplanar,
-						// we essentially 'extend' the first edge and delete the other. We do the opposite for
+						// if this face a pair of adjacent edges that connect with the same face but they are not
+						// coplanar, we essentially 'extend' the first edge and delete the other. We do the opposite for
 						// its neighboring edge pair
 						if (pairing->face == nextPairing->face)
 						{
@@ -960,7 +1032,10 @@ namespace rythe::physics
 		return dotResult > 0.0;
 	}
 
-	bool PhysicsStatics::isNewellFacesCoplanar(HalfEdgeFace* first, HalfEdgeFace* second, HalfEdgeEdge* connectingEdge, float scalingEpsilon, rsl::math::float3& outNormal, int skipCount)
+	bool PhysicsStatics::isNewellFacesCoplanar(
+		HalfEdgeFace* first, HalfEdgeFace* second, HalfEdgeEdge* connectingEdge, float scalingEpsilon,
+		rsl::math::float3& outNormal, int skipCount
+	)
 	{
 		// each face will at least have 3 vertices
 		std::vector<rsl::math::float3> NewellPolygon;
@@ -981,9 +1056,7 @@ namespace rythe::physics
 		}
 
 		auto collectVerticesOfFace = [&NewellPolygon](HalfEdgeEdge* edge)
-		{
-			NewellPolygon.emplace_back(edge->edgePosition);
-		};
+		{ NewellPolygon.emplace_back(edge->edgePosition); };
 
 		first->forEachEdge(collectVerticesOfFace);
 		NewellPolygon.pop_back();

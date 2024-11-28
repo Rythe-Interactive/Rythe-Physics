@@ -6,7 +6,10 @@
 
 namespace rythe::physics
 {
-	ConvexConvexPenetrationQuery::ConvexConvexPenetrationQuery(HalfEdgeFace* pRefFace, HalfEdgeFace* pIncFace, rsl::math::float3& pFaceCentroid, rsl::math::float3& pNormal, float pPenetration, bool pIsARef)
+	ConvexConvexPenetrationQuery::ConvexConvexPenetrationQuery(
+		HalfEdgeFace* pRefFace, HalfEdgeFace* pIncFace, rsl::math::float3& pFaceCentroid, rsl::math::float3& pNormal,
+		float pPenetration, bool pIsARef
+	)
 		: PenetrationQuery(pFaceCentroid, pNormal, pPenetration, pIsARef),
 		  refFace(pRefFace),
 		  incFace(pIncFace)
@@ -14,12 +17,16 @@ namespace rythe::physics
 		debugID = "ConvexConvexPenetrationQuery";
 	}
 
-	void ConvexConvexPenetrationQuery::populateContactList(physics_manifold& manifold, math::float4x4& refTransform, math::float4x4 incTransform, PhysicsCollider* refCollider)
+	void ConvexConvexPenetrationQuery::populateContactList(
+		physics_manifold& manifold, math::float4x4& refTransform, math::float4x4 incTransform,
+		PhysicsCollider* refCollider
+	)
 	{
 		auto incCollider = isARef ? manifold.colliderB : manifold.colliderA;
 		float largestDotResult = std::numeric_limits<float>::lowest();
 
-		//------------------------------- find face that is touching refFace -------------------------------------------------//
+		//------------------------------- find face that is touching refFace
+		//-------------------------------------------------//
 
 		for (auto face : incCollider->GetHalfEdgeFaces())
 		{
@@ -32,7 +39,8 @@ namespace rythe::physics
 			}
 		}
 
-		//------------------------------- get all world vertex positions in incFace -------------------------------------------------//
+		//------------------------------- get all world vertex positions in incFace
+		//-------------------------------------------------//
 		std::vector<ContactVertex> outputContactPoints;
 
 		bool facePartiallyBelowPlane = false;
@@ -47,7 +55,8 @@ namespace rythe::physics
 
 		incFace->forEachEdge(sendToInitialOutput);
 
-		//------------------------------- clip vertices with faces that are the neighbors of refFace  ---------------------------------//
+		//------------------------------- clip vertices with faces that are the neighbors of refFace
+		//---------------------------------//
 		auto clipNeigboringFaceWithOutput = [&refTransform, &outputContactPoints](HalfEdgeEdge* edge)
 		{
 			HalfEdgeFace* neighborFace = edge->pairingEdge->face;
@@ -58,14 +67,17 @@ namespace rythe::physics
 			outputContactPoints.clear();
 
 
-			PhysicsStatics::SutherlandHodgmanFaceClip(planeNormal, planePosition, inputContactList, outputContactPoints, edge);
+			PhysicsStatics::SutherlandHodgmanFaceClip(
+				planeNormal, planePosition, inputContactList, outputContactPoints, edge
+			);
 		};
 
 		refFace->forEachEdge(clipNeigboringFaceWithOutput);
 
 		for (const auto& incidentContact : outputContactPoints)
 		{
-			float distanceToCollisionPlane = PhysicsStatics::PointDistanceToPlane(normal, faceCentroid, incidentContact.position);
+			float distanceToCollisionPlane =
+				PhysicsStatics::PointDistanceToPlane(normal, faceCentroid, incidentContact.position);
 
 			if (distanceToCollisionPlane < constants::contactOffset)
 			{

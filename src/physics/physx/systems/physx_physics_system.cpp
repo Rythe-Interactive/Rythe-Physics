@@ -17,7 +17,9 @@ namespace rythe::physics
 	static void debugDrawPhysXScene(PxScene* sceneToDraw)
 	{
 		if (!shouldDebugDraw)
+		{
 			return;
+		}
 
 		const PxRenderBuffer& rb = sceneToDraw->getRenderBuffer();
 		for (PxU32 i = 0; i < rb.getNbLines(); i++)
@@ -69,16 +71,10 @@ namespace rythe::physics
 		{
 			switch (mode)
 			{
-				case transport_mode::pvd_network:
-					initializePVDDebugger(foundation);
-					break;
-				case transport_mode::file_output:
-					initializeFileDebugger(foundation);
-					break;
-				case transport_mode::none:
-					break;
-				default:
-					break;
+				case transport_mode::pvd_network: initializePVDDebugger(foundation); break;
+				case transport_mode::file_output: initializeFileDebugger(foundation); break;
+				case transport_mode::none: break;
+				default: break;
 			}
 		}
 
@@ -118,7 +114,8 @@ namespace rythe::physics
 			{
 				m_isDebuggerInit = true;
 				m_pvd = PxCreatePvd(*foundation);
-				m_transport = PxDefaultPvdSocketTransportCreate(pvdHost, defaultPVDListeningPort, defaultPVDHostTimeout);
+				m_transport =
+					PxDefaultPvdSocketTransportCreate(pvdHost, defaultPVDListeningPort, defaultPVDHostTimeout);
 			}
 			else
 			{
@@ -168,13 +165,14 @@ namespace rythe::physics
 
 		bindEventsToEventProcessors();
 
-		bindToEvent<events::component_destruction<physics_component>, &PhysXPhysicsSystem::markPhysicsWrapperPendingRemove>();
+		bindToEvent<
+			events::component_destruction<physics_component>, &PhysXPhysicsSystem::markPhysicsWrapperPendingRemove>();
 		bindToEvent<request_create_physics_material, &PhysXPhysicsSystem::onRequestCreatePhysicsMaterial>();
 
-		PhysicsComponentData::setConvexGeneratorDelegate([this](const std::vector<rsl::math::float3>& vertices) -> void*
-		{
-			return physxGenerateConvexMesh(vertices);
-		});
+		PhysicsComponentData::setConvexGeneratorDelegate(
+			[this](const std::vector<rsl::math::float3>& vertices) -> void*
+		{ return physxGenerateConvexMesh(vertices); }
+		);
 
 		// debugging related
 		bindToEvent<request_flip_physics_continuous, &PhysXPhysicsSystem::flipPhysicsContinuousState>();
@@ -209,13 +207,15 @@ namespace rythe::physics
 		convexDesc.points.count = vertices.size();
 		convexDesc.points.stride = sizeof(rsl::math::float3);
 		convexDesc.points.data = vertices.data();
-		convexDesc.flags =
-			PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eDISABLE_MESH_VALIDATION | PxConvexFlag::eFAST_INERTIA_COMPUTATION;
+		convexDesc.flags = PxConvexFlag::eCOMPUTE_CONVEX | PxConvexFlag::eDISABLE_MESH_VALIDATION |
+						   PxConvexFlag::eFAST_INERTIA_COMPUTATION;
 		convexDesc.vertexLimit = convexHullVertexLimit;
 
 		PxDefaultMemoryOutputStream buf;
 		if (!PS::cooking->cookConvexMesh(convexDesc, buf))
+		{
 			return nullptr;
+		}
 
 		PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
 		auto convex = PS::physxSDK->createConvexMesh(input);
@@ -352,7 +352,10 @@ namespace rythe::physics
 
 	void PhysXPhysicsSystem::onRequestCreatePhysicsMaterial(request_create_physics_material& physicsMaterialRequest)
 	{
-		physx::PxMaterial* material = PS::physxSDK->createMaterial(physicsMaterialRequest.newStaticFriction, physicsMaterialRequest.newDynamicFriction, physicsMaterialRequest.newRestitution);
+		physx::PxMaterial* material = PS::physxSDK->createMaterial(
+			physicsMaterialRequest.newStaticFriction, physicsMaterialRequest.newDynamicFriction,
+			physicsMaterialRequest.newRestitution
+		);
 
 		m_physicsMaterials.insert({physicsMaterialRequest.newMaterialHash, material});
 	}
@@ -409,7 +412,8 @@ namespace rythe::physics
 		for (auto entity : physicsAndRigidbodyComponentFilter)
 		{
 			auto& physComp = *entity.get_component<physics_component>();
-			pointer<PhysxInternalWrapper> physxWrapperPtr = m_physxWrapperContainer.findWrapperWithID(physComp.physicsComponentID);
+			pointer<PhysxInternalWrapper> physxWrapperPtr =
+				m_physxWrapperContainer.findWrapperWithID(physComp.physicsComponentID);
 
 			if (!physxWrapperPtr)
 			{
@@ -505,7 +509,8 @@ namespace rythe::physics
 			physics_component& phyComp = *ent.get_component<physics_component>();
 			rigidbody& rbComp = *ent.get_component<rigidbody>();
 
-			pointer<PhysxInternalWrapper> physxWrapper = m_physxWrapperContainer.findWrapperWithID(phyComp.physicsComponentID);
+			pointer<PhysxInternalWrapper> physxWrapper =
+				m_physxWrapperContainer.findWrapperWithID(phyComp.physicsComponentID);
 
 			if (physxWrapper)
 			{
@@ -561,7 +566,9 @@ namespace rythe::physics
 		}
 	}
 
-	void PhysXPhysicsSystem::instantiateCharacterController(ecs::entity ent, const CapsuleControllerData& capsuleData, PhysxCharacterWrapper& outCharacterWrapper)
+	void PhysXPhysicsSystem::instantiateCharacterController(
+		ecs::entity ent, const CapsuleControllerData& capsuleData, PhysxCharacterWrapper& outCharacterWrapper
+	)
 	{
 		const rsl::math::float3& pos = ent.get_component<position>();
 
@@ -585,7 +592,9 @@ namespace rythe::physics
 		// initialize controller hit callbacks based on presets
 		if (auto readOnlyPreset = capsuleData.getPreset<rigidbody_force_feedback>())
 		{
-			outCharacterWrapper.controllerFeedback->setShapeHitDelegate(initializeDefaultRigidbodyToCharacterResponse(readOnlyPreset->forceAmount, readOnlyPreset->massMaximum));
+			outCharacterWrapper.controllerFeedback->setShapeHitDelegate(
+				initializeDefaultRigidbodyToCharacterResponse(readOnlyPreset->forceAmount, readOnlyPreset->massMaximum)
+			);
 		}
 
 		// create controller using desc
@@ -594,7 +603,8 @@ namespace rythe::physics
 		controller->setUserData(ent.data);
 	}
 
-	rsl::delegate<void(const PxControllerShapeHit&)> PhysXPhysicsSystem::initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum)
+	rsl::delegate<void(const PxControllerShapeHit&)>
+	PhysXPhysicsSystem::initializeDefaultRigidbodyToCharacterResponse(float forceAmount, float massMaximum)
 	{
 		float force = forceAmount;
 		float massMax = massMaximum;
@@ -608,7 +618,9 @@ namespace rythe::physics
 			{
 				bool bisKinematic = rigidbody->getRigidBodyFlags() & PxRigidBodyFlag::eKINEMATIC;
 				if (bisKinematic)
+				{
 					return;
+				}
 
 				const PxVec3 upVector = hit.controller->getUpDirection();
 				const PxF32 dp = hit.dir.dot(upVector);
@@ -632,11 +644,15 @@ namespace rythe::physics
 		};
 	}
 
-	void PhysXPhysicsSystem::processPhysicsComponentEvents(ecs::entity ent, physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo)
+	void PhysXPhysicsSystem::processPhysicsComponentEvents(
+		ecs::entity ent, physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo
+	)
 	{
-		const std::bitset<physics_component_flag::pc_max>& eventsGenerated = physicsComponentToProcess.physicsCompData.getGeneratedModifyEvents();
+		const std::bitset<physics_component_flag::pc_max>& eventsGenerated =
+			physicsComponentToProcess.physicsCompData.getGeneratedModifyEvents();
 
-		core::pointer<PhysxInternalWrapper> wrapperPtr = m_physxWrapperContainer.findWrapperWithID(physicsComponentToProcess.physicsComponentID);
+		core::pointer<PhysxInternalWrapper> wrapperPtr =
+			m_physxWrapperContainer.findWrapperWithID(physicsComponentToProcess.physicsComponentID);
 
 		if (!wrapperPtr)
 		{
@@ -647,14 +663,19 @@ namespace rythe::physics
 		{
 			if (eventsGenerated.test(bitPos))
 			{
-				m_physicsComponentActionFuncs[bitPos].invoke(physicsComponentToProcess, physicsEnviromentInfo, *wrapperPtr, ent);
+				m_physicsComponentActionFuncs[bitPos].invoke(
+					physicsComponentToProcess, physicsEnviromentInfo, *wrapperPtr, ent
+				);
 			}
 		}
 
 		physicsComponentToProcess.physicsCompData.resetModificationFlags();
 	}
 
-	void PhysXPhysicsSystem::processRigidbodyComponentEvents(ecs::entity ent, rigidbody& rigidbody, physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo)
+	void PhysXPhysicsSystem::processRigidbodyComponentEvents(
+		ecs::entity ent, rigidbody& rigidbody, physics_component& physicsComponentToProcess,
+		const PhysxEnviromentInfo& physicsEnviromentInfo
+	)
 	{
 		rsl::size_type physicsComponentID = physicsComponentToProcess.physicsComponentID;
 		auto& eventsGenerated = rigidbody.data.getGeneratedModifyEvents();
@@ -677,7 +698,9 @@ namespace rythe::physics
 		rigidbody.data.resetModificationFlags();
 	}
 
-	void PhysXPhysicsSystem::processColliderModificationEvents(physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo)
+	void PhysXPhysicsSystem::processColliderModificationEvents(
+		physics_component& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo
+	)
 	{
 		rsl::size_type physicsComponentID = physicsComponentToProcess.physicsComponentID;
 		pointer<PhysxInternalWrapper> wrapperPtr = m_physxWrapperContainer.findWrapperWithID(physicsComponentID);
@@ -689,7 +712,9 @@ namespace rythe::physics
 		for (const collider_modification_data& modData : colliderModifyEvents)
 		{
 			const ColliderData& collider = colliders[modData.colliderIndex];
-			m_colliderActionFuncs[modData.modificationType].invoke(collider, modData, physicsEnviromentInfo, *wrapperPtr);
+			m_colliderActionFuncs[modData.modificationType].invoke(
+				collider, modData, physicsEnviromentInfo, *wrapperPtr
+			);
 		}
 
 		physicsComponentToProcess.physicsCompData.resetColliderModificationFlags();
@@ -716,7 +741,9 @@ namespace rythe::physics
 		capsule.data.resetModificationFlags();
 	}
 
-	void PhysXPhysicsSystem::processPhysicsEnviromentEvents(ecs::entity ent, physics_enviroment& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo)
+	void PhysXPhysicsSystem::processPhysicsEnviromentEvents(
+		ecs::entity ent, physics_enviroment& physicsComponentToProcess, const PhysxEnviromentInfo& physicsEnviromentInfo
+	)
 	{
 		rsl::size_type enviromentID = physicsComponentToProcess.physicsEnviromentID;
 		auto& eventsGenerated = physicsComponentToProcess.data.getGeneratedModifyEvents();
@@ -732,7 +759,9 @@ namespace rythe::physics
 		{
 			if (eventsGenerated.test(bitPos))
 			{
-				m_enviromentComponentActionFuncs[bitPos].invoke(physicsComponentToProcess, physicsEnviromentInfo, *wrapperPtr, ent);
+				m_enviromentComponentActionFuncs[bitPos].invoke(
+					physicsComponentToProcess, physicsEnviromentInfo, *wrapperPtr, ent
+				);
 			}
 		}
 

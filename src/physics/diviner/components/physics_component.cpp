@@ -16,7 +16,8 @@ namespace rythe::physics::diviner
 		localCenterOfMass /= static_cast<float>(colliders.size());
 	}
 
-	std::shared_ptr<ConvexCollider> physics_component::constructConvexHullFromVertices(const std::vector<rsl::math::float3>& vertices)
+	std::shared_ptr<ConvexCollider>
+	physics_component::constructConvexHullFromVertices(const std::vector<rsl::math::float3>& vertices)
 	{
 		auto collider = PhysicsStatics::generateConvexHull(vertices);
 

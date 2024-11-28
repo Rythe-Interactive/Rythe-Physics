@@ -49,15 +49,20 @@ namespace rythe::physics
 			return *this;
 		}
 
-		rythe_always_inline void addBoxCollider(const rsl::math::float3& extents, const rsl::math::float3& offset, const rsl::math::quat& rotation)
+		rythe_always_inline void addBoxCollider(
+			const rsl::math::float3& extents, const rsl::math::float3& offset, const rsl::math::quat& rotation
+		)
 		{
 			if (extents.x == 0.0f || extents.y == 0.0f || extents.z == 0.0f)
 			{
-				log::warn("PhysicsComponentData::addBoxCollider called with parameter 'extents' having an x,y, or z value equal to zero");
+				log::warn("PhysicsComponentData::addBoxCollider called with parameter 'extents' having an x,y, or z "
+						  "value equal to zero");
 				return;
 			}
 
-			m_colliders.push_back(ColliderData(m_colliderCount, {&m_colliderModificationRequests}, collider_type::box, offset, rotation));
+			m_colliders.push_back(
+				ColliderData(m_colliderCount, {&m_colliderModificationRequests}, collider_type::box, offset, rotation)
+			);
 			m_colliders[m_colliderCount].setColliderToBoxCollider(extents * boxExtentSizeMultiplier);
 
 			updateColliderRecords(physics_component_flag::pc_add_first_box, physics_component_flag::pc_add_next_box);
@@ -68,16 +73,24 @@ namespace rythe::physics
 			addBoxCollider(extents, rsl::math::float3(0.0f), math::identity<rsl::math::quat>());
 		}
 
-		void addConvexCollider(const std::vector<rsl::math::float3>& vertices, const rsl::math::float3& offset, const rsl::math::quat& rotation)
+		void addConvexCollider(
+			const std::vector<rsl::math::float3>& vertices, const rsl::math::float3& offset,
+			const rsl::math::quat& rotation
+		)
 		{
 			// convex colliders depend on an external vertex array, needs to be handled immediately
 			void* convexColliderPtr = m_generateConvexColliderFunc(vertices);
 
 			if (convexColliderPtr)
 			{
-				m_colliders.push_back(ColliderData(m_colliderCount, {&m_colliderModificationRequests}, collider_type::quickhull_convex, offset, rotation));
+				m_colliders.push_back(ColliderData(
+					m_colliderCount, {&m_colliderModificationRequests}, collider_type::quickhull_convex, offset,
+					rotation
+				));
 				m_colliders[m_colliderCount].setColliderToConvexCollider(convexColliderPtr);
-				updateColliderRecords(physics_component_flag::pc_add_first_convex, physics_component_flag::pc_add_next_convex);
+				updateColliderRecords(
+					physics_component_flag::pc_add_first_convex, physics_component_flag::pc_add_next_convex
+				);
 			}
 			else
 			{
@@ -85,7 +98,8 @@ namespace rythe::physics
 			}
 		}
 
-		rythe_always_inline void addSphereCollider(float radius, const rsl::math::float3& offset = rsl::math::float3(0.0f))
+		rythe_always_inline void
+		addSphereCollider(float radius, const rsl::math::float3& offset = rsl::math::float3(0.0f))
 		{
 			if (radius == 0.0f)
 			{
@@ -93,22 +107,25 @@ namespace rythe::physics
 				return;
 			}
 
-			m_colliders.push_back(ColliderData(m_colliderCount, {&m_colliderModificationRequests}, collider_type::sphere, offset, math::identity<rsl::math::quat>()));
+			m_colliders.push_back(ColliderData(
+				m_colliderCount, {&m_colliderModificationRequests}, collider_type::sphere, offset,
+				math::identity<rsl::math::quat>()
+			));
 			m_colliders[m_colliderCount].setColliderToSphereCollider(radius);
-			updateColliderRecords(physics_component_flag::pc_add_first_sphere, physics_component_flag::pc_add_next_sphere);
+			updateColliderRecords(
+				physics_component_flag::pc_add_first_sphere, physics_component_flag::pc_add_next_sphere
+			);
 		}
 
-		rythe_always_inline std::vector<ColliderData>& getColliders() noexcept
-		{
-			return m_colliders;
-		}
+		rythe_always_inline std::vector<ColliderData>& getColliders() noexcept { return m_colliders; }
 
 		rythe_always_inline const std::bitset<physics_component_flag::pc_max>& getGeneratedModifyEvents() const noexcept
 		{
 			return m_modificationFlags;
 		};
 
-		rythe_always_inline const std::vector<collider_modification_data>& getGeneratedColliderModifyEvents() const noexcept
+		rythe_always_inline const std::vector<collider_modification_data>&
+		getGeneratedColliderModifyEvents() const noexcept
 		{
 			return m_colliderModificationRequests;
 		};
@@ -123,9 +140,12 @@ namespace rythe::physics
 		}
 
 	private:
-		rythe_always_inline void updateColliderRecords(physics_component_flag firstColliderFlag, physics_component_flag nextColliderFlag) noexcept
+		rythe_always_inline void updateColliderRecords(
+			physics_component_flag firstColliderFlag, physics_component_flag nextColliderFlag
+		) noexcept
 		{
-			m_colliderCount == 0 ? m_modificationFlags.set(firstColliderFlag) : m_modificationFlags.set(nextColliderFlag);
+			m_colliderCount == 0 ? m_modificationFlags.set(firstColliderFlag)
+								 : m_modificationFlags.set(nextColliderFlag);
 
 			m_colliderCount++;
 		}
@@ -136,7 +156,9 @@ namespace rythe::physics
 		inline static GenerateConvexDelegate m_generateConvexColliderFunc =
 			[](const std::vector<rsl::math::float3>& vertices) -> void*
 		{
-			log::warn("convex collider not generated because PhysicsComponentData::m_generateConvexColliderFunc not set ");
+			log::warn(
+				"convex collider not generated because PhysicsComponentData::m_generateConvexColliderFunc not set "
+			);
 			return nullptr;
 		};
 
