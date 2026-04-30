@@ -27,7 +27,7 @@ namespace rythe::physics
 
 		virtual void setup();
 
-		void fixedUpdate(rsl::time_span<rsl::fast_time> deltaTime)
+		void fixedUpdate(rsl::time_span deltaTime)
 		{
 			ecs::component_container<diviner::rigidbody> rigidbodies;
 			std::vector<rsl::byte> hasRigidBodies;
